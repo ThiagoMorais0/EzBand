@@ -18,4 +18,9 @@ public class BandaServiceImpl implements BandaService {
     public List<Banda> buscarBandasPorUsuario(Long idUsuario) {
         return bandaDao.buscarBandasPorUsuario(idUsuario).orElse(new ArrayList<Banda>());
     }
+
+    @Override
+    public List<Banda> buscarParticipacoesEspeciais(Long idUsuario) {
+        return bandaDao.buscarParticipacoesEspeciais(idUsuario).orElse(new ArrayList<Banda>());
+    }
 }

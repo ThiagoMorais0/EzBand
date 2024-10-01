@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.beans.BeanUtils;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Getter
@@ -25,7 +26,7 @@ public class NotificacaoShowDTO extends NotificacaoDTO {
     private BandaDTO banda;
     private ShowDTO show;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy", locale = "pt-BR", timezone = "Brazil/East")
-    private Date dataEvento;
+    private LocalDate dataEvento;
 
     public NotificacaoShowDTO(NotificacaoShow notificacaoShow){
         BeanUtils.copyProperties(notificacaoShow, this);

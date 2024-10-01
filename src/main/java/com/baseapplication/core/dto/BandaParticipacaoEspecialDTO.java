@@ -1,26 +1,12 @@
-package com.baseapplication.core.model.dto;
+package com.baseapplication.core.dto;
 
-import com.baseapplication.core.dto.InfoPerfilUsuarioDTO;
 import com.baseapplication.core.model.Banda;
-import com.baseapplication.core.model.embedded.ParametrosBanda;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import lombok.Getter;
-import lombok.Setter;
 import org.springframework.beans.BeanUtils;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
 
-@Getter
-@Setter
-public class BandaDTO {
+public class BandaParticipacaoEspecialDTO {
     private Long id;
     private String nome;
     private String descricao;
@@ -34,11 +20,9 @@ public class BandaDTO {
     private Integer quantidadeShows;
     private Integer quantidadeEnsaios;
     private Integer quantidadeNotificacoes;
-    private Integer quantidadeDeMembros;
-    private List<InfoPerfilUsuarioDTO> membros;
 
 
-    public BandaDTO(Banda banda){
+    public BandaParticipacaoEspecialDTO(Banda banda){
         BeanUtils.copyProperties(banda, this);
         this.permiteEntradaPorConvite = banda.getParametros().getPermiteEntradaPorConvite();
         this.exigirAprovacaoCompromissos = banda.getParametros().getExigirAprovacaoCompromissos();
@@ -46,7 +30,5 @@ public class BandaDTO {
         this.quantidadeShows = banda.getShows().size();
         this.quantidadeEnsaios = banda.getEnsaios().size();
         this.quantidadeNotificacoes = banda.getNotificacaoShows().size() + banda.getNotificacaoEnsaios().size();
-        this.quantidadeDeMembros = banda.getMusicos().size();
-        this.membros = banda.getUsuariosMusicos().stream().map(InfoPerfilUsuarioDTO::new).collect(Collectors.toList());
     }
 }

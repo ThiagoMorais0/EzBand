@@ -8,9 +8,11 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "usuario")
@@ -29,11 +31,17 @@ public class Usuario implements UserDetails {
     private String email;
     private String celular;
     private String senha;
-    private Date dataCriacao;
+    private LocalDate dataCriacao;
     private Boolean ativo;
     private Boolean bloqueado;
     private PermissaoUsuario permissao;
     private String urlFotoPerfil;
+    @OneToMany(mappedBy = "id.idUsuario", fetch = FetchType.LAZY)
+    private List<MusicoBanda> musicoBandaList;
+
+    public List<Banda> getBandas(){
+        return musicoBandaList.stream().map(MusicoBanda::getBanda).collect(Collectors.toList());
+    }
 
     public Usuario(CadastroDTO data){
         this.login = data.getLogin();
@@ -43,7 +51,7 @@ public class Usuario implements UserDetails {
         this.permissao = PermissaoUsuario.USUARIO;
         this.ativo = true;
         this.bloqueado = false;
-        this.dataCriacao = new Date();
+        this.dataCriacao = LocalDate.now();
     }
 
     @Override

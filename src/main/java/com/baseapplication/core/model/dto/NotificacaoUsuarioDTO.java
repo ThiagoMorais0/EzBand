@@ -10,8 +10,6 @@ import org.springframework.beans.BeanUtils;
 
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 public class NotificacaoUsuarioDTO extends NotificacaoDTO {
 
     public NotificacaoUsuarioDTO(Notificacao notificacao){

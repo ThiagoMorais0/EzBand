@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Data
@@ -18,7 +19,7 @@ public class NotificacaoEnsaio extends Notificacao {
     @OneToOne
     @JoinColumn(name = "id_ensaio")
     private Ensaio ensaio;
-    private Date dataEnsaio;
+    private LocalDate dataEnsaio;
 
 
 }

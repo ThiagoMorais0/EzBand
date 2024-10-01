@@ -16,6 +16,7 @@ import jakarta.persistence.Id;
 import org.aspectj.weaver.ast.Not;
 import org.springframework.beans.BeanUtils;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 public class NotificacaoDTO {
@@ -24,7 +25,7 @@ public class NotificacaoDTO {
     private Long remetente;
     private String mensagem;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy", locale = "pt-BR", timezone = "Brazil/East")
-    private Date data;
+    private LocalDate data;
 
     public NotificacaoDTO toDTO(Notificacao notificacao) {
         if (notificacao instanceof NotificacaoShow) {

@@ -1,10 +1,12 @@
 package com.baseapplication.core.model.dto;
 
+import com.baseapplication.core.model.Show;
 import com.baseapplication.core.model.dto.superClasses.EventoDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.beans.BeanUtils;
 
 import java.math.BigDecimal;
 import java.sql.Time;
@@ -17,4 +19,8 @@ public class ShowDTO extends EventoDTO {
     private BigDecimal valorContrato;
     private Boolean isPortaria;
     private Integer porcentagemPortaria;
+
+    public ShowDTO(Show show){
+        BeanUtils.copyProperties(show, this);
+    }
 }

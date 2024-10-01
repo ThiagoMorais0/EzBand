@@ -16,4 +16,14 @@ public class MusicoBanda {
     private String instrumentos;
     @Enumerated(EnumType.STRING)
     private PermissaoMusico permissao;
+
+    @ManyToOne
+    @MapsId("idUsuario")
+    @JoinColumn(name = "ID_USUARIO")
+    private Usuario usuario;
+
+    @ManyToOne
+    @MapsId("idBanda")
+    @JoinColumn(name = "ID_BANDA")
+    private Banda banda;
 }

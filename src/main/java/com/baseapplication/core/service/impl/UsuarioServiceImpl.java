@@ -1,6 +1,8 @@
 package com.baseapplication.core.service.impl;
 
 import com.baseapplication.core.dao.UsuarioDao;
+import com.baseapplication.core.dto.BandaParticipacaoEspecialDTO;
+import com.baseapplication.core.dto.EventosSeparadosDTO;
 import com.baseapplication.core.dto.InfoUsuarioDTO;
 import com.baseapplication.core.dto.InfoUsuarioPainelDTO;
 import com.baseapplication.core.model.Banda;
@@ -57,22 +59,16 @@ public class UsuarioServiceImpl implements UsuarioService {
         try{
             CompletableFuture<List<BandaDTO>> bandasFuture = buscarBandasDoUsuarioAsync(idUsuario);
             CompletableFuture<List<NotificacaoDTO>> notificacoesFuture = buscarNotificacoesAsync(idUsuario);
-            CompletableFuture<List<Banda>> participacoesEspeciaisFuture = buscarParticipacoesEspeciaisAsync(idUsuario);
-            CompletableFuture<List<Evento>> proximosEventosFuture = buscarProximosEventosAsync(idUsuario);
-            CompletableFuture<InfoUsuarioDTO> infoPerfilUsuarioFuture = buscarInfoPerfilUsuarioAsync(idUsuario);
+            CompletableFuture<List<BandaParticipacaoEspecialDTO>> participacoesEspeciaisFuture = buscarParticipacoesEspeciaisAsync(idUsuario);
+            CompletableFuture<EventosSeparadosDTO> proximosEventosFuture = buscarProximosEventosAsync(idUsuario);
 
-            CompletableFuture.allOf(bandasFuture, notificacoesFuture, participacoesEspeciaisFuture, proximosEventosFuture, infoPerfilUsuarioFuture).join();
-
-            assert participacoesEspeciaisFuture != null;
-            assert proximosEventosFuture != null;
-            assert infoPerfilUsuarioFuture != null;
+            CompletableFuture.allOf(bandasFuture, notificacoesFuture, participacoesEspeciaisFuture, proximosEventosFuture).join();
 
             return new InfoUsuarioPainelDTO(
                     bandasFuture.get(),
                     notificacoesFuture.get(),
                     participacoesEspeciaisFuture.get(),
-                    proximosEventosFuture.get(),
-                    infoPerfilUsuarioFuture.get());
+                    proximosEventosFuture.get());
 
         } catch (ExecutionException | InterruptedException e) {
             throw new RuntimeException(e);
@@ -82,16 +78,14 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     }
 
-    private CompletableFuture<InfoUsuarioDTO> buscarInfoPerfilUsuarioAsync(Long idUsuario) {
-        return null;
+    private CompletableFuture<EventosSeparadosDTO> buscarProximosEventosAsync(Long idUsuario) {
+        return CompletableFuture.supplyAsync(() ->
+                eventoService.buscarPendentesPorUsuarioOrdenadoPorData(idUsuario));
     }
 
-    private CompletableFuture<List<Evento>> buscarProximosEventosAsync(Long idUsuario) {
-        return null;
-    }
-
-    private CompletableFuture<List<Banda>> buscarParticipacoesEspeciaisAsync(Long idUsuario) {
-        return null;
+    private CompletableFuture<List<BandaParticipacaoEspecialDTO>> buscarParticipacoesEspeciaisAsync(Long idUsuario) {
+        return CompletableFuture.supplyAsync(() ->
+                bandaService.buscarParticipacoesEspeciais(idUsuario).stream().map(BandaParticipacaoEspecialDTO::new).toList());
     }
 
     private CompletableFuture<List<NotificacaoDTO>> buscarNotificacoesAsync(Long idUsuario) {

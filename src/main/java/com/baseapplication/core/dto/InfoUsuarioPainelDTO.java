@@ -19,7 +19,6 @@ import java.util.List;
 public class InfoUsuarioPainelDTO {
     List<BandaDTO> bandas;
     List<NotificacaoDTO> notificacoes;
-    List<Banda> participacoesEspeciais;
-    List<Evento> proximosEventos;
-    InfoUsuarioDTO infoPerfilUsuario;
+    List<BandaParticipacaoEspecialDTO> participacoesEspeciais;
+    EventosSeparadosDTO proximosEventos;
 }

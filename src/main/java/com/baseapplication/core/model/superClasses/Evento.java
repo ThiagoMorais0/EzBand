@@ -2,23 +2,33 @@ package com.baseapplication.core.model.superClasses;
 
 import com.baseapplication.core.enums.StatusEvento;
 import com.baseapplication.core.enums.TipoEvento;
+import com.baseapplication.core.model.Banda;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.sql.Time;
+import java.time.LocalDate;
 import java.util.Date;
 
+
 @MappedSuperclass
+@Getter
+@Setter
 public abstract class Evento {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long idBanda;
+
+    @ManyToOne
+    @JoinColumn(name = "id_banda")
+    private Banda banda;
     @Column(name = "DATA_INCLUSAO")
     @DateTimeFormat(pattern = "dd/MM/yyyy")
-    private Date dataInclusao;
+    private LocalDate dataInclusao;
     @DateTimeFormat(pattern = "dd/MM/yyyy")
-    private Date data;
+    private LocalDate data;
     private Time duracao;
     private Time horarioInicio;
     private String local;
@@ -26,6 +36,8 @@ public abstract class Evento {
     private String observacoes;
     @Enumerated(EnumType.STRING)
     private StatusEvento status;
+    @Enumerated(EnumType.STRING)
+
     private TipoEvento evento;
 
 }

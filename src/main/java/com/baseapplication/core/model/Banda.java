@@ -6,7 +6,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.LocalDate;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
@@ -21,8 +24,25 @@ public class Banda {
     private String descricao;
     private String categoria;
     @DateTimeFormat(pattern = "dd/MM/yyyy")
-    private Date dataInclusao;
+    private LocalDate dataInclusao;
     private String urlLogo;
+    @OneToMany(mappedBy = "id.idBanda", fetch = FetchType.LAZY)
+    private List<MusicoBanda> musicos;
     @Embedded
     private ParametrosBanda parametros;
+
+    @OneToMany(mappedBy = "banda", fetch = FetchType.LAZY)
+    private List<NotificacaoShow> notificacaoShows;
+
+    @OneToMany(mappedBy = "banda", fetch = FetchType.LAZY)
+    private List<NotificacaoEnsaio> notificacaoEnsaios;
+
+    @OneToMany(mappedBy = "banda", fetch = FetchType.LAZY)
+    private List<Show> shows;
+
+    @OneToMany(mappedBy = "banda", fetch = FetchType.LAZY)
+    private List<Ensaio> ensaios;
+    public List<Usuario> getUsuariosMusicos() {
+        return musicos.stream().map(MusicoBanda::getUsuario).collect(Collectors.toList());
+    }
 }
