@@ -7,7 +7,9 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.Date;
 
-@MappedSuperclass
+@Entity
+@Inheritance(strategy = InheritanceType.JOINED)
+@Table(name = "NOTIFICACAO")
 public abstract class Notificacao {
 
     @Id

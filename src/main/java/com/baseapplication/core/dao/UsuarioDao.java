@@ -12,9 +12,9 @@ public interface UsuarioDao extends JpaRepository<Usuario, Long> {
 
     UserDetails findByLogin(String login);
 
-    @Query(value = "SELECT * FROM Usuario u WHERE u.login = :login", nativeQuery = true)
+    @Query(value = "SELECT u FROM Usuario u WHERE u.login = :login")
     Usuario findByUsername(String login);
 
-    @Query(value = "SELECT * FROM Usuario u WHERE u.email = :email", nativeQuery = true)
+    @Query(value = "SELECT u FROM Usuario u WHERE u.email = :email")
     Usuario findByEmail(String email);
 }

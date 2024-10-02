@@ -16,8 +16,8 @@ public interface BandaDao extends JpaRepository<Banda, Long> {
 
     @Query(value = "SELECT DISTINCT b from Banda b " +
             "INNER JOIN Show s on s.banda.id = b.id " +
-            "INNER JOIN MusicoEvento me on me.show.id = s.id " +
-            "WHERE me.usuario.id = :idUsuario " +
+            "INNER JOIN MusicoEvento me on me.id.idEvento = s.id " +
+            "WHERE me.id.idUsuario = :idUsuario " +
             "AND s.banda.id NOT IN (SELECT m.banda.id FROM MusicoBanda m where m.usuario.id = :idUsuario)")
     Optional<List<Banda>> buscarParticipacoesEspeciais(Long idUsuario);
 }

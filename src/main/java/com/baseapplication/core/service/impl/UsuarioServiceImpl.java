@@ -1,10 +1,7 @@
 package com.baseapplication.core.service.impl;
 
 import com.baseapplication.core.dao.UsuarioDao;
-import com.baseapplication.core.dto.BandaParticipacaoEspecialDTO;
-import com.baseapplication.core.dto.EventosSeparadosDTO;
-import com.baseapplication.core.dto.InfoUsuarioDTO;
-import com.baseapplication.core.dto.InfoUsuarioPainelDTO;
+import com.baseapplication.core.dto.*;
 import com.baseapplication.core.model.Banda;
 import com.baseapplication.core.model.Usuario;
 import com.baseapplication.core.model.dto.BandaDTO;
@@ -16,6 +13,7 @@ import com.baseapplication.core.service.EventoService;
 import com.baseapplication.core.service.NotificacaoService;
 import com.baseapplication.core.service.UsuarioService;
 import org.hibernate.service.spi.ServiceException;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -76,6 +74,13 @@ public class UsuarioServiceImpl implements UsuarioService {
             throw new ServiceException(e.getMessage());
         }
 
+    }
+
+    @Override
+    public void atualizarInformacoesPerfil(InfoPerfilUsuarioDTO infoPerfil) {
+        Usuario usuario = usuarioDao.findByEmail(infoPerfil.getEmail());
+        BeanUtils.copyProperties(infoPerfil, usuario);
+        usuarioDao.save(usuario);
     }
 
     private CompletableFuture<EventosSeparadosDTO> buscarProximosEventosAsync(Long idUsuario) {

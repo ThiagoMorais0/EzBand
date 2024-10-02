@@ -9,7 +9,7 @@ import java.util.List;
 
 @Repository
 public interface ShowDao extends JpaRepository<Show, Long> {
-    @Query(value = "SELECT * FROM MusicoEvento me " +
+    @Query(value = "SELECT s FROM MusicoEvento me " +
             "INNER JOIN Show s on me.id.idEvento = s.id " +
             "WHERE me.tipoEvento = 'SHOW' AND " +
             "me.id.idUsuario = :idUsuario")

@@ -17,17 +17,17 @@ public class AuthenticationController {
     @Autowired
     private AuthenticationService authenticationService;
 
-    @PostMapping("/teste.do")
+    @PostMapping("/teste")
     public String teste() {
         return "teste";
     }
 
-    @PostMapping("/login.do")
+    @PostMapping("/login")
     public ResponseEntity login(@RequestBody LoginDTO credenciais) {
         return authenticationService.login(credenciais);
     }
 
-    @PostMapping("/registrar.do")
+    @PostMapping("/registrar")
     public ResponseEntity registrar(@RequestBody CadastroDTO cadastroDTO) {
         RetornoDTO retorno = authenticationService.registrar(cadastroDTO);
         if(retorno.getSuccess() == 1)
@@ -36,7 +36,7 @@ public class AuthenticationController {
             return ResponseEntity.badRequest().build();
     }
 
-    @PostMapping("/validarToken.do")
+    @PostMapping("/validarToken")
     public RetornoDTO validarToken(@RequestBody String token){
         Boolean tokenValido = authenticationService.isTokenValid(token);
         if(tokenValido){
@@ -46,7 +46,7 @@ public class AuthenticationController {
         }
     }
 
-    @GetMapping("buscarInfoUsuario.do")
+    @GetMapping("buscarInfoUsuario")
     public RetornoDTO buscarInfoUsuario(@RequestParam String username){
         return authenticationService.buscarInfoUsuario(username);
     }

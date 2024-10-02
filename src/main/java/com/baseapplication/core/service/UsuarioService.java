@@ -1,5 +1,6 @@
 package com.baseapplication.core.service;
 
+import com.baseapplication.core.dto.InfoPerfilUsuarioDTO;
 import com.baseapplication.core.dto.InfoUsuarioPainelDTO;
 import com.baseapplication.core.model.Usuario;
 
@@ -11,4 +12,6 @@ public interface UsuarioService {
     void salvar(Usuario usuario);
 
     InfoUsuarioPainelDTO buscarInfoPainel(Long idUsuario);
+
+    void atualizarInformacoesPerfil(InfoPerfilUsuarioDTO infoPerfil);
 }
