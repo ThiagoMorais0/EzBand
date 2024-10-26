@@ -2,7 +2,9 @@ package com.baseapplication.core.service.impl;
 
 import com.baseapplication.core.dao.ShowDao;
 import com.baseapplication.core.enums.StatusEvento;
+import com.baseapplication.core.model.RepertorioEvento;
 import com.baseapplication.core.model.Show;
+import com.baseapplication.core.model.superClasses.Evento;
 import com.baseapplication.core.service.ShowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,4 +32,16 @@ public class ShowServiceImpl implements ShowService {
                 .sorted(Comparator.comparing(Show::getData))
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public void salvar(Show show) {
+        showDao.save(show);
+    }
+
+    @Override
+    public List<RepertorioEvento> buscarRepertorio(Long idEvento) {
+        //TODO: Implementar
+        return null;
+    }
+
 }

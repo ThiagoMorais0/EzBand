@@ -10,4 +10,6 @@ public interface EnsaioService {
     Ensaio buscarPorId(Long idEvento);
 
     List<Ensaio> buscarPendentesPorUsuarioOrdenadoPorData(Long idUsuario);
+
+    void salvar(Ensaio ensaio);
 }

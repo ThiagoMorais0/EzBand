@@ -1,6 +1,7 @@
 package com.baseapplication.core.model;
 
 import com.baseapplication.core.enums.PermissaoMusico;
+import com.baseapplication.core.enums.SituacaoMusicoEvento;
 import com.baseapplication.core.enums.TipoEvento;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -18,7 +19,11 @@ public class MusicoEvento {
     private MusicoEventoId id;
     private String instrumentos;
     private BigDecimal cache;
-    @Enumerated(EnumType.STRING)
-    private TipoEvento tipoEvento;
+    private SituacaoMusicoEvento situacao;
+
+    @ManyToOne
+    @MapsId("idUsuario")
+    @JoinColumn(name = "ID_USUARIO", referencedColumnName = "id")
+    private Usuario usuario;
 
 }

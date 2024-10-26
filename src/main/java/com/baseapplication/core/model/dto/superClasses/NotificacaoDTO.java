@@ -1,5 +1,6 @@
 package com.baseapplication.core.model.dto.superClasses;
 
+import com.baseapplication.core.enums.TipoNotificacao;
 import com.baseapplication.core.model.Banda;
 import com.baseapplication.core.model.NotificacaoEnsaio;
 import com.baseapplication.core.model.NotificacaoShow;
@@ -24,6 +25,7 @@ public class NotificacaoDTO {
 
     private Long remetente;
     private String mensagem;
+    private TipoNotificacao tipo;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy", locale = "pt-BR", timezone = "Brazil/East")
     private LocalDate data;
 

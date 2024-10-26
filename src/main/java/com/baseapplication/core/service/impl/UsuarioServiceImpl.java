@@ -2,6 +2,7 @@ package com.baseapplication.core.service.impl;
 
 import com.baseapplication.core.dao.UsuarioDao;
 import com.baseapplication.core.dto.*;
+import com.baseapplication.core.enums.TipoContato;
 import com.baseapplication.core.model.Banda;
 import com.baseapplication.core.model.Usuario;
 import com.baseapplication.core.model.dto.BandaDTO;
@@ -12,6 +13,7 @@ import com.baseapplication.core.service.BandaService;
 import com.baseapplication.core.service.EventoService;
 import com.baseapplication.core.service.NotificacaoService;
 import com.baseapplication.core.service.UsuarioService;
+import org.checkerframework.checker.units.qual.C;
 import org.hibernate.service.spi.ServiceException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,6 +83,25 @@ public class UsuarioServiceImpl implements UsuarioService {
         Usuario usuario = usuarioDao.findByEmail(infoPerfil.getEmail());
         BeanUtils.copyProperties(infoPerfil, usuario);
         usuarioDao.save(usuario);
+    }
+
+    @Override
+    public Usuario buscarPorId(Long id) {
+        return usuarioDao.findById(id).get();
+    }
+
+    @Override
+    public Usuario findByCelular(String celular) {
+        return usuarioDao.findByCelular(celular);
+    }
+
+    @Override
+    public Usuario buscarPorContato(String contato, TipoContato tipoContato) {
+        switch (tipoContato){
+            case EMAIL -> { return findByEmail(contato); }
+            case CELULAR -> {return findByCelular(contato); }
+            default -> { throw new ServiceException("Tipo de contato inválido"); }
+        }
     }
 
     private CompletableFuture<EventosSeparadosDTO> buscarProximosEventosAsync(Long idUsuario) {

@@ -1,6 +1,6 @@
 package com.baseapplication.core.model;
 
-import com.baseapplication.core.enums.Status;
+import com.baseapplication.core.enums.StatusNotificacao;
 import com.baseapplication.core.model.superClasses.Notificacao;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -24,7 +24,7 @@ public class EstadoNotificacao {
     private Notificacao notificacao;
 
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private StatusNotificacao statusNotificacao;
 
     @Column(length = 500)
     private String mensagemAdicional;

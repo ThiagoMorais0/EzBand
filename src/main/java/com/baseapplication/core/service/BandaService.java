@@ -1,7 +1,10 @@
 package com.baseapplication.core.service;
 
+import com.baseapplication.core.dto.AtualizacaoRepertorioEventoDTO;
 import com.baseapplication.core.dto.InfoPerfilUsuarioDTO;
 import com.baseapplication.core.dto.InfoUsuarioDTO;
+import com.baseapplication.core.dto.RepertorioEventoDTO;
+import com.baseapplication.core.enums.TipoEvento;
 import com.baseapplication.core.model.Banda;
 import com.baseapplication.core.model.dto.BandaDTO;
 
@@ -20,4 +23,8 @@ public interface BandaService {
     void expulsarUsuario(Long idBanda, Long idUsuario);
 
     List<InfoPerfilUsuarioDTO> buscarMembros(Long idBanda);
+
+    void atualizarRepertorioEvento(AtualizacaoRepertorioEventoDTO atualizacaoRepertorio);
+
+    List<RepertorioEventoDTO> buscarRepertorioEvento(Long idEvento, TipoEvento tipoEvento);
 }

@@ -4,6 +4,12 @@ import lombok.Getter;
 
 @Getter
 public enum TipoEvento {
-    SHOW,
-    ENSAIO
+    SHOW("Show"),
+    ENSAIO("Ensaio");
+
+    private final String descricao;
+    TipoEvento(String descricao){
+        this.descricao = descricao;
+    }
+
 }
