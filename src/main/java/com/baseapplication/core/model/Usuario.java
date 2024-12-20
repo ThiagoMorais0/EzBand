@@ -1,7 +1,10 @@
 package com.baseapplication.core.model;
 
 import com.baseapplication.core.dto.CadastroDTO;
+import com.baseapplication.core.dto.CadastroUsuarioDTO;
 import com.baseapplication.core.enums.PermissaoUsuario;
+import com.baseapplication.core.utils.DateUtils;
+import com.google.api.client.util.DateTime;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -10,7 +13,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,30 +29,48 @@ public class Usuario implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String nome;
-    private String login;
     private String email;
     private String celular;
+    private String cidade;
+    private String descricao;
     private String senha;
+    private LocalDate dataNascimento;
     private LocalDate dataCriacao;
     private Boolean ativo;
     private Boolean bloqueado;
+    @Enumerated(EnumType.STRING)
     private PermissaoUsuario permissao;
     private String urlFotoPerfil;
     @OneToMany(mappedBy = "id.idUsuario", fetch = FetchType.LAZY)
     private List<MusicoBanda> musicoBandaList;
 
-    public List<Banda> getBandas(){
-        return musicoBandaList.stream().map(MusicoBanda::getBanda).collect(Collectors.toList());
-    }
-
-    public Usuario(CadastroDTO data){
-        this.login = data.getLogin();
+    public Usuario(CadastroDTO data) {
         this.nome = data.getNome();
         this.email = data.getEmail();
         this.senha = data.getSenha();
         this.permissao = PermissaoUsuario.USUARIO;
         this.ativo = true;
         this.bloqueado = false;
+        this.urlFotoPerfil = "default";
+        this.dataCriacao = LocalDate.now();
+
+    }
+
+    public List<Banda> getBandas(){
+        return musicoBandaList.stream().map(MusicoBanda::getBanda).collect(Collectors.toList());
+    }
+
+    public Usuario(CadastroUsuarioDTO usuarioDTO, String urlImagem){
+        this.nome = usuarioDTO.getNome();
+        this.email = usuarioDTO.getEmail();
+        this.senha = usuarioDTO.getSenha();
+        this.permissao = PermissaoUsuario.USUARIO;
+        this.cidade = usuarioDTO.getCidade();
+        this.celular = usuarioDTO.getCelular();
+        this.dataNascimento = DateUtils.stringToLocalDate(usuarioDTO.getNascimento());
+        this.ativo = true;
+        this.bloqueado = false;
+        this.urlFotoPerfil = urlImagem;
         this.dataCriacao = LocalDate.now();
     }
 
@@ -69,7 +89,7 @@ public class Usuario implements UserDetails {
 
     @Override
     public String getUsername() {
-        return nome;
+        return email;
     }
 
     @Override

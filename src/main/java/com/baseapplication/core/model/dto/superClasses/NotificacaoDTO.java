@@ -14,12 +14,16 @@ import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import lombok.Getter;
+import lombok.Setter;
 import org.aspectj.weaver.ast.Not;
 import org.springframework.beans.BeanUtils;
 
 import java.time.LocalDate;
 import java.util.Date;
 
+@Getter
+@Setter
 public class NotificacaoDTO {
     private Long id;
 

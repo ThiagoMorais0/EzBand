@@ -18,7 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 public class InfoUsuarioPainelDTO {
     List<BandaDTO> bandas;
-    List<NotificacaoDTO> notificacoes;
-    List<BandaParticipacaoEspecialDTO> participacoesEspeciais;
-    EventosSeparadosDTO proximosEventos;
+    Integer quantidadeNotificacoes;
+    Integer quantidadeParticipacoesEspeciais;
+    Integer quantidadeProximosEventos;
 }

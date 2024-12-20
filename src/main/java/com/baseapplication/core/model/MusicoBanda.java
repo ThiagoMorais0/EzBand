@@ -19,11 +19,11 @@ public class MusicoBanda {
 
     @ManyToOne
     @MapsId("idUsuario")
-    @JoinColumn(name = "ID_USUARIO")
+    @JoinColumn(name = "ID_USUARIO", insertable = false, updatable = false)
     private Usuario usuario;
 
     @ManyToOne
     @MapsId("idBanda")
-    @JoinColumn(name = "ID_BANDA")
+    @JoinColumn(name = "ID_BANDA", insertable = false, updatable = false)
     private Banda banda;
 }

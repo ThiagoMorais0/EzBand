@@ -17,9 +17,9 @@ public class EstadoNotificacao {
 
     @ManyToOne
     @JoinColumn(name = "id_usuario")
-    private Usuario usuario;
+    private Usuario destinatario;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "id_notificacao")
     private Notificacao notificacao;
 

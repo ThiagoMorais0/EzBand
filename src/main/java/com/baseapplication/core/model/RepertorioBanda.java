@@ -14,7 +14,10 @@ public class RepertorioBanda {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long idBanda;
     @Embedded
     private Musica musica;
+
+    @ManyToOne
+    @JoinColumn(name = "id_banda")
+    private Banda banda;
 }

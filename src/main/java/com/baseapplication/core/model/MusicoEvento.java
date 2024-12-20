@@ -3,6 +3,7 @@ package com.baseapplication.core.model;
 import com.baseapplication.core.enums.PermissaoMusico;
 import com.baseapplication.core.enums.SituacaoMusicoEvento;
 import com.baseapplication.core.enums.TipoEvento;
+import com.baseapplication.core.model.superClasses.Evento;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,6 +20,8 @@ public class MusicoEvento {
     private MusicoEventoId id;
     private String instrumentos;
     private BigDecimal cache;
+
+    @Enumerated(EnumType.STRING)
     private SituacaoMusicoEvento situacao;
 
     @ManyToOne

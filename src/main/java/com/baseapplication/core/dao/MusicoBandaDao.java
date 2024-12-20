@@ -11,7 +11,7 @@ import java.util.List;
 
 @Repository
 public interface MusicoBandaDao extends JpaRepository<MusicoBanda, MusicoBandaId> {
-    @Query(value = "SELECT mb.usuario FROM MusicoBanda mb " +
+    @Query(value = "SELECT mb FROM MusicoBanda mb " +
             "WHERE mb.id.idBanda = :idBanda")
-    List<Usuario> buscarMembrosPorIdBanda(Long idBanda);
+    List<MusicoBanda> buscarMembrosPorIdBanda(Long idBanda);
 }

@@ -1,21 +1,21 @@
 package com.baseapplication.core.model;
 
 import jakarta.persistence.Column;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+
+import java.io.Serializable;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class MusicoBandaId {
+@EqualsAndHashCode
+public class MusicoBandaId implements Serializable {
 
     @Column(name = "ID_USUARIO")
     private Long idUsuario;
 
-    @Column(name = "ID_BANDA", insertable = false, updatable = false)
+    @Column(name = "ID_BANDA")
     private Long idBanda;
 
 }

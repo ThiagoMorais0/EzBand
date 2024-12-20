@@ -28,9 +28,12 @@ public class SecurityConfiguration {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.POST, "/auth/registrar").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/cadastrarUsuarioComImagem").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/validarToken").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/teste").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/usuario/verificarEmailJaCadastrado").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/usuario/editarUsuarioComImagem").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)

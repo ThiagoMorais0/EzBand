@@ -11,6 +11,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface MusicoEventoDao extends JpaRepository<MusicoEvento, MusicoEventoId> {
     @Modifying
-    @Query("DELETE FROM MusicoEvento me WHERE me.id.idEvento = :idEvento AND me.tipoEvento = :tipoEvento")
-    void removerTodosParticipantes(Long id, TipoEvento tipoEvento);
+    @Query(value = "delete from musico_evento me where me.id_evento = :idEvento and me.tipo_evento = :tipoEvento ", nativeQuery = true)
+    void removerTodosParticipantes(Long idEvento, TipoEvento tipoEvento);
 }

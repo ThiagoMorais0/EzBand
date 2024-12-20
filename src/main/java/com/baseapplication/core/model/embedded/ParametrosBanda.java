@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 @Embeddable
 public class ParametrosBanda {
-    private Boolean permiteEntradaPorConvite;
-    private Boolean exigirAprovacaoCompromissos;
-    private Boolean listarObservacaoRepertorio;
+    private Boolean permiteEntradaPorConvite = true;
+    private Boolean exigirAprovacaoCompromissos = true;
+    private Boolean listarObservacaoRepertorio = true;
 }

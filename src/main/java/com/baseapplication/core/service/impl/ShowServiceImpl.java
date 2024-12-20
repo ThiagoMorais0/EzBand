@@ -6,9 +6,11 @@ import com.baseapplication.core.model.RepertorioEvento;
 import com.baseapplication.core.model.Show;
 import com.baseapplication.core.model.superClasses.Evento;
 import com.baseapplication.core.service.ShowService;
+import org.hibernate.service.spi.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,8 +23,10 @@ public class ShowServiceImpl implements ShowService {
 
     @Override
     public Show buscarPorId(Long idShow) {
-        return showDao.findById(idShow).get();
+        return showDao.findById(idShow)
+                .orElseThrow(() -> new ServiceException("Show (" + idShow + ") não encontrado"));
     }
+
 
     @Override
     public List<Show> buscarPendentesPorUsuarioOrdenadoPorData(Long idUsuario) {
@@ -40,8 +44,27 @@ public class ShowServiceImpl implements ShowService {
 
     @Override
     public List<RepertorioEvento> buscarRepertorio(Long idEvento) {
-        //TODO: Implementar
-        return null;
+        return buscarPorId(idEvento).getRepertorio();
+    }
+
+    @Override
+    public List<Show> buscarShowsPendentesPorBandaEUsuarioOrdenadoPorData(Long idBanda, Long idUsuario) {
+        return showDao.buscarShowsPorStatusBandaEUsuarioOrdenadoPorData(idBanda, idUsuario, StatusEvento.PENDENTE.toString());
+    }
+
+    @Override
+    public List<Show> buscarShowsAguardandoPorBandaEUsuarioOrdenadoPorData(Long idBanda, Long idUsuario) {
+        return showDao.buscarShowsPorStatusBandaEUsuarioOrdenadoPorData(idBanda, idUsuario, StatusEvento.AGUARDANDO_APROVACAO.toString());
+    }
+
+    @Override
+    public List<Show> buscarShowsPorStatusBandaEUsuarioOrdenadoPorData(Long idBanda, Long idUsuario, String status) {
+        return showDao.buscarShowsPorStatusBandaEUsuarioOrdenadoPorData(idBanda, idUsuario, status);
+    }
+
+    @Override
+    public Evento buscarPrimeiroPorUsuarioEData(Long idUsuario, LocalDate data) {
+        return showDao.buscarPrimeiroPorUsuarioEData(idUsuario, data);
     }
 
 }

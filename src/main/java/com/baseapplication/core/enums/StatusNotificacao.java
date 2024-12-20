@@ -1,6 +1,8 @@
 package com.baseapplication.core.enums;
 
 public enum StatusNotificacao {
+
+    NAO_VISUALIZADO("Visualizado"),
     VISUALIZADO("Visualizado"),
     ACEITO("Aceito"),
     RECUSADO("Recusado");

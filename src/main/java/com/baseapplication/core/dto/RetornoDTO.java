@@ -36,8 +36,11 @@ public final class RetornoDTO {
         return new RetornoDTO(0, null, null);
     }
 
+//    public static RetornoDTO error(String message){
+//        return new RetornoDTO(0, null, "Erro: " + message);
+//    }
     public static RetornoDTO error(String message){
-        return new RetornoDTO(0, null, "Erro: " + message);
+        return new RetornoDTO(0, null, message);
     }
 
 

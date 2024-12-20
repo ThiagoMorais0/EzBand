@@ -2,6 +2,7 @@ package com.baseapplication.core.service.impl;
 
 import com.baseapplication.core.dao.MusicoBandaDao;
 import com.baseapplication.core.enums.PermissaoMusico;
+import com.baseapplication.core.model.Banda;
 import com.baseapplication.core.model.MusicoBanda;
 import com.baseapplication.core.model.MusicoBandaId;
 import com.baseapplication.core.model.Usuario;
@@ -22,9 +23,11 @@ public class MusicoBandaServiceImpl implements MusicoBandaService {
     }
 
     @Override
-    public MusicoBanda cadastrarUsuarioEmBanda(Long idUsuario, Long idBanda, String instrumentos) {
+    public MusicoBanda cadastrarUsuarioEmBanda(Usuario usuario, Banda banda, String instrumentos) {
         MusicoBanda musicoBanda = new MusicoBanda();
-        musicoBanda.setId(new MusicoBandaId(idUsuario, idBanda));
+        musicoBanda.setId(new MusicoBandaId(usuario.getId(), banda.getId()));
+        musicoBanda.setUsuario(usuario);
+        musicoBanda.setBanda(banda);
         musicoBanda.setInstrumentos(instrumentos);
         musicoBanda.setPermissao(PermissaoMusico.MEMBRO_REGULAR);
         return musicoBandaDao.save(musicoBanda);
@@ -36,7 +39,7 @@ public class MusicoBandaServiceImpl implements MusicoBandaService {
     }
 
     @Override
-    public List<Usuario> buscarMembrosPorIdBanda(Long idBanda) {
+    public List<MusicoBanda> buscarMembrosPorIdBanda(Long idBanda) {
         return musicoBandaDao.buscarMembrosPorIdBanda(idBanda);
     }
 }

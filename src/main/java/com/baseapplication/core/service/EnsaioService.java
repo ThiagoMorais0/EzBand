@@ -12,4 +12,6 @@ public interface EnsaioService {
     List<Ensaio> buscarPendentesPorUsuarioOrdenadoPorData(Long idUsuario);
 
     void salvar(Ensaio ensaio);
+
+    List<Ensaio> buscarEnsaiosPorStatusBandaEUsuarioOrdenadoPorData(Long idBanda, Long idUsuario, String string);
 }

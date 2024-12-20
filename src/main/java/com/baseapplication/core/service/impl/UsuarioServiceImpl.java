@@ -3,21 +3,16 @@ package com.baseapplication.core.service.impl;
 import com.baseapplication.core.dao.UsuarioDao;
 import com.baseapplication.core.dto.*;
 import com.baseapplication.core.enums.TipoContato;
-import com.baseapplication.core.model.Banda;
 import com.baseapplication.core.model.Usuario;
 import com.baseapplication.core.model.dto.BandaDTO;
 import com.baseapplication.core.model.dto.superClasses.NotificacaoDTO;
-import com.baseapplication.core.model.superClasses.Evento;
-import com.baseapplication.core.model.superClasses.Notificacao;
-import com.baseapplication.core.service.BandaService;
-import com.baseapplication.core.service.EventoService;
-import com.baseapplication.core.service.NotificacaoService;
-import com.baseapplication.core.service.UsuarioService;
-import org.checkerframework.checker.units.qual.C;
+import com.baseapplication.core.service.*;
+import com.baseapplication.core.utils.Context;
 import org.hibernate.service.spi.ServiceException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -37,12 +32,15 @@ public class UsuarioServiceImpl implements UsuarioService {
     private NotificacaoService notificacaoService;
 
     @Autowired
-    private EventoService eventoService;
+    private EventoHelperService eventoHelperService;
 
-    @Override
-    public Usuario findByLogin(String login) {
-        return usuarioDao.findByUsername(login);
-    }
+    @Autowired
+    private ImagemService imagemService;
+
+//    @Override
+//    public Usuario findByLogin(String login) {
+//        return usuarioDao.findByUsername(login);
+//    }
 
     @Override
     public Usuario findByEmail(String email) {
@@ -55,12 +53,13 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
-    public InfoUsuarioPainelDTO buscarInfoPainel(Long idUsuario) {
-        try{
+    public InfoUsuarioPainelDTO buscarInfoPainel() {
+        try {
+            Long idUsuario = Context.getUsuarioLogado().getId();
             CompletableFuture<List<BandaDTO>> bandasFuture = buscarBandasDoUsuarioAsync(idUsuario);
-            CompletableFuture<List<NotificacaoDTO>> notificacoesFuture = buscarNotificacoesAsync(idUsuario);
-            CompletableFuture<List<BandaParticipacaoEspecialDTO>> participacoesEspeciaisFuture = buscarParticipacoesEspeciaisAsync(idUsuario);
-            CompletableFuture<EventosSeparadosDTO> proximosEventosFuture = buscarProximosEventosAsync(idUsuario);
+            CompletableFuture<Integer> notificacoesFuture = buscarQuantidadeNotificacoesAsync(idUsuario);
+            CompletableFuture<Integer> participacoesEspeciaisFuture = buscarQuantidadeParticipacoesEspeciaisAsync(idUsuario);
+            CompletableFuture<Integer> proximosEventosFuture = buscarQuantidadeProximosEventosAsync(idUsuario);
 
             CompletableFuture.allOf(bandasFuture, notificacoesFuture, participacoesEspeciaisFuture, proximosEventosFuture).join();
 
@@ -72,10 +71,31 @@ public class UsuarioServiceImpl implements UsuarioService {
 
         } catch (ExecutionException | InterruptedException e) {
             throw new RuntimeException(e);
-        } catch (Exception e){
+        } catch (Exception e) {
             throw new ServiceException(e.getMessage());
         }
 
+    }
+
+    private CompletableFuture<Integer> buscarQuantidadeProximosEventosAsync(Long idUsuario) {
+        return CompletableFuture.supplyAsync(() -> buscarQuantidadeProximosEventos(idUsuario));
+    }
+
+
+    private CompletableFuture<Integer> buscarQuantidadeParticipacoesEspeciaisAsync(Long idUsuario) {
+        return CompletableFuture.supplyAsync(() -> buscarQuantidadeParticipacoesEspeciais(idUsuario));
+    }
+
+    private Integer buscarQuantidadeParticipacoesEspeciais(Long idUsuario) {
+        return usuarioDao.buscarQuantidadeParticipacoesEspeciais(idUsuario);
+    }
+
+    private CompletableFuture<Integer> buscarQuantidadeNotificacoesAsync(Long idUsuario) {
+        return CompletableFuture.supplyAsync(() -> buscarQuantidadeNotificacoes(idUsuario));
+    }
+
+    private Integer buscarQuantidadeProximosEventos(Long idUsuario) {
+        return usuarioDao.buscarQuantidadeProximosEventos(idUsuario);
     }
 
     @Override
@@ -97,16 +117,62 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     public Usuario buscarPorContato(String contato, TipoContato tipoContato) {
-        switch (tipoContato){
-            case EMAIL -> { return findByEmail(contato); }
-            case CELULAR -> {return findByCelular(contato); }
-            default -> { throw new ServiceException("Tipo de contato inválido"); }
+        switch (tipoContato) {
+            case EMAIL -> {
+                return findByEmail(contato);
+            }
+            case CELULAR -> {
+                return findByCelular(contato);
+            }
+            default -> {
+                throw new ServiceException("Tipo de contato inválido");
+            }
         }
+    }
+
+    @Override
+    public Boolean verificarEmailJaCadastrado(String email) {
+        return usuarioDao.findByEmail(email) != null;
+    }
+
+    @Override
+    public InfoPerfilUsuarioDTO editarUsuarioComImagem(InfoPerfilUsuarioDTO usuarioDTO, MultipartFile imagem) {
+        String urlImagem = imagemService.saveImageAndGetUrl(imagem);
+        Usuario usuario = buscarPorContato(usuarioDTO.getEmail(), TipoContato.EMAIL);
+        BeanUtils.copyProperties(usuarioDTO, usuario);
+        usuario.setUrlFotoPerfil(urlImagem);
+        usuario.setAtivo(true);
+        usuarioDao.save(usuario);
+        usuarioDTO.setUrlFotoPerfil(urlImagem);
+        return usuarioDTO;
+    }
+
+    @Override
+    public Integer buscarQuantidadeNotificacoes(Long idUsuario) {
+        return usuarioDao.buscarQuantidadeNotificacoes(idUsuario);
+    }
+
+    @Override
+    public void enviarSolicitacaoParaIngressarBanda(Long idBanda, Long idUsuarioRemetente, String instrumento) {
+        notificacaoService.enviarSolicitacaoParaIngressarBanda(
+                bandaService.buscarPorId(idBanda),
+                buscarPorId(idUsuarioRemetente),
+                instrumento);
+    }
+
+    @Override
+    public InfoPerfilUsuarioDTO buscarInformacoesDoPerfilPorId(Long idUsuario) {
+        return new InfoPerfilUsuarioDTO(buscarPorId(idUsuario));
+    }
+
+    @Override
+    public List<NotificacaoDTO> buscarNotificacoesUsuario(Long idUsuario) {
+        return notificacaoService.buscarNotificacoesPorUsuario(idUsuario).stream().map(i -> new NotificacaoDTO().toDTO(i)).collect(Collectors.toList());
     }
 
     private CompletableFuture<EventosSeparadosDTO> buscarProximosEventosAsync(Long idUsuario) {
         return CompletableFuture.supplyAsync(() ->
-                eventoService.buscarPendentesPorUsuarioOrdenadoPorData(idUsuario));
+                eventoHelperService.buscarPendentesPorUsuarioOrdenadoPorData(idUsuario));
     }
 
     private CompletableFuture<List<BandaParticipacaoEspecialDTO>> buscarParticipacoesEspeciaisAsync(Long idUsuario) {
@@ -122,6 +188,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     private CompletableFuture<List<BandaDTO>> buscarBandasDoUsuarioAsync(Long idUsuario) {
         return CompletableFuture.supplyAsync(() ->
-                bandaService.buscarBandasPorUsuario(idUsuario).stream().map(BandaDTO::new).toList());
+                bandaService.buscarBandasPorUsuario(idUsuario)
+                        .stream().map(BandaDTO::new).toList());
     }
 }

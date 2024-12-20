@@ -43,8 +43,8 @@ public abstract class Evento {
     private String observacoes;
     @Enumerated(EnumType.STRING)
     private StatusEvento status;
-    @Enumerated(EnumType.STRING)
 
+    @Enumerated(EnumType.STRING)
     private TipoEvento tipoEvento;
 
     @OneToMany(mappedBy = "id.idEvento", fetch = FetchType.LAZY)

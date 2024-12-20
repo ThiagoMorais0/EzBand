@@ -26,21 +26,24 @@ public class Banda {
     @DateTimeFormat(pattern = "dd/MM/yyyy")
     private LocalDate dataInclusao;
     private String urlLogo;
-    @OneToMany(mappedBy = "id.idBanda", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "id.idBanda", fetch = FetchType.EAGER)
     private List<MusicoBanda> musicos;
     @Embedded
-    private ParametrosBanda parametros;
+    private ParametrosBanda parametros = new ParametrosBanda();
 
-    @OneToMany(mappedBy = "banda", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "banda", fetch = FetchType.EAGER)
     private List<NotificacaoShow> notificacaoShows;
 
-    @OneToMany(mappedBy = "banda", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "banda", fetch = FetchType.EAGER)
     private List<NotificacaoEnsaio> notificacaoEnsaios;
 
-    @OneToMany(mappedBy = "banda", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "banda", fetch = FetchType.EAGER)
     private List<Show> shows;
 
-    @OneToMany(mappedBy = "banda", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "banda", fetch = FetchType.EAGER)
+    private List<RepertorioBanda> repertorio;
+
+    @OneToMany(mappedBy = "banda", fetch = FetchType.EAGER)
     private List<Ensaio> ensaios;
     public List<Usuario> getUsuariosMusicos() {
         return musicos.stream().map(MusicoBanda::getUsuario).collect(Collectors.toList());

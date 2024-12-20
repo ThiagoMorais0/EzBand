@@ -3,6 +3,7 @@ package com.baseapplication.core.model.dto.superClasses;
 import com.baseapplication.core.enums.StatusEvento;
 import com.baseapplication.core.enums.TipoEvento;
 import com.baseapplication.core.model.superClasses.Evento;
+import com.baseapplication.core.utils.DateUtils;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,10 +20,8 @@ import java.util.Date;
 public class EventoDTO {
     private Long id;
     private Long idBanda;
-    @DateTimeFormat(pattern = "dd/MM/yyyy")
-    private LocalDate dataInclusao;
-    @DateTimeFormat(pattern = "dd/MM/yyyy")
-    private LocalDate data;
+    private String dataInclusao;
+    private String data;
     private Time duracao;
     private Time horarioInicio;
     private String local;
@@ -33,5 +32,6 @@ public class EventoDTO {
 
     public EventoDTO(Evento evento){
         BeanUtils.copyProperties(evento, this);
+        this.setData(DateUtils.localDateToString(evento.getData()));
     }
 }

@@ -2,6 +2,7 @@ package com.baseapplication.core.model.dto;
 
 import com.baseapplication.core.model.Show;
 import com.baseapplication.core.model.dto.superClasses.EventoDTO;
+import com.baseapplication.core.utils.DateUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,5 +23,6 @@ public class ShowDTO extends EventoDTO {
 
     public ShowDTO(Show show){
         BeanUtils.copyProperties(show, this);
+        this.setData(DateUtils.localDateToString(show.getData()));
     }
 }

@@ -16,7 +16,6 @@ public class InfoUsuarioDTO {
 
     private Long id;
     private String nome;
-    private String login;
     private String email;
     private Boolean ativo;
     private Boolean bloqueado;
@@ -26,7 +25,6 @@ public class InfoUsuarioDTO {
         InfoUsuarioDTO dto = new InfoUsuarioDTO();
         dto.setId(usuario.getId());
         dto.setNome(usuario.getNome());
-        dto.setLogin(usuario.getLogin());
         dto.setEmail(usuario.getEmail());
         dto.setAtivo(usuario.getAtivo());
         dto.setBloqueado(usuario.getBloqueado());

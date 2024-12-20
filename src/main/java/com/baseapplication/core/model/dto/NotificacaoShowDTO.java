@@ -30,5 +30,7 @@ public class NotificacaoShowDTO extends NotificacaoDTO {
 
     public NotificacaoShowDTO(NotificacaoShow notificacaoShow){
         BeanUtils.copyProperties(notificacaoShow, this);
+        this.setMensagem(notificacaoShow.getMensagem());
+        this.setTipo(notificacaoShow.getTipoNotificacao());
     }
 }
