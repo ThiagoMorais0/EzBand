@@ -1,5 +1,6 @@
 package com.baseapplication.core.service;
 
+import com.baseapplication.core.dto.EmailDTO;
 import com.baseapplication.core.dto.InfoPerfilUsuarioDTO;
 import com.baseapplication.core.dto.InfoUsuarioPainelDTO;
 import com.baseapplication.core.dto.RetornoDTO;
@@ -38,4 +39,8 @@ public interface UsuarioService {
     InfoPerfilUsuarioDTO buscarInformacoesDoPerfilPorId(Long idUsuario);
 
     List<NotificacaoDTO> buscarNotificacoesUsuario(Long id);
+
+    void reportarErro(String mensagem);
+
+    void enviarEmail(EmailDTO email);
 }

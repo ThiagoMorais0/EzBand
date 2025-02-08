@@ -1,5 +1,6 @@
 package com.baseapplication.core.controller;
 
+import com.baseapplication.core.dto.EmailDTO;
 import com.baseapplication.core.dto.InfoPerfilUsuarioDTO;
 import com.baseapplication.core.dto.RetornoDTO;
 import com.baseapplication.core.service.UsuarioService;
@@ -104,6 +105,24 @@ public class UsuarioController {
         }
     }
 
+    @PostMapping("/reportarErro")
+    public RetornoDTO reportarErro(@RequestBody String mensagem){
+        try{
+            usuarioService.reportarErro(mensagem);
+            return RetornoDTO.success();
+        }catch (Exception e){
+            return RetornoDTO.error("Erro ao enviar mensagem");
+        }
+    }
 
+    @PostMapping("/enviarEmail")
+    public RetornoDTO enviarEmail(@RequestBody EmailDTO email){
+        try{
+            usuarioService.enviarEmail(email);
+            return RetornoDTO.success();
+        }catch (Exception e){
+            return RetornoDTO.error("Erro ao enviar e-mail: " + e.getMessage());
+        }
+    }
 
 }

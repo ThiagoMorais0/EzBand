@@ -1,7 +1,10 @@
 package com.baseapplication.core.model.dto;
 
 import com.baseapplication.core.dto.InfoPerfilUsuarioDTO;
+import com.baseapplication.core.enums.StatusEvento;
+import com.baseapplication.core.enums.StatusNotificacao;
 import com.baseapplication.core.model.Banda;
+import com.baseapplication.core.utils.Context;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
@@ -36,9 +39,18 @@ public class BandaDTO {
         this.permiteEntradaPorConvite = banda.getParametros().getPermiteEntradaPorConvite();
         this.exigirAprovacaoCompromissos = banda.getParametros().getExigirAprovacaoCompromissos();
         this.listarObservacaoRepertorio = banda.getParametros().getListarObservacaoRepertorio();
-        this.quantidadeShows = banda.getShows().size();
-        this.quantidadeEnsaios = banda.getEnsaios().size();
-        this.quantidadeNotificacoes = banda.getNotificacaoShows().size() + banda.getNotificacaoEnsaios().size();
+        this.quantidadeShows = banda.getShows().stream().filter(i -> i.getStatus().equals(StatusEvento.PENDENTE)).toList().size();
+        this.quantidadeEnsaios = banda.getEnsaios().stream().filter(i -> i.getStatus().equals(StatusEvento.PENDENTE)).toList().size();
+
+        this.quantidadeNotificacoes = (int) banda.getNotificacaoShows().stream()
+                        .filter(notificacao -> notificacao.getStatusNotificacao().equals(StatusNotificacao.NAO_VISUALIZADO))
+                        .filter(notificacao -> notificacao.getDestinatario().equals(Context.getUsuarioLogado()))
+                        .count() +
+                        (int) banda.getNotificacaoEnsaios().stream()
+                                .filter(notificacao -> notificacao.getStatusNotificacao().equals(StatusNotificacao.NAO_VISUALIZADO))
+                                .filter(notificacao -> notificacao.getDestinatario().equals(Context.getUsuarioLogado()))
+                                .count();
+
         this.quantidadeMembros = banda.getMusicos().size();
         this.membros = banda.getUsuariosMusicos().stream().map(InfoPerfilUsuarioDTO::new).collect(Collectors.toList());
     }

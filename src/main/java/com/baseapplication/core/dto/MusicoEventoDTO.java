@@ -23,4 +23,10 @@ public class MusicoEventoDTO {
         this.usuario = new InfoPerfilUsuarioDTO(usuario);
     }
 
+    public MusicoEventoDTO(MusicoEvento musicoEvento){
+        this.usuario = new InfoPerfilUsuarioDTO(musicoEvento.getUsuario());
+        this.instrumento = musicoEvento.getInstrumentos();
+        this.cache = musicoEvento.getCache();
+    }
+
 }

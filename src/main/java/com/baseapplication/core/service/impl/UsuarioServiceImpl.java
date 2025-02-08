@@ -37,6 +37,12 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Autowired
     private ImagemService imagemService;
 
+    @Autowired
+    private ReporteDeErroService reporteDeErroService;
+
+    @Autowired
+    private EmailService emailService;
+
 //    @Override
 //    public Usuario findByLogin(String login) {
 //        return usuarioDao.findByUsername(login);
@@ -168,6 +174,20 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Override
     public List<NotificacaoDTO> buscarNotificacoesUsuario(Long idUsuario) {
         return notificacaoService.buscarNotificacoesPorUsuario(idUsuario).stream().map(i -> new NotificacaoDTO().toDTO(i)).collect(Collectors.toList());
+    }
+
+    @Override
+    public void reportarErro(String mensagem) {
+        reporteDeErroService.reportarErro(mensagem, Context.getUsuarioLogado());
+    }
+
+    @Override
+    public void enviarEmail(EmailDTO email) {
+        emailService.enviarEmail(
+                email.getAssunto(),
+                email.getMensagem(),
+                email.getDestinatario()
+        );
     }
 
     private CompletableFuture<EventosSeparadosDTO> buscarProximosEventosAsync(Long idUsuario) {

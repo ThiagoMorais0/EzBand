@@ -2,6 +2,7 @@ package com.baseapplication.core.dto.superClasses;
 
 import com.baseapplication.core.dto.InformacoesEnsaioDTO;
 import com.baseapplication.core.dto.InformacoesShowDTO;
+import com.baseapplication.core.dto.MusicoEventoDTO;
 import com.baseapplication.core.dto.RepertorioEventoDTO;
 import com.baseapplication.core.enums.StatusEvento;
 import com.baseapplication.core.enums.TipoEvento;
@@ -48,5 +49,6 @@ public abstract class InformacoesEventoDTO {
     private TipoEvento tipoEvento;
     private List<RepertorioEventoDTO> repertorio;
     private List<Long> idUsuariosParticipantes;
+    private List<MusicoEventoDTO> participantes;
 
 }

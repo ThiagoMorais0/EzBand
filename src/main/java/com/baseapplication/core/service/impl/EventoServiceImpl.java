@@ -85,9 +85,10 @@ public class EventoServiceImpl implements EventoService {
     @Override
     public InformacoesEventoDTO buscarPobuscarInformacoesEventorId(Long idEvento, TipoEvento tipoEvento) {
         Evento evento = buscarEvento(idEvento, tipoEvento);
+        MusicoEvento musicoEvento = musicoEventoService.buscar(idEvento, tipoEvento, Context.getUsuarioLogado().getId());
 
         if(evento instanceof Show)
-            return new InformacoesShowDTO((Show) evento);
+            return new InformacoesShowDTO((Show) evento, musicoEvento);
         if(evento instanceof Ensaio)
             return new InformacoesEnsaioDTO((Ensaio) evento);
 

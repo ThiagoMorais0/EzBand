@@ -48,17 +48,16 @@ public interface BandaDao extends JpaRepository<Banda, Long> {
     Integer buscarQuantidadeDeEnsaios(Long idBanda, Long idUsuario);
 
     @Query(value = "SELECT COUNT(distinct n.id) AS total_notificacoes " +
-            "FROM NOTIFICACAO n " +
-            "JOIN ESTADO_NOTIFICACAO en ON en.id_notificacao = n.id " +
-            "JOIN BANDA b ON b.id = n.id_banda_destino " +
-            "JOIN musico_banda ub ON ub.id_banda = b.id " +
-            "JOIN USUARIO u ON ub.id_usuario = u.id " +
-            "WHERE ( " +
-            "    (n.tipo_notificacao = 0 AND ub.permissao in ('ADMINISTRADOR', 'FUNDADOR')) " +
-            "    OR " +
-            "    (n.tipo_notificacao = 2) " +
-            ") " +
-            "AND en.status_notificacao = 'NAO_VISUALIZADO';", nativeQuery = true)
+            "            FROM NOTIFICACAO n " +
+            "            JOIN BANDA b ON b.id = n.id_banda_destino " +
+            "            JOIN musico_banda ub ON ub.id_banda = b.id " +
+            "            JOIN USUARIO u ON ub.id_usuario = u.id " +
+            "            WHERE ( " +
+            "                (n.tipo_notificacao = 'SOLICITACAO_PARA_INGRESSAR_BANDA' AND ub.permissao in ('ADMINISTRADOR', 'FUNDADOR')) " +
+            "                OR " +
+            "                (n.tipo_notificacao = 'APROVACAO_EVENTO') " +
+            "            ) " +
+            "            AND (n.status_notificacao = 'NAO_VISUALIZADO' or n.status_notificacao = 'VISUALIZADO')", nativeQuery = true)
     Integer buscarQuantidadeDeNotificacoes(Long idBanda);
 
     @Query(value = "select count(*) from musico_banda mb where id_banda = :idBanda", nativeQuery = true)
