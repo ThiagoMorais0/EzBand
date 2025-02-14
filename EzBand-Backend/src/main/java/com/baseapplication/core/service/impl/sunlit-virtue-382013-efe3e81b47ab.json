@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "sunlit-virtue-382013",
+  "private_key_id": "efe3e81b47ab212312212e8de6c46654efdd7ee5",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCZFFU2gCti6i7b\nHZj5fGPOTVafzLab8/XBjoY+fdzbL51pkIr+i2YEEMa3SE/WjgHkTO5NYgVEHePS\nCksAdwD3Bp+rj3WdKB4usTkipvgENgpnd3Nhqayk8UTL/KRIx+hhXGAnVV6ww/wz\nZ7f40T6bocKxe/zZB9LTp5uqEsg8gKVKsPON7gLGbVg6/YCPTEpEcxhk9eSiZMft\nlFmvAAzKwRv/PBXe1O5DdCxgw16VwX6RCtjAh9PBY3KAwDR35CRbaGi/P8tr0ZXA\neKZY0CJaaP3hzkyoncksnrE4RueW3SBjRTVqOek9rmhVry3S9nCdc4I/gv3jcQCx\n4Iv9KthhAgMBAAECggEAHYnE351fwdh6biGJ8SpFf/uAaZlw6yrqEw1Tbh+PTGQl\ntccEaxWu+73Y+mjjrvz79He7zAbMCVbTLSZ7Tn2oHAKVMN+fzFF/cXcVFVCurvFW\nlJyCEShSfgloQwxfDwQ0HQVcMHrSqL1Inwq2fzaxJArUrLbGFYLi9aBz8x9or/O+\niIBD27hHhewlTPgHO7z952CMOK+81brwv79NDuljy0XKkWx2jkvwBtaRPMQiSRZ9\na7nAqjbE9Esf5ne4kibATzY5RkzBv+alFdRTXNcW4WWU+pix00MR6BfiuN483HYw\nelnFBEYTyiAKk1flXbTQxIscYtZwWpR7JW2BaipaIQKBgQDJeuv++ZXOOe02zDuJ\n6h7YHAIw0owhVdQIIKOV281fOu5rCzlUq6R/+gEYUf1v7gOPG+tWkbuZyF2uydXb\nawdUhNxQacevQlCaU9Mvzip193c4XF8Y9vRohqmXdWE8EXpJo3z+Yt+yTXMve2w4\noBx+yVGwNJZ7KkhY32edkadprQKBgQDCgI928sH5EbW19REm83mcA6ENR+rtLGxX\nc4s/WMvd7jT06AvS/7hW6P9In5u5MAF/gZwetOcLtwbk7BUphV2sSogyzUUYYi2E\nqoXHKxajWRjAx9cAmaJ4l9TlmUHInfsh4d4ChByNK/5lcPxLHs56KWaCH0Wt+75C\nzwSN58XoBQKBgH6qAY2FeRFyR1hI4zFb91IjoZjx9NjMLYWCh3Uh/yXcVaEEKGG7\nmqo+EMwqV2szthcVFUmSSt9uIL9O8lyEF9KhyCPhrIDY7vVmt4D5WqZZEiFjqQF3\n18WSyzGFwMBTuI5s8pq2rC1bFYwHSsz6k499nxZoqSX7OgptQKXFuPrtAoGACCNE\n3V8uynL5PVGxlAWf0u078chOhfnT1pzY+J+IeBKdWJnU1NEqL0i0VZ+H7mmZxnHv\nzEEZYZ4Yxb8y63fPAYRkymtYNrr02JYh3sFowxDZPkeeMUI8T/taRvjwjao+dZ5z\noXtRjn6GuEvP4ny5etb8mPkh+zOLNFRhBmbqGtkCgYBNWazrWquNkcouLI4bnMuh\n7GtP8bC5Oo1CKT85PcEVA2w88yjBmiZBAac0baIgwMba8bFNB3zj6IZXvaj4P/BT\nVEtO4+NWxaPtHSSqqf9gWL+55ECAHQYJaAg9Bc4RXn8TazwZosZ8rGOHdOr3qKwn\nlUSBzzhHeBNYs5s8SLUAnw==\n-----END PRIVATE KEY-----\n",
+  "client_email": "thiago@sunlit-virtue-382013.iam.gserviceaccount.com",
+  "client_id": "112438152723335026920",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/thiago%40sunlit-virtue-382013.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
