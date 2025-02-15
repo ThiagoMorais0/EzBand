@@ -1,18 +1,19 @@
 package com.baseapplication.core.controller;
 
-import com.baseapplication.core.dto.MusicoEventoDTO;
-import com.baseapplication.core.model.Ensaio;
-import com.baseapplication.core.model.Show;
-import com.baseapplication.core.utils.DateUtils;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Getter;
-import lombok.Setter;
-import org.springframework.beans.BeanUtils;
-
 import java.math.BigDecimal;
 import java.sql.Time;
 import java.time.LocalDate;
 import java.util.List;
+
+import org.springframework.beans.BeanUtils;
+
+import com.baseapplication.core.dto.MusicoEventoDTO;
+import com.baseapplication.core.model.Ensaio;
+import com.baseapplication.core.utils.DateUtils;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter

@@ -1,7 +1,7 @@
 services:
   db:
     image: postgres
-    container_name: postgres_ezband_dev
+    container_name: ezband_db_dev
     env_file: .env
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
@@ -18,7 +18,7 @@ services:
     build: 
       context: ./EzBand-Backend
       dockerfile: Dockerfile
-    container_name: api_backend
+    container_name: ezband_backend_dev
     depends_on:
       - db
     env_file: .env
@@ -32,7 +32,6 @@ services:
       - ezband_app_network
 
 volumes:
-  # postgres_data_prd:
   postgres_data_dev:
 
 networks:

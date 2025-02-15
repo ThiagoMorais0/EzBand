@@ -1,6 +1,7 @@
 package com.baseapplication.core.config;
 
 import com.baseapplication.core.model.Usuario;
+
 import lombok.Getter;
 import lombok.Setter;
 

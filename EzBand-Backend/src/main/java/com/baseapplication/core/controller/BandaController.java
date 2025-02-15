@@ -1,15 +1,23 @@
 package com.baseapplication.core.controller;
 
-import com.baseapplication.core.dto.*;
-import com.baseapplication.core.enums.TipoEvento;
-import com.baseapplication.core.model.dto.BandaDTO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.baseapplication.core.dto.CadastroBandaDTO;
+import com.baseapplication.core.dto.ConviteEventoDTO;
+import com.baseapplication.core.dto.RepertorioBandaDTO;
+import com.baseapplication.core.dto.RetornoDTO;
 import com.baseapplication.core.service.BandaService;
 import com.baseapplication.core.utils.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @CrossOrigin(origins = "http://127.0.0.1:5500")

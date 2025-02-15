@@ -1,19 +1,15 @@
 package com.baseapplication.core.dto;
 
-import com.baseapplication.core.enums.PermissaoUsuario;
+import org.springframework.beans.BeanUtils;
+
 import com.baseapplication.core.model.MusicoBanda;
 import com.baseapplication.core.model.Usuario;
 import com.baseapplication.core.utils.DateUtils;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.beans.BeanUtils;
-
-import java.time.LocalDate;
 
 @Getter
 @Setter

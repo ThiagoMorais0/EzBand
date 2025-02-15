@@ -1,10 +1,11 @@
 package com.baseapplication.core.dto;
 
-import com.baseapplication.core.model.Banda;
-import com.fasterxml.jackson.annotation.JsonFormat;
+import java.time.LocalDate;
+
 import org.springframework.beans.BeanUtils;
 
-import java.time.LocalDate;
+import com.baseapplication.core.model.Banda;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 public class BandaParticipacaoEspecialDTO {
     private Long id;

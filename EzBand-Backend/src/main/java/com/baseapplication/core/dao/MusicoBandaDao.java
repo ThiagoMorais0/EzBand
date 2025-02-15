@@ -1,13 +1,13 @@
 package com.baseapplication.core.dao;
 
-import com.baseapplication.core.model.MusicoBanda;
-import com.baseapplication.core.model.MusicoBandaId;
-import com.baseapplication.core.model.Usuario;
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import com.baseapplication.core.model.MusicoBanda;
+import com.baseapplication.core.model.MusicoBandaId;
 
 @Repository
 public interface MusicoBandaDao extends JpaRepository<MusicoBanda, MusicoBandaId> {

@@ -1,11 +1,11 @@
 package com.baseapplication.core.dao;
 
 
-import com.baseapplication.core.model.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Repository;
+
+import com.baseapplication.core.model.Usuario;
 
 @Repository
 public interface UsuarioDao extends JpaRepository<Usuario, Long> {

@@ -1,0 +1,16 @@
+com.baseapplication
+com.baseapplication.core.config
+com.baseapplication.core.controller
+com.baseapplication.core.dao
+com.baseapplication.core.dto
+com.baseapplication.core.dto.superClasses
+com.baseapplication.core.enums
+com.baseapplication.core.interfaces
+com.baseapplication.core.model
+com.baseapplication.core.model.dto
+com.baseapplication.core.model.dto.superClasses
+com.baseapplication.core.model.embedded
+com.baseapplication.core.model.superClasses
+com.baseapplication.core.service
+com.baseapplication.core.service.impl
+com.baseapplication.core.utils

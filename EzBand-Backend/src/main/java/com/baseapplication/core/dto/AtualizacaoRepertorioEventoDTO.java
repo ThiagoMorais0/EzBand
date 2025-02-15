@@ -1,12 +1,11 @@
 package com.baseapplication.core.dto;
 
+import java.util.List;
+
 import com.baseapplication.core.enums.TipoEvento;
-import com.baseapplication.core.model.MusicoEvento;
-import com.baseapplication.core.model.RepertorioEvento;
+
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.List;
 
 @Getter
 @Setter

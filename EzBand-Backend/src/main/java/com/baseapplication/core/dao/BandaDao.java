@@ -1,13 +1,13 @@
 package com.baseapplication.core.dao;
 
-import com.baseapplication.core.model.Banda;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import com.baseapplication.core.model.Banda;
 
 @Repository
 public interface BandaDao extends JpaRepository<Banda, Long> {
