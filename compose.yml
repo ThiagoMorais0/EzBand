@@ -30,9 +30,12 @@ services:
       - "8080:8080"
     networks:
       - ezband_app_network
+    volumes:
+      - app_logs_dev:/app/logs
 
 volumes:
   postgres_data_dev:
+  app_logs_dev:
 
 networks:
   ezband_app_network:
