@@ -34,6 +34,11 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.POST, "/auth/teste").permitAll()
                         .requestMatchers(HttpMethod.GET, "/usuario/verificarEmailJaCadastrado").permitAll()
                         .requestMatchers(HttpMethod.POST, "/usuario/editarUsuarioComImagem").permitAll()
+                        // SWAGGER
+                        .requestMatchers(HttpMethod.GET, "/swagger-ui.html").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/swagger-ui/*").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/v3/api-docs").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/v3/api-docs/*").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)

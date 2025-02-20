@@ -14,8 +14,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.baseapplication.core.dto.CadastroDTO;
 import com.baseapplication.core.dto.CadastroUsuarioDTO;
+import com.baseapplication.core.dto.InfoUsuarioDTO;
 import com.baseapplication.core.dto.LoginDTO;
-import com.baseapplication.core.dto.RetornoDTO;
+import com.baseapplication.core.exception.InternalException;
 import com.baseapplication.core.service.AuthenticationService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,52 +29,42 @@ import lombok.extern.java.Log;
 @Log
 public class AuthenticationController {
 
-    @Autowired
-    private AuthenticationService authenticationService;
+	@Autowired
+	private AuthenticationService authenticationService;
 
-    @PostMapping("/teste")
-    public String teste() {
-        return "teste";
-    }
+	@PostMapping("/login")
+	public ResponseEntity<?> login(@RequestBody LoginDTO credenciais) {
+		return authenticationService.login(credenciais);
+	}
 
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginDTO credenciais) {
-        return authenticationService.login(credenciais);
-    }
+	@CrossOrigin(origins = "*")
+	@PostMapping("/registrar")
+	public void registrar(@RequestBody CadastroDTO cadastroDTO) {
+		authenticationService.registrar(cadastroDTO);
+	}
 
-    @CrossOrigin(origins = "*")
-    @PostMapping("/registrar")
-    public ResponseEntity<?> registrar(@RequestBody CadastroDTO cadastroDTO) {
-        RetornoDTO retorno = authenticationService.registrar(cadastroDTO);
-        if(retorno.getSuccess() == 1)
-            return ResponseEntity.ok().build();
-        else
-            return ResponseEntity.badRequest().build();
-    }
+	@PostMapping("/cadastrarUsuarioComImagem")
+	@CrossOrigin(origins = "*")
+	public void cadastrarUsuarioComImagem(@RequestParam("usuario") String usuarioJson, MultipartFile imagem) {
 
+		CadastroUsuarioDTO usuario = null;
+		try {
+			usuario = new ObjectMapper().readValue(usuarioJson, CadastroUsuarioDTO.class);
+		} catch (JsonProcessingException e) {
+			throw new InternalException(e.getMessage());
+		}
 
-    @PostMapping("/cadastrarUsuarioComImagem")
-    @CrossOrigin(origins = "*")
-    public RetornoDTO cadastrarUsuarioComImagem(@RequestParam("usuario") String usuarioJson, MultipartFile imagem) throws JsonProcessingException {
-        CadastroUsuarioDTO usuario = new ObjectMapper().readValue(usuarioJson, CadastroUsuarioDTO.class);
+		authenticationService.cadastrarUsuarioComImagem(usuario, imagem);
+	}
 
-        return authenticationService.cadastrarUsuarioComImagem(usuario, imagem);
-    }
+	@PostMapping("/validarToken")
+	public boolean validarToken(@RequestBody String token) {
+		return authenticationService.isTokenValid(token);
+	}
 
-
-    @PostMapping("/validarToken")
-    public RetornoDTO validarToken(@RequestBody String token){
-        Boolean tokenValido = authenticationService.isTokenValid(token);
-        if(tokenValido){
-            return RetornoDTO.success();
-        }else{
-            return RetornoDTO.error();
-        }
-    }
-
-    @GetMapping("buscarInfoUsuario")
-    public RetornoDTO buscarInfoUsuario(@RequestParam String email){
-        return authenticationService.buscarInfoUsuario(email);
-    }
+	@GetMapping("buscarInfoUsuario")
+	public InfoUsuarioDTO buscarInfoUsuario(@RequestParam String email) {
+		return authenticationService.buscarInfoUsuario(email);
+	}
 
 }

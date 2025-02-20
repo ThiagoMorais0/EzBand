@@ -1,5 +1,7 @@
 package com.baseapplication.core.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,122 +14,81 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.baseapplication.core.dto.EmailDTO;
 import com.baseapplication.core.dto.InfoPerfilUsuarioDTO;
-import com.baseapplication.core.dto.RetornoDTO;
+import com.baseapplication.core.dto.InfoUsuarioPainelDTO;
+import com.baseapplication.core.model.dto.superClasses.NotificacaoDTO;
 import com.baseapplication.core.service.UsuarioService;
 import com.baseapplication.core.utils.Context;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
 @RequestMapping("/usuario")
 public class UsuarioController {
 
-    @Autowired
-    private UsuarioService usuarioService;
+	@Autowired
+	private UsuarioService usuarioService;
 
-    @GetMapping("/buscarInfoUsuarioPainel")
-    public RetornoDTO buscarInfoUsuarioPainel() {
-        try {
-            return RetornoDTO.success(usuarioService.buscarInfoPainel());
-        } catch (Exception e) {
-            return RetornoDTO.error(e.getMessage());
-        }
-    }
+	@GetMapping("/buscarInfoUsuarioPainel")
+	public InfoUsuarioPainelDTO buscarInfoUsuarioPainel() {
+		return usuarioService.buscarInfoPainel();
+	}
 
-    @GetMapping("/buscarInformacoesDoPerfil")
-    public RetornoDTO buscarInformacoesDoPerfil() {
-        try {
-            return RetornoDTO.success(new InfoPerfilUsuarioDTO(Context.getUsuarioLogado()));
-        } catch (Exception e) {
-            return RetornoDTO.error(e.getMessage());
-        }
-    }
+	@GetMapping("/buscarInformacoesDoPerfil")
+	public InfoPerfilUsuarioDTO buscarInformacoesDoPerfil() {
 
-    @PostMapping("/atualizarInformacoesPerfil")
-    public RetornoDTO atualizarInformacoesPerfil(@RequestBody InfoPerfilUsuarioDTO infoPerfil) {
-        try {
-            usuarioService.atualizarInformacoesPerfil(infoPerfil);
-            return RetornoDTO.success();
-        } catch (Exception e) {
-            return RetornoDTO.error(e.getMessage());
-        }
-    }
+		return new InfoPerfilUsuarioDTO(Context.getUsuarioLogado());
 
-    @PostMapping("/editarUsuarioComImagem")
-    public RetornoDTO editarUsuarioComImagem(@RequestParam("usuario") String usuarioJson, MultipartFile imagem) throws JsonProcessingException {
-        try{
-            InfoPerfilUsuarioDTO usuario = new ObjectMapper().readValue(usuarioJson, InfoPerfilUsuarioDTO.class);
-            return RetornoDTO.success(usuarioService.editarUsuarioComImagem(usuario, imagem));
-        }catch (Exception e){
-            return RetornoDTO.error(e.getMessage());
-        }
-    }
+	}
 
-    @GetMapping("/verificarEmailJaCadastrado")
-    @CrossOrigin(origins = "*")
-    public RetornoDTO verificarEmailJaCadastrado(@RequestParam String email) {
-        try {
-            return !usuarioService.verificarEmailJaCadastrado(email) ? RetornoDTO.success() : RetornoDTO.error("E-mail já cadastrado");
-        } catch (Exception e) {
-            return RetornoDTO.error(e.getMessage());
-        }
-    }
+	@PostMapping("/atualizarInformacoesPerfil")
+	public void atualizarInformacoesPerfil(@RequestBody InfoPerfilUsuarioDTO infoPerfil) {
 
-    @GetMapping("/buscarQuantidadeNotificacoes")
-    public RetornoDTO buscarQuantidadeNotificacoes(){
-        try{
-            return RetornoDTO.success(usuarioService.buscarQuantidadeNotificacoes(Context.getUsuarioLogado().getId()));
-        }catch (Exception e){
-            return RetornoDTO.error("Erro ao buscar notificações");
-        }
-    }
+		usuarioService.atualizarInformacoesPerfil(infoPerfil);
 
-    @GetMapping("/enviarSolicitacaoParaIngressarBanda")
-    public RetornoDTO enviarSolicitacaoParaIngressarBanda(@RequestParam Long idBanda, @RequestParam String instrumento){
-        try{
-            usuarioService.enviarSolicitacaoParaIngressarBanda(idBanda, Context.getUsuarioLogado().getId(), instrumento);
-            return RetornoDTO.success();
-        }catch (Exception e){
-            return RetornoDTO.error("Erro ao enviar solicitação");
-        }
-    }
+	}
 
-    @GetMapping("/buscarInformacoesDoPerfilPorId")
-    public RetornoDTO buscarInformacoesDoPerfilPorId(@RequestParam Long idUsuario) {
-        try {
-            return RetornoDTO.success(usuarioService.buscarInformacoesDoPerfilPorId(idUsuario));
-        } catch (Exception e) {
-            return RetornoDTO.error(e.getMessage());
-        }
-    }
+	@PostMapping("/editarUsuarioComImagem")
+	public InfoPerfilUsuarioDTO editarUsuarioComImagem(@RequestParam("usuario") String usuarioJson,
+			MultipartFile imagem) {
 
-    @GetMapping("/buscarNotificacoesUsuario")
-    public RetornoDTO buscarNotificacoesUsuario(){
-        try{
-            return RetornoDTO.success(usuarioService.buscarNotificacoesUsuario(Context.getUsuarioLogado().getId()));
-        }catch (Exception e){
-            return RetornoDTO.error(e.getMessage());
-        }
-    }
+		return usuarioService.editarUsuarioComImagem(usuarioJson, imagem);
 
-    @PostMapping("/reportarErro")
-    public RetornoDTO reportarErro(@RequestBody String mensagem){
-        try{
-            usuarioService.reportarErro(mensagem);
-            return RetornoDTO.success();
-        }catch (Exception e){
-            return RetornoDTO.error("Erro ao enviar mensagem");
-        }
-    }
+	}
 
-    @PostMapping("/enviarEmail")
-    public RetornoDTO enviarEmail(@RequestBody EmailDTO email){
-        try{
-            usuarioService.enviarEmail(email);
-            return RetornoDTO.success();
-        }catch (Exception e){
-            return RetornoDTO.error("Erro ao enviar e-mail: " + e.getMessage());
-        }
-    }
+	@GetMapping("/verificarEmailJaCadastrado")
+	@CrossOrigin(origins = "*")
+	public boolean verificarEmailJaCadastrado(@RequestParam String email) {
 
+		return usuarioService.verificarEmailJaCadastrado(email);
+
+	}
+
+	@GetMapping("/buscarQuantidadeNotificacoes")
+	public Integer buscarQuantidadeNotificacoes() {
+		return usuarioService.buscarQuantidadeNotificacoes(Context.getUsuarioLogado().getId());
+	}
+
+	@GetMapping("/enviarSolicitacaoParaIngressarBanda")
+	public void enviarSolicitacaoParaIngressarBanda(@RequestParam Long idBanda, @RequestParam String instrumento) {
+		usuarioService.enviarSolicitacaoParaIngressarBanda(idBanda, Context.getUsuarioLogado().getId(), instrumento);
+
+	}
+
+	@GetMapping("/buscarInformacoesDoPerfilPorId")
+	public InfoPerfilUsuarioDTO buscarInformacoesDoPerfilPorId(@RequestParam Long idUsuario) {
+		return usuarioService.buscarInformacoesDoPerfilPorId(idUsuario);
+	}
+
+	@GetMapping("/buscarNotificacoesUsuario")
+	public List<NotificacaoDTO> buscarNotificacoesUsuario() {
+		return usuarioService.buscarNotificacoesUsuario(Context.getUsuarioLogado().getId());
+	}
+
+	@PostMapping("/reportarErro")
+	public void reportarErro(@RequestBody String mensagem) {
+		usuarioService.reportarErro(mensagem);
+	}
+
+	@PostMapping("/enviarEmail")
+	public void enviarEmail(@RequestBody EmailDTO email) {
+		usuarioService.enviarEmail(email);
+	}
 }

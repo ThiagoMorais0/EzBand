@@ -1,21 +1,23 @@
 package com.baseapplication.core.service;
 
-import com.baseapplication.core.dto.*;
-import com.baseapplication.core.enums.TipoEvento;
-import com.baseapplication.core.model.Banda;
-import com.baseapplication.core.model.dto.BandaDTO;
-import com.google.protobuf.ServiceException;
+import java.util.List;
+
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Collection;
-import java.util.List;
+import com.baseapplication.core.dto.EnsaiosFuturosDTO;
+import com.baseapplication.core.dto.InfoMembroBandaDTO;
+import com.baseapplication.core.dto.MusicaDTO;
+import com.baseapplication.core.dto.RepertorioBandaDTO;
+import com.baseapplication.core.dto.ShowsFuturosDTO;
+import com.baseapplication.core.model.Banda;
+import com.baseapplication.core.model.dto.BandaDTO;
 
 public interface BandaService {
     List<Banda> buscarBandasPorUsuario(Long idUsuario);
 
     List<Banda> buscarParticipacoesEspeciais(Long idUsuario);
 
-    BandaDTO getInfo(Long idBanda) throws ServiceException;
+    BandaDTO getInfo(Long idBanda);
 
     void cadastrarUsuario(Long idBanda, Long idUsuario, String instrumentos);
 
@@ -24,9 +26,9 @@ public interface BandaService {
     List<InfoMembroBandaDTO> buscarMembros(Long idBanda);
 
 
-    void novaBanda(CadastroBandaDTO bandaDTO, MultipartFile logo);
+    void novaBanda(String bandaJson, MultipartFile logo);
 
-    BandaDTO buscarBandaParaIngressar(Long idBanda) throws ServiceException;
+    BandaDTO buscarBandaParaIngressar(Long idBanda);
 
 
     Integer buscarQuantidadeDeShows(Long idBanda);
@@ -39,11 +41,11 @@ public interface BandaService {
 
     void sairDaBanda(Long idBanda, Long id);
 
-    ShowsFuturosDTO buscarShowsFuturosBanda(Long idBanda, Long idUsuario) throws ServiceException;
+    ShowsFuturosDTO buscarShowsFuturosBanda(Long idBanda, Long idUsuario) ;
 
     Banda buscarPorId(Long idBanda);
 
-    EnsaiosFuturosDTO buscarEnsaiosFuturosBanda(Long idBanda, Long id) throws ServiceException;
+    EnsaiosFuturosDTO buscarEnsaiosFuturosBanda(Long idBanda, Long id) ;
 
     List<MusicaDTO> buscarRepertorio(Long idBanda);
 

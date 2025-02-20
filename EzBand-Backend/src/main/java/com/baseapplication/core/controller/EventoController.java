@@ -1,5 +1,7 @@
 package com.baseapplication.core.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -10,11 +12,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.baseapplication.core.dto.AtualizacaoRepertorioEventoDTO;
 import com.baseapplication.core.dto.ConviteEventoDTO;
+import com.baseapplication.core.dto.DisponibilidadeMusicoParaEventoDTO;
+import com.baseapplication.core.dto.MusicoEventoDTO;
 import com.baseapplication.core.dto.NovoShowDTO;
-import com.baseapplication.core.dto.RetornoDTO;
+import com.baseapplication.core.dto.RepertorioEventoDTO;
 import com.baseapplication.core.dto.superClasses.InformacoesEventoDTO;
 import com.baseapplication.core.enums.TipoContato;
 import com.baseapplication.core.enums.TipoEvento;
+import com.baseapplication.core.model.superClasses.Evento;
 import com.baseapplication.core.service.EventoService;
 import com.baseapplication.core.utils.DateUtils;
 
@@ -22,134 +27,82 @@ import com.baseapplication.core.utils.DateUtils;
 @RequestMapping("/evento")
 public class EventoController {
 
-    @Autowired
-    private EventoService eventoService;
+	@Autowired
+	private EventoService eventoService;
 
-    @GetMapping("/buscarPorId")
-    public RetornoDTO buscar(@RequestParam Long idEvento, @RequestParam TipoEvento tipoEvento){
-        try{
-            return RetornoDTO.success(eventoService.buscarPorId(idEvento, tipoEvento));
-        }catch (Exception e){
-            return RetornoDTO.error();
-        }
-    }
+	@GetMapping("/buscarPorId")
+	public Evento buscar(@RequestParam Long idEvento, @RequestParam TipoEvento tipoEvento) {
 
-    @GetMapping("/buscarInformacoesEvento")
-    public RetornoDTO buscarInformacoesEvento(@RequestParam Long idEvento, @RequestParam TipoEvento tipoEvento){
-        try{
-            return RetornoDTO.success(eventoService.buscarPobuscarInformacoesEventorId(idEvento, tipoEvento));
-        }catch (Exception e){
-            return RetornoDTO.error();
-        }
-    }
+		return eventoService.buscarPorId(idEvento, tipoEvento);
 
-    @PostMapping("/atualizarInformacoesEvento")
-    public RetornoDTO atualizarInformacoesEvento(@RequestBody InformacoesEventoDTO informacoesEventoDTO){
-        try{
-            eventoService.atualizarInformacoesEvento(informacoesEventoDTO);
-            return RetornoDTO.success();
-        }catch (Exception e){
-            return RetornoDTO.error(e.getMessage());
-        }
-    }
+	}
 
-    @GetMapping("/buscarMusicoParaEvento")
-    public RetornoDTO buscarMusicoParaEvento(@RequestParam String contato, @RequestParam TipoContato tipoContato){
-        try{
-            return RetornoDTO.success(eventoService.buscarMusicoParaEvento(contato, tipoContato));
-        }catch (Exception e){
-            return RetornoDTO.error(e.getMessage());
-        }
-    }
+	@GetMapping("/buscarInformacoesEvento")
+	public InformacoesEventoDTO buscarInformacoesEvento(@RequestParam Long idEvento,
+			@RequestParam TipoEvento tipoEvento) {
+		return eventoService.buscarPobuscarInformacoesEventorId(idEvento, tipoEvento);
 
-    @PostMapping("/enviarConviteParaEvento")
-    public RetornoDTO enviarConviteParaEvento(@RequestBody ConviteEventoDTO conviteEvento){
-        try{
-            eventoService.enviarConviteParaEvento(conviteEvento);
-            return RetornoDTO.success();
-        }catch (Exception e){
-            return RetornoDTO.error(e.getMessage());
-        }
-    }
+	}
 
-    @GetMapping("buscarRepertorioEvento")
-    public RetornoDTO buscarRepertorioEvento(@RequestParam Long idEvento, @RequestParam TipoEvento tipoEvento){
-        try{
-            return RetornoDTO.success(eventoService.buscarRepertorioEvento(idEvento, tipoEvento));
-        }catch (Exception e){
-            return RetornoDTO.error(e.getMessage());
-        }
-    }
+	@PostMapping("/atualizarInformacoesEvento")
+	public void atualizarInformacoesEvento(@RequestBody InformacoesEventoDTO informacoesEventoDTO) {
+		eventoService.atualizarInformacoesEvento(informacoesEventoDTO);
 
-    @PostMapping("atualizarRepertorioEvento")
-    public RetornoDTO atualizarRepertorioEvento(@RequestBody AtualizacaoRepertorioEventoDTO atualizacaoRepertorio){
-        try{
-            eventoService.atualizarRepertorioEvento(atualizacaoRepertorio);
-            return RetornoDTO.success();
-        }catch (Exception e){
-            return RetornoDTO.error(e.getMessage());
-        }
-    }
+	}
 
-    @GetMapping("/buscarMembrosEDisponibilidadeParaShow")
-    public RetornoDTO buscarMembrosParaShow(@RequestParam Long idBanda,
-                                            @RequestParam String data){
-        try{
-            return RetornoDTO.success(
-                    eventoService.buscarMembrosEDisponibilidadeParaShow(idBanda, DateUtils.stringToLocalDate(data))
-            );
-        } catch (Exception e){
-            return RetornoDTO.error("Erro ao buscar membros para show");
-        }
-    }
+	@GetMapping("/buscarMusicoParaEvento")
+	public MusicoEventoDTO buscarMusicoParaEvento(@RequestParam String contato, @RequestParam TipoContato tipoContato) {
+		return eventoService.buscarMusicoParaEvento(contato, tipoContato);
 
-    @PostMapping("/marcarShow")
-    public RetornoDTO marcarShow(@RequestBody NovoShowDTO novoShowDTO){
-        try{
-            eventoService.marcarShow(novoShowDTO);
-            return RetornoDTO.success();
-        } catch (Exception e){
-            return RetornoDTO.error(e.getMessage());
-        }
-    }
+	}
 
-    @PostMapping("/marcarEnsaio")
-    public RetornoDTO marcarEnsaio(@RequestBody NovoEnsaioDTO novoEnsaioDTO){
-        try{
-            eventoService.marcarEnsaio(novoEnsaioDTO);
-            return RetornoDTO.success();
-        } catch (Exception e){
-            return RetornoDTO.error(e.getMessage());
-        }
-    }
+	@PostMapping("/enviarConviteParaEvento")
+	public void enviarConviteParaEvento(@RequestBody ConviteEventoDTO conviteEvento) {
+		eventoService.enviarConviteParaEvento(conviteEvento);
 
-    @GetMapping("/isNotificacaoShowAceitaPorTodosMembros")
-    public RetornoDTO isNotificacaoShowAceitaPorTodosMembros(Long idShow){
-        try{
-            return RetornoDTO.success(eventoService.isNotificacaoShowAceitaPorTodosMembros(idShow));
-        }catch (Exception e){
-            return RetornoDTO.error(e.getMessage());
-        }
-    }
+	}
 
-    @PostMapping("/aceitarNotificacao")
-    public RetornoDTO aceitarNotificacao(@RequestParam Long idNotificacao){
-        try{
-            eventoService.aceitarNotificacao(idNotificacao);
-            return RetornoDTO.success();
-        }catch (Exception e){
-            return RetornoDTO.error();
-        }
-    }
+	@GetMapping("buscarRepertorioEvento")
+	public List<RepertorioEventoDTO> buscarRepertorioEvento(@RequestParam Long idEvento,
+			@RequestParam TipoEvento tipoEvento) {
+		return eventoService.buscarRepertorioEvento(idEvento, tipoEvento);
 
-    @PostMapping("/recusarNotificacao")
-    public RetornoDTO recusarNotificacao(@RequestParam Long idNotificacao){
-        try{
-            eventoService.recusarNotificacao(idNotificacao);
-            return RetornoDTO.success();
-        }catch (Exception e){
-            return RetornoDTO.error();
-        }
-    }
+	}
+
+	@PostMapping("atualizarRepertorioEvento")
+	public void atualizarRepertorioEvento(@RequestBody AtualizacaoRepertorioEventoDTO atualizacaoRepertorio) {
+		eventoService.atualizarRepertorioEvento(atualizacaoRepertorio);
+	}
+
+	@GetMapping("/buscarMembrosEDisponibilidadeParaShow")
+	public List<DisponibilidadeMusicoParaEventoDTO> buscarMembrosParaShow(@RequestParam Long idBanda,
+			@RequestParam String data) {
+		return eventoService.buscarMembrosEDisponibilidadeParaShow(idBanda, DateUtils.stringToLocalDate(data));
+	}
+
+	@PostMapping("/marcarShow")
+	public void marcarShow(@RequestBody NovoShowDTO novoShowDTO) {
+		eventoService.marcarShow(novoShowDTO);
+	}
+
+	@PostMapping("/marcarEnsaio")
+	public void marcarEnsaio(@RequestBody NovoEnsaioDTO novoEnsaioDTO) {
+		eventoService.marcarEnsaio(novoEnsaioDTO);
+	}
+
+	@GetMapping("/isNotificacaoShowAceitaPorTodosMembros")
+	public boolean isNotificacaoShowAceitaPorTodosMembros(Long idShow) {
+		return eventoService.isNotificacaoShowAceitaPorTodosMembros(idShow);
+	}
+
+	@PostMapping("/aceitarNotificacao")
+	public void aceitarNotificacao(@RequestParam Long idNotificacao) {
+		eventoService.aceitarNotificacao(idNotificacao);
+	}
+
+	@PostMapping("/recusarNotificacao")
+	public void recusarNotificacao(@RequestParam Long idNotificacao) {
+		eventoService.recusarNotificacao(idNotificacao);
+	}
 
 }
