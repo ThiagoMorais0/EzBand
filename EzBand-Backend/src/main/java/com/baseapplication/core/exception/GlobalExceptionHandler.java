@@ -28,34 +28,35 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(ResourceNotFoundException.class)
 	public ResponseEntity<ExcResponse> handleResourceNotFoundException(ResourceNotFoundException ex) {
 		ExcResponse excResponse = new ExcResponse("NOT_FOUND", ex.getMessage());
-		log.error("Erro: ", ex);
+		log.error(ex.getMessage());
 		return new ResponseEntity<>(excResponse, HttpStatus.NOT_FOUND);
 	}
 
 	@ExceptionHandler(ConflictException.class)
 	public ResponseEntity<ExcResponse> handleConflictException(ConflictException ex) {
 		ExcResponse excResponse = new ExcResponse("CONFLICT", ex.getMessage());
-		log.error("Erro: ", ex);
+		log.error(ex.getMessage());
 		return new ResponseEntity<>(excResponse, HttpStatus.CONFLICT);
 	}
 
 	@ExceptionHandler(RestrictionException.class)
 	public ResponseEntity<ExcResponse> handleRestrictionException(RestrictionException ex) {
 		ExcResponse excResponse = new ExcResponse("FORBIDDEN", ex.getMessage());
+		log.error(ex.getMessage());
 		return new ResponseEntity<>(excResponse, HttpStatus.FORBIDDEN);
 	}
 
 	@ExceptionHandler(InvalidParamException.class)
 	public ResponseEntity<ExcResponse> handleInvalidParamException(InvalidParamException ex) {
 		ExcResponse excResponse = new ExcResponse("BAD_REQUEST", ex.getMessage());
-		log.error("Erro: ", ex);
+		log.error(ex.getMessage());
 		return new ResponseEntity<>(excResponse, HttpStatus.BAD_REQUEST);
 	}
 
 	@ExceptionHandler(NoContentException.class)
 	public ResponseEntity<ExcResponse> handleRNoContentException(NoContentException ex) {
 		ExcResponse excResponse = new ExcResponse("NO_CONTENT", ex.getMessage());
-		log.error("Erro: ", ex);
+		log.error(ex.getMessage());
 		return new ResponseEntity<>(excResponse, HttpStatus.NO_CONTENT);
 	}
 }

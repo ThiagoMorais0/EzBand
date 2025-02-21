@@ -20,6 +20,7 @@ import com.baseapplication.core.dto.CadastroUsuarioDTO;
 import com.baseapplication.core.dto.InfoUsuarioDTO;
 import com.baseapplication.core.dto.LoginDTO;
 import com.baseapplication.core.dto.LoginResponseDTO;
+import com.baseapplication.core.exception.ConflictException;
 import com.baseapplication.core.model.Usuario;
 import com.baseapplication.core.service.AuthenticationService;
 import com.baseapplication.core.service.ImagemService;
@@ -75,10 +76,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 	private void verificaUsuarioJaCadastrado(CadastroUsuarioDTO dados) {
 		if (usuarioService.findByEmail(dados.getEmail()) != null)
-			throw new ServiceException("Nome de usuário já cadastrado.");
-
-		if (usuarioService.findByEmail(dados.getEmail()) != null)
-			throw new ServiceException("Email já cadastrado.");
+			throw new ConflictException("Email já cadastrado.");
 	}
 
 	private void verificaUsuarioJaCadastrado(CadastroDTO dados) {
@@ -86,7 +84,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 //            throw new ServiceException("Nome de usuário já cadastrado.");
 
 		if (usuarioService.findByEmail(dados.getEmail()) != null)
-			throw new ServiceException("Email já cadastrado.");
+			throw new ConflictException("Email já cadastrado.");
 	}
 
 	@Override

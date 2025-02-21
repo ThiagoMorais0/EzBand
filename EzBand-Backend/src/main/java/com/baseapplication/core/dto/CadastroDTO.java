@@ -1,5 +1,7 @@
 package com.baseapplication.core.dto;
 
+import java.time.LocalDate;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,5 +17,7 @@ public class CadastroDTO {
     private String login;
     private String email;
     private String senha;
+    private LocalDate
+    dataNascimento;
 
 }

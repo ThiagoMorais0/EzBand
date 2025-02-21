@@ -40,6 +40,7 @@ public class AuthenticationController {
 	@CrossOrigin(origins = "*")
 	@PostMapping("/registrar")
 	public void registrar(@RequestBody CadastroDTO cadastroDTO) {
+		System.out.println(cadastroDTO.getDataNascimento());
 		authenticationService.registrar(cadastroDTO);
 	}
 

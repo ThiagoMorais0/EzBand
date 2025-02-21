@@ -66,7 +66,7 @@ public class Usuario implements UserDetails {
         this.bloqueado = false;
         this.urlFotoPerfil = "default";
         this.dataCriacao = LocalDate.now();
-
+        this.dataNascimento = data.getDataNascimento();
     }
 
     public List<Banda> getBandas(){

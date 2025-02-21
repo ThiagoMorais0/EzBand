@@ -1,27 +1,19 @@
 package com.baseapplication.core.service.impl;
 
-import com.baseapplication.core.config.TokenService;
-import com.baseapplication.core.dto.*;
-import com.baseapplication.core.model.Usuario;
-import com.baseapplication.core.service.AuthenticationService;
-import com.baseapplication.core.service.ImagemService;
-import com.baseapplication.core.service.UsuarioService;
-import com.google.auth.oauth2.GoogleCredentials;
-import com.google.cloud.storage.*;
-import org.hibernate.service.spi.ServiceException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.*;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.BlobId;
+import com.google.cloud.storage.BlobInfo;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
 
 @Service
 public class GoogleCloudStorageServiceImpl {

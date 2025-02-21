@@ -144,7 +144,7 @@ public class EventoServiceImpl implements EventoService {
 
 		if (retorno == null)
 			throw new ResourceNotFoundException("Evento não encontrado");
-		
+
 		return retorno;
 	}
 
@@ -195,6 +195,7 @@ public class EventoServiceImpl implements EventoService {
 	@Override
 	public void atualizarRepertorioEvento(AtualizacaoRepertorioEventoDTO atualizacaoRepertorio) {
 		Evento evento = buscarEvento(atualizacaoRepertorio.getIdEvento(), atualizacaoRepertorio.getTipoEvento());
+		if (evento == null) throw new ResourceNotFoundException("Evento não encontrado");
 
 		evento.setRepertorio(atualizacaoRepertorio.getMusicas().stream()
 				.map(musica -> RepertorioEventoDTO.toEntity(musica, atualizacaoRepertorio.getIdEvento(),
@@ -224,6 +225,7 @@ public class EventoServiceImpl implements EventoService {
 	public void marcarShow(NovoShowDTO novoShowDTO) {
 		Show show = novoShowDTO.toEntity();
 		Banda banda = bandaService.buscarPorId(novoShowDTO.getIdBanda());
+		if (banda == null) throw new ResourceNotFoundException("Banda não encontrada");
 		show.setBanda(banda);
 		if (banda.getParametros().getExigirAprovacaoCompromissos()) {
 			show.setStatus(StatusEvento.AGUARDANDO_APROVACAO);

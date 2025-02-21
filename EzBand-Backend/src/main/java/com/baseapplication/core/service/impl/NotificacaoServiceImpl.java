@@ -2,6 +2,7 @@ package com.baseapplication.core.service.impl;
 
 import com.baseapplication.core.dao.NotificacaoDao;
 import com.baseapplication.core.enums.*;
+import com.baseapplication.core.exception.ResourceNotFoundException;
 import com.baseapplication.core.model.*;
 import com.baseapplication.core.model.superClasses.Evento;
 import com.baseapplication.core.model.superClasses.Notificacao;
@@ -71,14 +72,14 @@ public class NotificacaoServiceImpl implements NotificacaoService {
 
     @Override
     public Notificacao recusarNotificacao(Long idNotificacao) {
-        Notificacao notificacao = notificacaoDao.findById(idNotificacao).orElseThrow(() -> new ServiceException("Notificação não encontrada."));
+        Notificacao notificacao = notificacaoDao.findById(idNotificacao).orElseThrow(() -> new ResourceNotFoundException("Notificação não encontrada."));
         notificacao.setStatusNotificacao(StatusNotificacao.RECUSADO);
         return notificacaoDao.save(notificacao);
     }
 
     @Override
     public Notificacao aceitarNotificacao(Long idNotificacao) {
-        Notificacao notificacao = notificacaoDao.findById(idNotificacao).orElseThrow(() -> new ServiceException("Notificação não encontrada."));
+        Notificacao notificacao = notificacaoDao.findById(idNotificacao).orElseThrow(() -> new ResourceNotFoundException("Notificação não encontrada."));
         notificacao.setStatusNotificacao(StatusNotificacao.ACEITO);
         return notificacaoDao.save(notificacao);
     }

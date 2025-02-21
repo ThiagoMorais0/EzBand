@@ -17,8 +17,10 @@ import com.baseapplication.core.dto.EventosSeparadosDTO;
 import com.baseapplication.core.dto.InfoPerfilUsuarioDTO;
 import com.baseapplication.core.dto.InfoUsuarioPainelDTO;
 import com.baseapplication.core.enums.TipoContato;
+import com.baseapplication.core.exception.ConflictException;
 import com.baseapplication.core.exception.InternalException;
 import com.baseapplication.core.exception.InvalidParamException;
+import com.baseapplication.core.exception.ResourceNotFoundException;
 import com.baseapplication.core.model.Usuario;
 import com.baseapplication.core.model.dto.BandaDTO;
 import com.baseapplication.core.model.dto.superClasses.NotificacaoDTO;
@@ -120,13 +122,18 @@ public class UsuarioServiceImpl implements UsuarioService {
 	@Override
 	public void atualizarInformacoesPerfil(InfoPerfilUsuarioDTO infoPerfil) {
 		Usuario usuario = usuarioDao.findByEmail(infoPerfil.getEmail());
+		if (usuario == null)
+			throw new ResourceNotFoundException("Usuário não encontrado");
+		if (usuario.getId() != infoPerfil.getId())
+			throw new InvalidParamException("ID e e-mail divergentes");
 		BeanUtils.copyProperties(infoPerfil, usuario);
 		usuarioDao.save(usuario);
 	}
 
 	@Override
 	public Usuario buscarPorId(Long id) {
-		return usuarioDao.findById(id).get();
+		return usuarioDao.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado para o id " + id));
 	}
 
 	@Override

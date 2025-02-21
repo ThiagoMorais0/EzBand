@@ -1,5 +1,6 @@
 package com.baseapplication.core.service.impl;
 
+import com.baseapplication.core.exception.InternalException;
 import com.baseapplication.core.service.ImagemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,8 +18,7 @@ public class ImagemServiceImpl implements ImagemService {
         try {
             return storageService.uploadImage(imagem);
         } catch (IOException e) {
-            e.printStackTrace();
-            return null;
+            throw new InternalException("Erro ao realizar upload da imagem");
         }
     }
 
