@@ -15,3 +15,5 @@
 ### Diferentes ambientes:
 Ainda precisamos definir a melhor abordagem. Sugestão é termos dois conjuntos de .env diferentes, um para prd outro para dev.
 Também é interessante termos infos variáveis no compose para dev e prd, como nome dos containers e networks, por exemplo.
+### Mais instruções
+- Arquivos .env_base e application-base.properties possuem instruções específicas
