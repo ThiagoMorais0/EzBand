@@ -46,7 +46,7 @@ public class AuthenticationController {
 
 	@PostMapping("/cadastrarUsuarioComImagem")
 	@CrossOrigin(origins = "*")
-	public void cadastrarUsuarioComImagem(@RequestParam("usuario") String usuarioJson, MultipartFile imagem) {
+	public ResponseEntity<?> cadastrarUsuarioComImagem(@RequestParam("usuario") String usuarioJson, MultipartFile imagem) {
 
 		CadastroUsuarioDTO usuario = null;
 		try {
@@ -55,7 +55,7 @@ public class AuthenticationController {
 			throw new InternalException(e.getMessage());
 		}
 
-		authenticationService.cadastrarUsuarioComImagem(usuario, imagem);
+		return authenticationService.cadastrarUsuarioComImagem(usuario, imagem);
 	}
 
 	@PostMapping("/validarToken")

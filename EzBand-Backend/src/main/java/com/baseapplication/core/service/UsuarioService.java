@@ -2,6 +2,7 @@ package com.baseapplication.core.service;
 
 import java.util.List;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.baseapplication.core.dto.EmailDTO;
@@ -43,4 +44,6 @@ public interface UsuarioService {
 	void reportarErro(String mensagem);
 
 	void enviarEmail(EmailDTO email);
+
+    ResponseEntity<?> buscarProximosEventosDoUsuario();
 }

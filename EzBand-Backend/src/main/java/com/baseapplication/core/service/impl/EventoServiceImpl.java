@@ -5,11 +5,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.baseapplication.core.model.*;
+import com.baseapplication.core.service.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import com.baseapplication.core.controller.NovoEnsaioDTO;
+import com.baseapplication.core.dto.NovoEnsaioDTO;
 import com.baseapplication.core.dto.AtualizacaoRepertorioEventoDTO;
 import com.baseapplication.core.dto.ConviteEventoDTO;
 import com.baseapplication.core.dto.DisponibilidadeMusicoParaEventoDTO;
@@ -29,26 +32,10 @@ import com.baseapplication.core.enums.TipoNotificacao;
 import com.baseapplication.core.exception.InvalidParamException;
 import com.baseapplication.core.exception.NoContentException;
 import com.baseapplication.core.exception.ResourceNotFoundException;
-import com.baseapplication.core.model.Banda;
-import com.baseapplication.core.model.Ensaio;
-import com.baseapplication.core.model.MusicoBanda;
-import com.baseapplication.core.model.MusicoEvento;
-import com.baseapplication.core.model.MusicoEventoId;
-import com.baseapplication.core.model.NotificacaoEnsaio;
-import com.baseapplication.core.model.NotificacaoShow;
-import com.baseapplication.core.model.Show;
-import com.baseapplication.core.model.Usuario;
 import com.baseapplication.core.model.dto.EnsaioDTO;
 import com.baseapplication.core.model.dto.ShowDTO;
 import com.baseapplication.core.model.superClasses.Evento;
 import com.baseapplication.core.model.superClasses.Notificacao;
-import com.baseapplication.core.service.BandaService;
-import com.baseapplication.core.service.EnsaioService;
-import com.baseapplication.core.service.EventoService;
-import com.baseapplication.core.service.MusicoEventoService;
-import com.baseapplication.core.service.NotificacaoService;
-import com.baseapplication.core.service.ShowService;
-import com.baseapplication.core.service.UsuarioService;
 import com.baseapplication.core.utils.Context;
 import com.baseapplication.core.utils.DateUtils;
 
@@ -74,6 +61,9 @@ public class EventoServiceImpl implements EventoService {
 
 	@Autowired
 	private BandaService bandaService;
+
+	@Autowired
+	private RepertorioEventoService repertorioEventoService;
 
 	@Override
 	public Evento buscarPorId(Long idEvento, TipoEvento tipoEvento) {
@@ -197,17 +187,23 @@ public class EventoServiceImpl implements EventoService {
 		Evento evento = buscarEvento(atualizacaoRepertorio.getIdEvento(), atualizacaoRepertorio.getTipoEvento());
 		if (evento == null) throw new ResourceNotFoundException("Evento não encontrado");
 
-		evento.setRepertorio(atualizacaoRepertorio.getMusicas().stream()
-				.map(musica -> RepertorioEventoDTO.toEntity(musica, atualizacaoRepertorio.getIdEvento(),
-						atualizacaoRepertorio.getIdBanda(), atualizacaoRepertorio.getTipoEvento()))
-				.collect(Collectors.toList()));
+		List<RepertorioEvento> repertorio = atualizacaoRepertorio.getMusicas().stream().map(i -> montarMusicaRepertorioEvento(i, evento)).toList();
+		repertorioEventoService.limparRepertorioEvento(evento.getId(), evento.getTipoEvento());
+		repertorioEventoService.salvarLista(repertorio);
 
-		salvar(evento);
+//		evento.setRepertorio(atualizacaoRepertorio.getMusicas().stream()
+//				.map(musica -> RepertorioEventoDTO.toEntity(musica, atualizacaoRepertorio.getIdEvento(),
+//						evento.getBanda().getId(), atualizacaoRepertorio.getTipoEvento()))
+//				.collect(Collectors.toList()));
+//
+	}
+
+	private RepertorioEvento montarMusicaRepertorioEvento(RepertorioEventoDTO repertorioEventoDTO, Evento evento) {
+		return RepertorioEventoDTO.toEntity(repertorioEventoDTO, evento.getId(), evento.getBanda().getId(), evento.getTipoEvento());
 	}
 
 	@Override
-	public List<DisponibilidadeMusicoParaEventoDTO> buscarMembrosEDisponibilidadeParaShow(Long idBanda,
-			LocalDate data) {
+	public ResponseEntity<?> buscarMembrosEDisponibilidadeParaShow(Long idBanda, LocalDate data) {
 		Banda banda = bandaService.buscarPorId(idBanda);
 		List<MusicoBanda> musicos = banda.getMusicos();
 		List<DisponibilidadeMusicoParaEventoDTO> musicosParaEvento = new ArrayList<>();
@@ -217,7 +213,7 @@ public class EventoServiceImpl implements EventoService {
 			musicosParaEvento.add(montarDisponibilidadeMusicoDTO(musico, evento));
 //            }
 		}
-		return musicosParaEvento;
+		return ResponseEntity.ok(musicosParaEvento);
 	}
 
 	@Transactional

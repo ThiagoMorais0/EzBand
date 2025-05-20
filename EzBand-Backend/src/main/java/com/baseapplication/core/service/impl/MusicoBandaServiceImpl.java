@@ -23,13 +23,13 @@ public class MusicoBandaServiceImpl implements MusicoBandaService {
     }
 
     @Override
-    public MusicoBanda cadastrarUsuarioEmBanda(Usuario usuario, Banda banda, String instrumentos) {
+    public MusicoBanda cadastrarUsuarioEmBanda(Usuario usuario, Banda banda, String instrumentos, PermissaoMusico permissaoMusico) {
         MusicoBanda musicoBanda = new MusicoBanda();
         musicoBanda.setId(new MusicoBandaId(usuario.getId(), banda.getId()));
         musicoBanda.setUsuario(usuario);
         musicoBanda.setBanda(banda);
         musicoBanda.setInstrumentos(instrumentos);
-        musicoBanda.setPermissao(PermissaoMusico.MEMBRO_REGULAR);
+        musicoBanda.setPermissao(permissaoMusico);
         return musicoBandaDao.save(musicoBanda);
     }
 

@@ -2,6 +2,7 @@ package com.baseapplication.core.model.dto.superClasses;
 
 import com.baseapplication.core.enums.StatusEvento;
 import com.baseapplication.core.enums.TipoEvento;
+import com.baseapplication.core.model.dto.BandaDTO;
 import com.baseapplication.core.model.superClasses.Evento;
 import com.baseapplication.core.utils.DateUtils;
 import jakarta.persistence.*;
@@ -18,6 +19,7 @@ import java.util.Date;
 @Getter
 @Setter
 public class EventoDTO {
+
     private Long id;
     private Long idBanda;
     private String dataInclusao;
@@ -29,6 +31,7 @@ public class EventoDTO {
     private String observacoes;
     private String status;
     private TipoEvento evento;
+    private BandaDTO banda;
 
     public EventoDTO(Evento evento){
         BeanUtils.copyProperties(evento, this);

@@ -2,6 +2,7 @@ package com.baseapplication.core.service;
 
 import java.util.List;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.baseapplication.core.dto.EnsaiosFuturosDTO;
@@ -28,7 +29,7 @@ public interface BandaService {
 
     void novaBanda(String bandaJson, MultipartFile logo);
 
-    BandaDTO buscarBandaParaIngressar(Long idBanda);
+    ResponseEntity<?> buscarBandaParaIngressar(Long idBanda);
 
 
     Integer buscarQuantidadeDeShows(Long idBanda);
@@ -50,4 +51,6 @@ public interface BandaService {
     List<MusicaDTO> buscarRepertorio(Long idBanda);
 
     void adicionarMusicaAoRepertorio(RepertorioBandaDTO repertorioBandaDTO);
+
+    void editarBanda(String bandaJson, MultipartFile logo);
 }

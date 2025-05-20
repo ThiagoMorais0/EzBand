@@ -1,4 +1,4 @@
-package com.baseapplication.core.controller;
+package com.baseapplication.core.dto;
 
 import java.math.BigDecimal;
 import java.sql.Time;
@@ -7,7 +7,6 @@ import java.util.List;
 
 import org.springframework.beans.BeanUtils;
 
-import com.baseapplication.core.dto.MusicoEventoDTO;
 import com.baseapplication.core.model.Ensaio;
 import com.baseapplication.core.utils.DateUtils;
 import com.fasterxml.jackson.annotation.JsonFormat;

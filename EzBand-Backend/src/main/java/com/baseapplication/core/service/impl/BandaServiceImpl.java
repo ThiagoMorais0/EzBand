@@ -6,18 +6,16 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+import com.baseapplication.core.dto.*;
+import com.baseapplication.core.enums.PermissaoMusico;
+import com.baseapplication.core.model.embedded.ParametrosBanda;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.baseapplication.core.dao.BandaDao;
-import com.baseapplication.core.dto.CadastroBandaDTO;
-import com.baseapplication.core.dto.EnsaiosFuturosDTO;
-import com.baseapplication.core.dto.InfoMembroBandaDTO;
-import com.baseapplication.core.dto.MusicaDTO;
-import com.baseapplication.core.dto.RepertorioBandaDTO;
-import com.baseapplication.core.dto.ShowsFuturosDTO;
 import com.baseapplication.core.enums.Tonalidade;
 import com.baseapplication.core.exception.ConflictException;
 import com.baseapplication.core.exception.InternalException;
@@ -75,8 +73,12 @@ public class BandaServiceImpl implements BandaService {
 
 	@Override
 	public void cadastrarUsuario(Long idBanda, Long idUsuario, String instrumentos) {
-		musicoBandaService.cadastrarUsuarioEmBanda(Context.getUsuarioLogado(), bandaDao.findById(idBanda).get(),
-				instrumentos);
+		musicoBandaService.cadastrarUsuarioEmBanda(
+				Context.getUsuarioLogado(),
+				bandaDao.findById(idBanda).get(),
+				instrumentos,
+				PermissaoMusico.MEMBRO_REGULAR
+		);
 	}
 
 	@Override
@@ -92,29 +94,67 @@ public class BandaServiceImpl implements BandaService {
 
 	@Override
 	public void novaBanda(String bandaJson, MultipartFile logo) {
-
 		CadastroBandaDTO bandaDTO;
 		try {
 			bandaDTO = new ObjectMapper().readValue(bandaJson, CadastroBandaDTO.class);
 		} catch (JsonProcessingException e) {
-			e.printStackTrace();
 			throw new InternalException("Erro ao converter json");
 		}
 
 		String urlLogo = imagemService.saveImageAndGetUrl(logo);
-		cadastrarUsuarioEmBanda(bandaDTO, novaBandaFromCadastroDTO(bandaDTO, urlLogo));
-	}
-
-	private void cadastrarUsuarioEmBanda(CadastroBandaDTO bandaDTO, Banda novaBanda) {
-		musicoBandaService.cadastrarUsuarioEmBanda(Context.getUsuarioLogado(), novaBanda, bandaDTO.getInstrumento());
+		Banda banda = novaBandaFromCadastroDTO(bandaDTO, urlLogo);
+		cadastrarUsuarioEmBanda(bandaDTO, banda, PermissaoMusico.FUNDADOR);
 	}
 
 	@Override
-	public BandaDTO buscarBandaParaIngressar(Long idBanda) {
+	public void editarBanda(String bandaJson, MultipartFile logo) {
+		EdicaoBandaDTO bandaDTO;
+		try {
+			bandaDTO = new ObjectMapper().readValue(bandaJson, EdicaoBandaDTO.class);
+		} catch (JsonProcessingException e) {
+			throw new InternalException("Erro ao converter json");
+		}
+
+		Banda banda = buscarPorId(bandaDTO.getId());
+
+		String urlLogo = banda.getUrlLogo();
+		if(logo != null){
+			urlLogo = imagemService.saveImageAndGetUrl(logo);
+		}
+
+		setarInformacoesEditadas(banda, bandaDTO, urlLogo);
+		bandaDao.save(banda);
+
+	}
+
+	private void setarInformacoesEditadas(Banda banda, EdicaoBandaDTO bandaDTO, String urlLogo) {
+		banda.setNome(bandaDTO.getNome());
+		banda.setDescricao(bandaDTO.getDescricao());
+		banda.setCategoria(bandaDTO.getCategoria());
+		banda.setUrlLogo(urlLogo);
+		banda.getParametros().setPermiteEntradaPorConvite(bandaDTO.getPermiteEntradaPorConvite());
+		banda.getParametros().setExigirAprovacaoCompromissos(bandaDTO.getExigirAprovacaoCompromissos());
+	}
+
+	private void cadastrarUsuarioEmBanda(CadastroBandaDTO bandaDTO, Banda novaBanda, PermissaoMusico permissaoMusico) {
+		musicoBandaService.cadastrarUsuarioEmBanda(Context.getUsuarioLogado(), novaBanda, bandaDTO.getInstrumento(), permissaoMusico);
+	}
+
+	@Override
+	public ResponseEntity<?> buscarBandaParaIngressar(Long idBanda) {
 		Banda banda = buscarPorId(idBanda);
-		verificarSeUsuarioJaEstaNaBanda(banda);
-		verificarSeBandaPermiteEntradaPorConvite(banda);
-		return new BandaDTO(banda);
+		if(banda == null){
+			return ResponseEntity.status(404).body("Banda não existe");
+		}
+		try{
+			verificarSeUsuarioJaEstaNaBanda(banda);
+			verificarSeBandaPermiteEntradaPorConvite(banda);
+		}catch (ConflictException c ){
+			return ResponseEntity.status(409).body(c.getMessage());
+		}catch (RestrictionException r ){
+			return ResponseEntity.status(403).body(r.getMessage());
+		}
+		return ResponseEntity.ok(new BandaDTO(banda));
 	}
 
 	@Override
@@ -292,6 +332,13 @@ public class BandaServiceImpl implements BandaService {
 		novaBanda.setDescricao(bandaDTO.getDescricao());
 		novaBanda.setUrlLogo(urlLogo);
 		novaBanda.setDataInclusao(LocalDate.now());
+
+		ParametrosBanda parametros = new ParametrosBanda();
+		parametros.setExigirAprovacaoCompromissos(false);
+		parametros.setPermiteEntradaPorConvite(true);
+		parametros.setListarObservacaoRepertorio(false);
+		novaBanda.setParametros(parametros);
+
 		novaBanda = bandaDao.save(novaBanda);
 		return novaBanda;
 	}

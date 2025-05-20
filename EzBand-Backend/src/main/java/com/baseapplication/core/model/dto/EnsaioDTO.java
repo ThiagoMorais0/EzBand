@@ -19,6 +19,7 @@ public class EnsaioDTO extends EventoDTO {
     public EnsaioDTO(Ensaio ensaio){
         BeanUtils.copyProperties(ensaio, this);
         this.setData(DateUtils.localDateToString(ensaio.getData()));
+        this.setBanda(new BandaDTO(ensaio.getBanda()));
         this.setIdBanda(ensaio.getBanda().getId());
         this.setStatus(ensaio.getStatus().getDescricao());
 

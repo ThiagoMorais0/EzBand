@@ -1,11 +1,12 @@
 package com.baseapplication.core.service;
 
-import com.baseapplication.core.controller.NovoEnsaioDTO;
+import com.baseapplication.core.dto.NovoEnsaioDTO;
 import com.baseapplication.core.dto.*;
 import com.baseapplication.core.dto.superClasses.InformacoesEventoDTO;
 import com.baseapplication.core.enums.TipoContato;
 import com.baseapplication.core.enums.TipoEvento;
 import com.baseapplication.core.model.superClasses.Evento;
+import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -30,7 +31,7 @@ public interface EventoService {
 
     void atualizarRepertorioEvento(AtualizacaoRepertorioEventoDTO atualizacaoRepertorio);
 
-    List<DisponibilidadeMusicoParaEventoDTO> buscarMembrosEDisponibilidadeParaShow(Long idBanda, LocalDate data);
+    ResponseEntity<?> buscarMembrosEDisponibilidadeParaShow(Long idBanda, LocalDate data);
 
     void marcarShow(NovoShowDTO novoShowDTO);
 

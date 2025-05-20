@@ -98,12 +98,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	}
 
 	@Override
-	public void cadastrarUsuarioComImagem(CadastroUsuarioDTO usuario, MultipartFile imagem) {
-
+	public ResponseEntity<?> cadastrarUsuarioComImagem(CadastroUsuarioDTO usuario, MultipartFile imagem) {
+		try{
+			verificaUsuarioJaCadastrado(usuario);
+		} catch (ConflictException e) {
+			return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+		}
 		String urlImagem = imagemService.saveImageAndGetUrl(imagem);
-		verificaUsuarioJaCadastrado(usuario);
 		usuario.setSenha(criptografar(usuario.getSenha()));
 		usuarioService.salvar(new Usuario(usuario, urlImagem));
-
+		return ResponseEntity.ok(null);
 	}
 }

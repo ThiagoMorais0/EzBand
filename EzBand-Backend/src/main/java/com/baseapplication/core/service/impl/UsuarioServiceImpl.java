@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -212,7 +213,13 @@ public class UsuarioServiceImpl implements UsuarioService {
 		emailService.enviarEmail(email.getAssunto(), email.getMensagem(), email.getDestinatario());
 	}
 
-	private CompletableFuture<EventosSeparadosDTO> buscarProximosEventosAsync(Long idUsuario) {
+    @Override
+    public ResponseEntity<?> buscarProximosEventosDoUsuario() {
+		EventosSeparadosDTO eventosSeparadosDTO = buscarProximosEventosAsync(Context.getUsuarioLogado().getId()).join();
+        return ResponseEntity.ok(eventosSeparadosDTO);
+    }
+
+    private CompletableFuture<EventosSeparadosDTO> buscarProximosEventosAsync(Long idUsuario) {
 		return CompletableFuture
 				.supplyAsync(() -> eventoHelperService.buscarPendentesPorUsuarioOrdenadoPorData(idUsuario));
 	}

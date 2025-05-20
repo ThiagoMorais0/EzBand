@@ -17,6 +17,6 @@ public interface AuthenticationService {
 
 	InfoUsuarioDTO buscarInfoUsuario(String email);
 
-	void cadastrarUsuarioComImagem(CadastroUsuarioDTO usuario, MultipartFile imagem);
+	ResponseEntity<?> cadastrarUsuarioComImagem(CadastroUsuarioDTO usuario, MultipartFile imagem);
 
 }

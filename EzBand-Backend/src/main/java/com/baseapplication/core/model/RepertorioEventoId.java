@@ -12,6 +12,8 @@ import lombok.*;
 @Setter
 @EqualsAndHashCode
 public class RepertorioEventoId {
+    private Integer indice;
+
     @Column(name = "id_evento", nullable = false)
     private Long idEvento;
 

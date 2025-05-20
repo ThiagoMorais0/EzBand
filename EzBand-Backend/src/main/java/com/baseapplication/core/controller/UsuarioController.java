@@ -3,6 +3,7 @@ package com.baseapplication.core.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,9 +34,7 @@ public class UsuarioController {
 
 	@GetMapping("/buscarInformacoesDoPerfil")
 	public InfoPerfilUsuarioDTO buscarInformacoesDoPerfil() {
-
 		return new InfoPerfilUsuarioDTO(Context.getUsuarioLogado());
-
 	}
 
 	@PostMapping("/atualizarInformacoesPerfil")
@@ -90,5 +89,10 @@ public class UsuarioController {
 	@PostMapping("/enviarEmail")
 	public void enviarEmail(@RequestBody EmailDTO email) {
 		usuarioService.enviarEmail(email);
+	}
+
+	@GetMapping("/buscarProximosEventosDoUsuario")
+	public ResponseEntity<?> buscarProximosEventosDoUsuario(){
+		return usuarioService.buscarProximosEventosDoUsuario();
 	}
 }

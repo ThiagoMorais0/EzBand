@@ -1,5 +1,6 @@
 package com.baseapplication.core.service;
 
+import com.baseapplication.core.enums.PermissaoMusico;
 import com.baseapplication.core.model.Banda;
 import com.baseapplication.core.model.MusicoBanda;
 import com.baseapplication.core.model.Usuario;
@@ -9,7 +10,7 @@ import java.util.List;
 public interface MusicoBandaService {
     MusicoBanda buscarPorIdUsuarioEIdBanda(Long idUsuario, Long idBanda);
 
-    MusicoBanda cadastrarUsuarioEmBanda(Usuario usuario, Banda banda, String instrumentos);
+    MusicoBanda cadastrarUsuarioEmBanda(Usuario usuario, Banda banda, String instrumentos, PermissaoMusico permissaoMusico);
 
     void expulsar(Long idBanda, Long idUsuario);
 

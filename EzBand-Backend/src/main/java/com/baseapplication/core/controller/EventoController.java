@@ -2,7 +2,9 @@ package com.baseapplication.core.controller;
 
 import java.util.List;
 
+import com.baseapplication.core.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -10,12 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.baseapplication.core.dto.AtualizacaoRepertorioEventoDTO;
-import com.baseapplication.core.dto.ConviteEventoDTO;
-import com.baseapplication.core.dto.DisponibilidadeMusicoParaEventoDTO;
-import com.baseapplication.core.dto.MusicoEventoDTO;
-import com.baseapplication.core.dto.NovoShowDTO;
-import com.baseapplication.core.dto.RepertorioEventoDTO;
 import com.baseapplication.core.dto.superClasses.InformacoesEventoDTO;
 import com.baseapplication.core.enums.TipoContato;
 import com.baseapplication.core.enums.TipoEvento;
@@ -62,21 +58,21 @@ public class EventoController {
 
 	}
 
-	@GetMapping("buscarRepertorioEvento")
+	@GetMapping("/buscarRepertorioEvento")
 	public List<RepertorioEventoDTO> buscarRepertorioEvento(@RequestParam Long idEvento,
-			@RequestParam TipoEvento tipoEvento) {
-		return eventoService.buscarRepertorioEvento(idEvento, tipoEvento);
+			@RequestParam String tipoEvento) {
+		return eventoService.buscarRepertorioEvento(idEvento, TipoEvento.valueOf(tipoEvento));
 
 	}
 
-	@PostMapping("atualizarRepertorioEvento")
+	@PostMapping("/atualizarRepertorioEvento")
 	public void atualizarRepertorioEvento(@RequestBody AtualizacaoRepertorioEventoDTO atualizacaoRepertorio) {
 		eventoService.atualizarRepertorioEvento(atualizacaoRepertorio);
 	}
 
 	@GetMapping("/buscarMembrosEDisponibilidadeParaShow")
-	public List<DisponibilidadeMusicoParaEventoDTO> buscarMembrosParaShow(@RequestParam Long idBanda,
-			@RequestParam String data) {
+	public ResponseEntity<?> buscarMembrosParaShow(@RequestParam Long idBanda,
+												   @RequestParam String data) {
 		return eventoService.buscarMembrosEDisponibilidadeParaShow(idBanda, DateUtils.stringToLocalDate(data));
 	}
 

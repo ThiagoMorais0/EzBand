@@ -22,6 +22,7 @@ import java.sql.Time;
 @NoArgsConstructor
 public class RepertorioEventoDTO {
     private String titulo;
+    private Integer indice;
     private String artista;
     private String descricao;
     private String observacao;
@@ -36,6 +37,7 @@ public class RepertorioEventoDTO {
         RepertorioEvento repertorioEvento = new RepertorioEvento();
 
         repertorioEvento.setId(new RepertorioEventoId(
+                repertorioEventoDTO.indice,
                 idEvento,
                 idBanda,
                 tipoEvento));
@@ -45,7 +47,7 @@ public class RepertorioEventoDTO {
                 repertorioEventoDTO.artista,
                 repertorioEventoDTO.descricao,
                 repertorioEventoDTO.observacao,
-                Time.valueOf(repertorioEventoDTO.duracao),
+                repertorioEventoDTO.duracao != null ? Time.valueOf(repertorioEventoDTO.duracao) : null,
                 repertorioEventoDTO.tonalidade)
         );
         return repertorioEvento;
@@ -53,6 +55,9 @@ public class RepertorioEventoDTO {
 
     public RepertorioEventoDTO(RepertorioEvento entity){
         BeanUtils.copyProperties(entity.getMusica(), this);
+        if(entity.getMusica().getDuracao() != null){
+            this.duracao = entity.getMusica().getDuracao().toString();
+        }
         this.bloco = entity.getBloco();
     }
 }

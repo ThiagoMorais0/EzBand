@@ -23,6 +23,7 @@ public class ShowDTO extends EventoDTO {
 
     public ShowDTO(Show show){
         BeanUtils.copyProperties(show, this);
+        this.setBanda(new BandaDTO(show.getBanda()));
         this.setData(DateUtils.localDateToString(show.getData()));
     }
 }
