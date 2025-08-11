@@ -1,5 +1,6 @@
 package com.baseapplication.core.service.impl;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -22,16 +23,16 @@ public class GoogleCloudStorageServiceImpl {
     private final Storage storage;
 
     public GoogleCloudStorageServiceImpl() {
-//        storage = StorageOptions.getDefaultInstance().getService();
+        //storage = StorageOptions.getDefaultInstance().getService();
 
         try {
-            String s3Url = "https://ezband-bucket.s3.amazonaws.com/sunlit-virtue-382013-efe3e81b47ab.json";
-            URL url = new URL(s3Url);
-            URLConnection connection = url.openConnection();
-            InputStream inputStream = connection.getInputStream();
+          //  String s3Url = "https://ezband-bucket.s3.amazonaws.com/sunlit-virtue-382013-efe3e81b47ab.json";
+            //URL url = new URL(s3Url);
+            //URLConnection connection = url.openConnection();
+            //InputStream inputStream = connection.getInputStream();
             // Carregar as credenciais de serviço a partir do arquivo
-            GoogleCredentials credentials = GoogleCredentials.fromStream(inputStream);
-//                    new FileInputStream("D:/Dev/IntelliJ/api/src/main/java/com/ezband/api/key/sunlit-virtue-382013-efe3e81b47ab.json"));
+            GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream("C:\\Users\\aluno\\dev\\EzBand\\EzBand-Backend\\src\\main\\java\\com\\baseapplication\\core\\service\\impl\\sunlit-virtue-382013-efe3e81b47ab.json"));
+
 
             // Configurar as credenciais e criar a instância do Storage
             storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();

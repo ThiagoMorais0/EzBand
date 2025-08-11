@@ -17,7 +17,6 @@ public class CadastroDTO {
     private String login;
     private String email;
     private String senha;
-    private LocalDate
-    dataNascimento;
+    private LocalDate dataNascimento;
 
 }
