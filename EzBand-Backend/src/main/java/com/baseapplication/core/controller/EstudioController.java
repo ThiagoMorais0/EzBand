@@ -1,5 +1,7 @@
 package com.baseapplication.core.controller;
 
+import com.baseapplication.core.dto.CadastroEstudioDTO;
+import com.baseapplication.core.dto.EstudioDTO;
 import com.baseapplication.core.service.EstudioService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

@@ -1,13 +1,11 @@
 package com.baseapplication.core.service.impl;
 
-import com.baseapplication.core.controller.EstudioDTO;
+import com.baseapplication.core.dto.EstudioDTO;
 import com.baseapplication.core.dao.EstudioDao;
 import com.baseapplication.core.model.Estudio;
-import com.baseapplication.core.model.Usuario;
 import com.baseapplication.core.service.EstudioService;
 import com.baseapplication.core.utils.Context;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.service.spi.ServiceException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

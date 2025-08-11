@@ -1,6 +1,6 @@
 package com.baseapplication.core.service;
 
-import com.baseapplication.core.controller.EstudioDTO;
+import com.baseapplication.core.dto.EstudioDTO;
 import com.baseapplication.core.model.Estudio;
 
 import java.util.List;
