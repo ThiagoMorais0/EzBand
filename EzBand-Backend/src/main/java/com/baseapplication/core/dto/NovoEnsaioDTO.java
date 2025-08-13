@@ -20,7 +20,8 @@ public class NovoEnsaioDTO {
     private Long idBanda;
     private Long idUsuario;
     private String local;
-    private String cidade;
+    private Long idEstudio;
+    private EnderecoDTO endereco;
     private String dataEnsaio;
     @JsonFormat(pattern = "HH:mm:ss")
     private Time horarioInicio;
@@ -32,6 +33,7 @@ public class NovoEnsaioDTO {
     public Ensaio toEntity(){
         Ensaio ensaio = new Ensaio();
         BeanUtils.copyProperties(this, ensaio);
+        BeanUtils.copyProperties(this.getEndereco(), ensaio.getEndereco());
         ensaio.setData(DateUtils.stringToLocalDate(this.dataEnsaio));
         ensaio.setDataInclusao(LocalDate.now());
         return ensaio;

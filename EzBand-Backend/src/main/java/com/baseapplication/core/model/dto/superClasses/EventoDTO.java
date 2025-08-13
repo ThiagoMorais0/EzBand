@@ -1,5 +1,6 @@
 package com.baseapplication.core.model.dto.superClasses;
 
+import com.baseapplication.core.dto.EnderecoDTO;
 import com.baseapplication.core.enums.StatusEvento;
 import com.baseapplication.core.enums.TipoEvento;
 import com.baseapplication.core.model.dto.BandaDTO;
@@ -27,7 +28,7 @@ public class EventoDTO {
     private Time duracao;
     private Time horarioInicio;
     private String local;
-    private String cidade;
+    private EnderecoDTO endereco;
     private String observacoes;
     private String status;
     private TipoEvento evento;

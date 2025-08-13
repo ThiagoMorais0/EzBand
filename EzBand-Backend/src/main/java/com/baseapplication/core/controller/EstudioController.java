@@ -1,12 +1,18 @@
 package com.baseapplication.core.controller;
 
 import com.baseapplication.core.dto.CadastroEstudioDTO;
+import com.baseapplication.core.dto.CadastroUsuarioDTO;
 import com.baseapplication.core.dto.EstudioDTO;
+import com.baseapplication.core.dto.InfoPerfilUsuarioDTO;
+import com.baseapplication.core.exception.InternalException;
 import com.baseapplication.core.service.EstudioService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -70,5 +76,31 @@ public class EstudioController {
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }
+
+    @PostMapping("/cadastrarComImagem")
+    @CrossOrigin(origins = "*")
+    public ResponseEntity<?> cadastrarUsuarioComImagem(@RequestParam("usuario") String estudioJson, MultipartFile imagem) {
+
+        CadastroEstudioDTO estudio = null;
+        try {
+            estudio = new ObjectMapper().readValue(estudioJson, CadastroEstudioDTO.class);
+        } catch (JsonProcessingException e) {
+            throw new InternalException(e.getMessage());
+        }
+
+        return service.cadastrarComImagem(estudio, imagem);
+    }
+
+    @PostMapping("/editarComImagem")
+    public ResponseEntity<?> editarComImagem(@RequestParam("usuario") String estudioJson,
+                                                       MultipartFile imagem) {
+        try{
+            service.editarComImagem(estudioJson, imagem);
+            return ResponseEntity.ok().build();
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+
     }
 }

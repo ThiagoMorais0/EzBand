@@ -3,31 +3,33 @@ package com.baseapplication.core.model;
 import com.baseapplication.core.model.embedded.Endereco;
 import jakarta.persistence.*;
 import lombok.Data;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Data
 @Entity
-@Table(name = "ESTUDIO")
-public class Estudio {
+@Table(name = "LOCAL_EVENTO")
+@Data
+public class LocalEvento {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Embedded
+    private Endereco endereco = new Endereco();
+
     @ManyToOne
     @JoinColumn(name = "ID_USUARIO")
     private Usuario proprietario = new Usuario();
-    @Embedded
-    private Endereco endereco = new Endereco();
     private String nome;
-    private String descricao;
+    private String bio;
+    private String urlFotoPerfil;
     private LocalDateTime horarioInicioFuncionamento;
     private LocalDateTime horarioFinalFuncionamento;
     private LocalDateTime DataInclusao;
-    private String urlFotoPerfil;
-    @OneToMany(mappedBy = "estudio", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ServicoEstudio> servicos;
 
-    @OneToMany(mappedBy = "estudio", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<EquipamentoEstudio> equipamentos;
+    @OneToMany(mappedBy = "localEvento", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<EquipamentoLocalEvento> equipamentos;
 
 }

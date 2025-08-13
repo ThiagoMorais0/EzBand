@@ -2,9 +2,7 @@ package com.baseapplication.core.model;
 
 import com.baseapplication.core.enums.TipoEvento;
 import com.baseapplication.core.model.superClasses.Evento;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -15,6 +13,10 @@ import java.sql.Time;
 @Entity
 @Table(name = "SHOW")
 public class Show extends Evento {
+
+    @ManyToOne
+    @JoinColumn(name = "ID_LOCAL_EVENTO")
+    private LocalEvento localEvento;
 
     private Time horarioPassagemSom;
     private BigDecimal valorContrato;

@@ -3,16 +3,23 @@ package com.baseapplication.core.model;
 import com.baseapplication.core.enums.TipoEvento;
 import com.baseapplication.core.model.superClasses.Evento;
 import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
 
 import java.math.BigDecimal;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @Entity
 @Table(name = "ENSAIO")
 public class Ensaio extends Evento {
+
+    @ManyToOne
+    @JoinColumn(name = "ID_ESTUDIO")
+    private Estudio estudio;
 
     private BigDecimal valor;
 

@@ -40,9 +40,7 @@ public class UsuarioController {
 	@PostMapping("/editarUsuarioComImagem")
 	public InfoPerfilUsuarioDTO editarUsuarioComImagem(@RequestParam("usuario") String usuarioJson,
 			MultipartFile imagem) {
-
 		return usuarioService.editarUsuarioComImagem(usuarioJson, imagem);
-
 	}
 
 	@GetMapping("/verificarEmailJaCadastrado")

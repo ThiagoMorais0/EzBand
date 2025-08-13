@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.beans.BeanUtils;
+import org.springframework.context.annotation.Bean;
 
 import java.math.BigDecimal;
 import java.sql.Time;
@@ -23,6 +24,7 @@ public class ShowDTO extends EventoDTO {
 
     public ShowDTO(Show show){
         BeanUtils.copyProperties(show, this);
+        BeanUtils.copyProperties(show.getEndereco(), this.getEndereco());
         this.setBanda(new BandaDTO(show.getBanda()));
         this.setData(DateUtils.localDateToString(show.getData()));
     }

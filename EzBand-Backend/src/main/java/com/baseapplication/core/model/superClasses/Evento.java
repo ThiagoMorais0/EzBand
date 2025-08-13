@@ -6,6 +6,7 @@ import com.baseapplication.core.model.Banda;
 import com.baseapplication.core.model.MusicoEvento;
 import com.baseapplication.core.model.RepertorioEvento;
 import com.baseapplication.core.model.Usuario;
+import com.baseapplication.core.model.embedded.Endereco;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -38,8 +39,9 @@ public abstract class Evento {
     private LocalDate data;
     private Time duracao;
     private Time horarioInicio;
+    @Embedded
+    private Endereco endereco;
     private String local;
-    private String cidade;
     private String observacoes;
     @Enumerated(EnumType.STRING)
     private StatusEvento status;

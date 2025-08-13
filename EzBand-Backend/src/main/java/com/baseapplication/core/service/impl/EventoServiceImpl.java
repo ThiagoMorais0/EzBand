@@ -1,69 +1,45 @@
 package com.baseapplication.core.service.impl;
 
+import com.baseapplication.core.dto.*;
+import com.baseapplication.core.dto.superClasses.InformacoesEventoDTO;
+import com.baseapplication.core.enums.*;
+import com.baseapplication.core.exception.InternalException;
+import com.baseapplication.core.exception.InvalidParamException;
+import com.baseapplication.core.exception.NoContentException;
+import com.baseapplication.core.exception.ResourceNotFoundException;
+import com.baseapplication.core.model.*;
+import com.baseapplication.core.model.dto.EnsaioDTO;
+import com.baseapplication.core.model.dto.ShowDTO;
+import com.baseapplication.core.model.superClasses.Evento;
+import com.baseapplication.core.model.superClasses.Notificacao;
+import com.baseapplication.core.service.*;
+import com.baseapplication.core.utils.Context;
+import com.baseapplication.core.utils.DateUtils;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.BeanUtils;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.baseapplication.core.model.*;
-import com.baseapplication.core.service.*;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-
-import com.baseapplication.core.dto.NovoEnsaioDTO;
-import com.baseapplication.core.dto.AtualizacaoRepertorioEventoDTO;
-import com.baseapplication.core.dto.ConviteEventoDTO;
-import com.baseapplication.core.dto.DisponibilidadeMusicoParaEventoDTO;
-import com.baseapplication.core.dto.EventosSeparadosDTO;
-import com.baseapplication.core.dto.InformacoesEnsaioDTO;
-import com.baseapplication.core.dto.InformacoesShowDTO;
-import com.baseapplication.core.dto.MusicoEventoDTO;
-import com.baseapplication.core.dto.NovoShowDTO;
-import com.baseapplication.core.dto.RepertorioEventoDTO;
-import com.baseapplication.core.dto.superClasses.InformacoesEventoDTO;
-import com.baseapplication.core.enums.SituacaoMusicoEvento;
-import com.baseapplication.core.enums.StatusEvento;
-import com.baseapplication.core.enums.StatusNotificacao;
-import com.baseapplication.core.enums.TipoContato;
-import com.baseapplication.core.enums.TipoEvento;
-import com.baseapplication.core.enums.TipoNotificacao;
-import com.baseapplication.core.exception.InvalidParamException;
-import com.baseapplication.core.exception.NoContentException;
-import com.baseapplication.core.exception.ResourceNotFoundException;
-import com.baseapplication.core.model.dto.EnsaioDTO;
-import com.baseapplication.core.model.dto.ShowDTO;
-import com.baseapplication.core.model.superClasses.Evento;
-import com.baseapplication.core.model.superClasses.Notificacao;
-import com.baseapplication.core.utils.Context;
-import com.baseapplication.core.utils.DateUtils;
-
-import jakarta.transaction.Transactional;
-
 @Service
+@RequiredArgsConstructor
 public class EventoServiceImpl implements EventoService {
 
-	@Autowired
 	private ShowService showService;
-
-	@Autowired
 	private EnsaioService ensaioService;
-
-	@Autowired
 	private MusicoEventoService musicoEventoService;
-
-	@Autowired
 	private UsuarioService usuarioService;
-
-	@Autowired
 	private NotificacaoService notificacaoService;
-
-	@Autowired
 	private BandaService bandaService;
-
-	@Autowired
 	private RepertorioEventoService repertorioEventoService;
+	private EstudioService estudioService;
+	private LocalEventoService localEventoService;
+
 
 	@Override
 	public Evento buscarPorId(Long idEvento, TipoEvento tipoEvento) {
@@ -229,9 +205,21 @@ public class EventoServiceImpl implements EventoService {
 			show.setStatus(StatusEvento.PENDENTE);
 		}
 
+		setarLocalEvento(novoShowDTO, show);
 		showService.salvar(show);
-
 		incluirMusicosNoEvento(novoShowDTO.getMusicos(), banda, show, TipoEvento.SHOW);
+	}
+
+	private void setarLocalEvento(NovoShowDTO novoShowDTO, Show show) {
+		if(novoShowDTO.getIdLocalEvento() != null){
+			LocalEvento localEvento = localEventoService.buscarPorId(novoShowDTO.getIdLocalEvento());
+			if(localEvento == null){
+				throw new InternalException("Local de evento não encontrado");
+			}else{
+				show.setLocalEvento(localEvento);
+				show.setEndereco(null);
+			}
+		}
 	}
 
 	@Override
@@ -244,10 +232,21 @@ public class EventoServiceImpl implements EventoService {
 		} else {
 			ensaio.setStatus(StatusEvento.PENDENTE);
 		}
-
+		setarEstudio(novoEnsaioDTO, ensaio);
 		ensaioService.salvar(ensaio);
-
 		incluirMusicosNoEvento(novoEnsaioDTO.getMusicos(), banda, ensaio, TipoEvento.ENSAIO);
+	}
+
+	private void setarEstudio(NovoEnsaioDTO novoEnsaioDTO, Ensaio ensaio) {
+		if(novoEnsaioDTO.getIdEstudio() != null){
+			Estudio estudio = estudioService.buscarPorId(novoEnsaioDTO.getIdEstudio());
+			if(estudio == null){
+				throw new InternalException("Estúdio não encontrado");
+			}else{
+				ensaio.setEstudio(estudio);
+				estudio.setEndereco(null);
+			}
+		}
 	}
 
 	@Override
@@ -365,7 +364,7 @@ public class EventoServiceImpl implements EventoService {
 		notificacaoEnsaio.setBanda(evento.getBanda());
 		notificacaoEnsaio.setMensagem(
 				Context.getUsuarioLogado().getNome() + " está marcando um ensaio em " + evento.getLocal() + " - "
-						+ evento.getCidade() + " na data " + DateUtils.localDateToString(evento.getData()) + ".");
+						+ evento.getEndereco() + " na data " + DateUtils.localDateToString(evento.getData()) + ".");
 		notificacaoEnsaio.setTipoNotificacao(TipoNotificacao.APROVACAO_EVENTO);
 		notificacaoEnsaio.setDestinatario(usuario);
 		notificacaoEnsaio.setStatusNotificacao(StatusNotificacao.NAO_VISUALIZADO);
@@ -380,7 +379,7 @@ public class EventoServiceImpl implements EventoService {
 		notificacaoShow.setData(LocalDate.now());
 		notificacaoShow.setDataEvento(evento.getData());
 		notificacaoShow.setMensagem(Context.getUsuarioLogado().getNome() + " está marcando com "
-				+ evento.getBanda().getNome() + " um show em " + evento.getLocal() + " - " + evento.getCidade()
+				+ evento.getBanda().getNome() + " um show em " + evento.getLocal() + " - " + evento.getEndereco().getCidade()
 				+ " na data " + DateUtils.localDateToString(evento.getData()) + ".");
 		notificacaoShow.setTipoNotificacao(TipoNotificacao.APROVACAO_EVENTO);
 		notificacaoShow.setDestinatario(usuario);

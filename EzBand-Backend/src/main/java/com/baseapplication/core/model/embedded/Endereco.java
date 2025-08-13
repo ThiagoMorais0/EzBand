@@ -12,11 +12,11 @@ import lombok.Setter;
 @NoArgsConstructor
 @Embeddable
 public class Endereco {
-    private String pais;
-    private String estado;
-    private String cidade;
-    private String bairro;
-    private String rua;
-    private String numero;
-    private String cep;
+    private String pais = "";
+    private String estado = "";
+    private String cidade = "";
+    private String bairro = "";
+    private String rua = "";
+    private String numero = "";
+    private String cep = "";
 }
