@@ -101,6 +101,14 @@ public class EstudioController {
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }
 
+    @GetMapping("/buscarEnsaiosPorEstudio")
+    public ResponseEntity<?> buscarEnsaiosPorEstudio(@RequestParam Long idEstudio){
+        try{
+            return ResponseEntity.ok(service.buscarEnsaiosPorEstudio(idEstudio));
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }

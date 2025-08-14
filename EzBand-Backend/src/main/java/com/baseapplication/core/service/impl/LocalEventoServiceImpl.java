@@ -3,6 +3,7 @@ package com.baseapplication.core.service.impl;
 import com.baseapplication.core.dao.LocalEventoDao;
 import com.baseapplication.core.dto.LocalEventoDTO;
 import com.baseapplication.core.model.LocalEvento;
+import com.baseapplication.core.model.dto.ShowDTO;
 import com.baseapplication.core.service.LocalEventoService;
 import com.baseapplication.core.utils.Context;
 import lombok.RequiredArgsConstructor;
@@ -46,5 +47,10 @@ public class LocalEventoServiceImpl implements LocalEventoService {
         LocalEvento estudio = dao.findById(estudioDTO.getId()).orElseThrow();
         estudioDTO.toEntity(estudio);
         dao.save(estudio);
+    }
+
+    @Override
+    public List<ShowDTO> buscarShowsPorLocalEvento(Long idLocalEvento) {
+        return null;
     }
 }

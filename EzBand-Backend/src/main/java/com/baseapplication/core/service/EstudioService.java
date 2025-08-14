@@ -3,6 +3,7 @@ package com.baseapplication.core.service;
 import com.baseapplication.core.dto.CadastroEstudioDTO;
 import com.baseapplication.core.dto.EstudioDTO;
 import com.baseapplication.core.model.Estudio;
+import com.baseapplication.core.model.dto.EnsaioDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,4 +25,6 @@ public interface EstudioService {
     ResponseEntity<?> cadastrarComImagem(CadastroEstudioDTO estudio, MultipartFile imagem);
 
     void editarComImagem(String estudioJson, MultipartFile imagem);
+
+    List<EnsaioDTO> buscarEnsaiosPorEstudio(Long idEstudio);
 }

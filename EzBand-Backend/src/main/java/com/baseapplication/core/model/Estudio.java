@@ -30,4 +30,7 @@ public class Estudio {
     @OneToMany(mappedBy = "estudio", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<EquipamentoEstudio> equipamentos;
 
+    @OneToMany(mappedBy = "estudio", fetch = FetchType.LAZY)
+    private List<Ensaio> ensaios;
+
 }

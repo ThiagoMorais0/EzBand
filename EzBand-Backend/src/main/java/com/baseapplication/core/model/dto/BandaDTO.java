@@ -7,6 +7,7 @@ import com.baseapplication.core.model.Banda;
 import com.baseapplication.core.utils.Context;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.beans.BeanUtils;
 
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class BandaDTO {
     private Long id;
     private String nome;

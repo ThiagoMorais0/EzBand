@@ -32,4 +32,7 @@ public class LocalEvento {
     @OneToMany(mappedBy = "localEvento", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<EquipamentoLocalEvento> equipamentos;
 
+    @OneToMany(mappedBy = "localEvento", fetch = FetchType.LAZY)
+    private List<Show> shows;
+
 }

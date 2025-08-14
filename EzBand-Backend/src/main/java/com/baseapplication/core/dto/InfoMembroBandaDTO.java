@@ -1,5 +1,6 @@
 package com.baseapplication.core.dto;
 
+import com.baseapplication.core.enums.PermissaoMusico;
 import com.baseapplication.core.model.MusicoBanda;
 import com.baseapplication.core.model.Usuario;
 import com.baseapplication.core.utils.DateUtils;
@@ -8,6 +9,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.beans.BeanUtils;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -24,7 +27,7 @@ public class InfoMembroBandaDTO {
     private String descricao;
     private String urlFotoPerfil;
     private String instrumentos;
-    private Integer permissao;
+    private List<String> permissoes;
 
     public InfoMembroBandaDTO(Usuario usuario){
         BeanUtils.copyProperties(usuario, this);
@@ -37,6 +40,6 @@ public class InfoMembroBandaDTO {
         this.nascimento = DateUtils.localDateToString(musico.getUsuario().getDataNascimento());
         this.dataCriacao = DateUtils.localDateToString(musico.getUsuario().getDataCriacao());
         this.instrumentos = musico.getInstrumentos();
-        this.permissao = musico.getPermissao().getNivel();
+        this.permissoes = musico.getPermissoes().stream().map(Enum::toString).toList();
     }
 }

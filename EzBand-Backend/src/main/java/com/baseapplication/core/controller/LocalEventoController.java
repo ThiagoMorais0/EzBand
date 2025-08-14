@@ -71,4 +71,14 @@ public class LocalEventoController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+    @GetMapping("/buscarShowsPorLocalEvento")
+    public ResponseEntity<?> buscarShowsPorLocalEvento(@RequestParam Long idLocalEvento){
+        try{
+            return ResponseEntity.ok(service.buscarShowsPorLocalEvento(idLocalEvento));
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
 }

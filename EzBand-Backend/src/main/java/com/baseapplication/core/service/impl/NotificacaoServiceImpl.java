@@ -98,8 +98,8 @@ public class NotificacaoServiceImpl implements NotificacaoService {
 
     private static void enviarNotificacaoParaTodosAdministradores(Banda banda, Notificacao notificacao) {
         for(MusicoBanda musicoBanda : banda.getMusicos()){
-            if(musicoBanda.getPermissao().equals(PermissaoMusico.ADMINISTRADOR) ||
-                    musicoBanda.getPermissao().equals(PermissaoMusico.FUNDADOR)){
+            if(musicoBanda.getPermissoes().contains(PermissaoMusico.ADMINISTRADOR) ||
+                    musicoBanda.getPermissoes().contains(PermissaoMusico.FUNDADOR)){
                 montarEstadoNotificacaoNova(notificacao, musicoBanda.getUsuario());
             }
         }

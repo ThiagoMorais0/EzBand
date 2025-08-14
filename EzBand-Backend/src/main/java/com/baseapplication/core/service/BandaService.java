@@ -38,7 +38,6 @@ public interface BandaService {
     Integer buscarQuantidadeDeMembros(Long idBanda);
     Integer buscarQuantidadeDeMusicasNoRepertorio(Long idBanda);
 
-    Integer getNivelPermissaoUsuario(Long idBanda, Long id);
 
     void sairDaBanda(Long idBanda, Long id);
 
@@ -53,4 +52,6 @@ public interface BandaService {
     void adicionarMusicaAoRepertorio(RepertorioBandaDTO repertorioBandaDTO);
 
     void editarBanda(String bandaJson, MultipartFile logo);
+
+    List<String> getNivelPermissoesUsuarioMusico(Long idBanda, Long id);
 }

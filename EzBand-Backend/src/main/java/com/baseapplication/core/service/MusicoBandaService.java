@@ -10,7 +10,7 @@ import java.util.List;
 public interface MusicoBandaService {
     MusicoBanda buscarPorIdUsuarioEIdBanda(Long idUsuario, Long idBanda);
 
-    MusicoBanda cadastrarUsuarioEmBanda(Usuario usuario, Banda banda, String instrumentos, PermissaoMusico permissaoMusico);
+    MusicoBanda cadastrarUsuarioEmBanda(Usuario usuario, Banda banda, String instrumentos, List<PermissaoMusico> permissaoMusico);
 
     void expulsar(Long idBanda, Long idUsuario);
 

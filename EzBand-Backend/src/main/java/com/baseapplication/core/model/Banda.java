@@ -1,5 +1,6 @@
 package com.baseapplication.core.model;
 
+import com.baseapplication.core.model.embedded.Endereco;
 import com.baseapplication.core.model.embedded.ParametrosBanda;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -26,6 +27,8 @@ public class Banda {
     @DateTimeFormat(pattern = "dd/MM/yyyy")
     private LocalDate dataInclusao;
     private String urlLogo;
+    @Embedded
+    private Endereco endereco;
     @OneToMany(mappedBy = "id.idBanda", fetch = FetchType.EAGER)
     private List<MusicoBanda> musicos;
     @Embedded
@@ -42,6 +45,9 @@ public class Banda {
 
     @OneToMany(mappedBy = "banda", fetch = FetchType.EAGER)
     private List<RepertorioBanda> repertorio;
+
+    @OneToMany(mappedBy = "banda", fetch = FetchType.EAGER)
+    private List<CondicaoOrcamento> condicoesOrcamento;
 
     @OneToMany(mappedBy = "banda", fetch = FetchType.EAGER)
     private List<Ensaio> ensaios;

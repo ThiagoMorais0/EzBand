@@ -9,6 +9,8 @@ import com.baseapplication.core.exception.ConflictException;
 import com.baseapplication.core.exception.InternalException;
 import com.baseapplication.core.model.Estudio;
 import com.baseapplication.core.model.Usuario;
+import com.baseapplication.core.model.dto.EnsaioDTO;
+import com.baseapplication.core.service.EnsaioService;
 import com.baseapplication.core.service.EstudioService;
 import com.baseapplication.core.service.ImagemService;
 import com.baseapplication.core.utils.Context;
@@ -29,6 +31,7 @@ public class EstudioServiceImpl implements EstudioService {
 
     private final EstudioDao dao;
     private final ImagemService imagemService;
+    private final EnsaioService ensaioService;
 
     @Override
     public void cadastrar(Estudio estudio) {
@@ -84,5 +87,14 @@ public class EstudioServiceImpl implements EstudioService {
         BeanUtils.copyProperties(estudioDTO, estudio);
         estudio.setUrlFotoPerfil(urlImagem);
         dao.save(estudio);
+    }
+
+    @Override
+    public List<EnsaioDTO> buscarEnsaiosPorEstudio(Long idEstudio) {
+        Estudio estudio = buscarPorId(idEstudio);
+        if(estudio == null){
+            throw new InternalException("Estúdio não encontrado");
+        }
+        return estudio.getEnsaios().stream().map(EnsaioDTO::new).toList();
     }
 }

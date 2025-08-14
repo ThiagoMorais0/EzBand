@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import com.baseapplication.core.dto.*;
 import com.baseapplication.core.enums.PermissaoMusico;
+import com.baseapplication.core.enums.PermissaoUsuario;
 import com.baseapplication.core.model.embedded.ParametrosBanda;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,7 +78,7 @@ public class BandaServiceImpl implements BandaService {
 				Context.getUsuarioLogado(),
 				bandaDao.findById(idBanda).get(),
 				instrumentos,
-				PermissaoMusico.MEMBRO_REGULAR
+				List.of(PermissaoMusico.MEMBRO_REGULAR)
 		);
 	}
 
@@ -103,7 +104,7 @@ public class BandaServiceImpl implements BandaService {
 
 		String urlLogo = imagemService.saveImageAndGetUrl(logo);
 		Banda banda = novaBandaFromCadastroDTO(bandaDTO, urlLogo);
-		cadastrarUsuarioEmBanda(bandaDTO, banda, PermissaoMusico.FUNDADOR);
+		cadastrarUsuarioEmBanda(bandaDTO, banda, PermissaoMusico.getAll());
 	}
 
 	@Override
@@ -127,6 +128,15 @@ public class BandaServiceImpl implements BandaService {
 
 	}
 
+	@Override
+	public List<String> getNivelPermissoesUsuarioMusico(Long idBanda, Long idUsuario) {
+		MusicoBanda musicoBanda = musicoBandaService.buscarPorIdUsuarioEIdBanda(idUsuario, idBanda);
+		if(musicoBanda == null){
+			throw new InternalException("Músico não encontrado");
+		}
+		return musicoBanda.getPermissoes().stream().map(Enum::toString).toList();
+	}
+
 	private void setarInformacoesEditadas(Banda banda, EdicaoBandaDTO bandaDTO, String urlLogo) {
 		banda.setNome(bandaDTO.getNome());
 		banda.setDescricao(bandaDTO.getDescricao());
@@ -136,8 +146,8 @@ public class BandaServiceImpl implements BandaService {
 		banda.getParametros().setExigirAprovacaoCompromissos(bandaDTO.getExigirAprovacaoCompromissos());
 	}
 
-	private void cadastrarUsuarioEmBanda(CadastroBandaDTO bandaDTO, Banda novaBanda, PermissaoMusico permissaoMusico) {
-		musicoBandaService.cadastrarUsuarioEmBanda(Context.getUsuarioLogado(), novaBanda, bandaDTO.getInstrumento(), permissaoMusico);
+	private void cadastrarUsuarioEmBanda(CadastroBandaDTO bandaDTO, Banda novaBanda, List<PermissaoMusico> permissoes) {
+		musicoBandaService.cadastrarUsuarioEmBanda(Context.getUsuarioLogado(), novaBanda, bandaDTO.getInstrumento(), permissoes);
 	}
 
 	@Override
@@ -180,11 +190,6 @@ public class BandaServiceImpl implements BandaService {
 	@Override
 	public Integer buscarQuantidadeDeMusicasNoRepertorio(Long idBanda) {
 		return bandaDao.buscarQuantidadeDeMusicasNoRepertorio(idBanda);
-	}
-
-	@Override
-	public Integer getNivelPermissaoUsuario(Long idBanda, Long idUsuario) {
-		return musicoBandaService.buscarPorIdUsuarioEIdBanda(idUsuario, idBanda).getPermissao().getNivel();
 	}
 
 	@Override
