@@ -3,7 +3,6 @@ package com.baseapplication.core.controller;
 import com.baseapplication.core.dto.EmailDTO;
 import com.baseapplication.core.dto.InfoPerfilUsuarioDTO;
 import com.baseapplication.core.dto.InfoUsuarioPainelDTO;
-import com.baseapplication.core.model.dto.superClasses.NotificacaoDTO;
 import com.baseapplication.core.service.UsuarioService;
 import com.baseapplication.core.utils.Context;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,10 +66,10 @@ public class UsuarioController {
 		return usuarioService.buscarInformacoesDoPerfilPorId(idUsuario);
 	}
 
-	@GetMapping("/buscarNotificacoesUsuario")
-	public List<NotificacaoDTO> buscarNotificacoesUsuario() {
-		return usuarioService.buscarNotificacoesUsuario(Context.getUsuarioLogado().getId());
-	}
+//	@GetMapping("/buscarNotificacoesUsuario")
+//	public List<NotificacaoDTO> buscarNotificacoesUsuario() {
+//		return usuarioService.buscarNotificacoesUsuario(Context.getUsuarioLogado().getId());
+//	}
 
 	@PostMapping("/reportarErro")
 	public void reportarErro(@RequestBody String mensagem) {

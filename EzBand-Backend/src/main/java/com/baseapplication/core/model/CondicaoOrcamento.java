@@ -18,5 +18,9 @@ public class CondicaoOrcamento {
     @JoinColumn(name = "id_banda")
     private Banda banda = new Banda();
 
+    @ManyToOne
+    @JoinColumn(name = "id_orcamento")
+    private Orcamento orcamento = new Orcamento();
+
     private String condicao;
 }

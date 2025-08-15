@@ -3,6 +3,8 @@ package com.baseapplication.core.service.impl;
 import com.baseapplication.core.dto.*;
 import com.baseapplication.core.dto.superClasses.InformacoesEventoDTO;
 import com.baseapplication.core.enums.*;
+import com.baseapplication.core.event.events.SolicitacaoAgendarEnsaioEvent;
+import com.baseapplication.core.event.events.SolicitarEntradaBandaEvent;
 import com.baseapplication.core.exception.InternalException;
 import com.baseapplication.core.exception.InvalidParamException;
 import com.baseapplication.core.exception.NoContentException;
@@ -18,6 +20,7 @@ import com.baseapplication.core.utils.DateUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -30,15 +33,16 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class EventoServiceImpl implements EventoService {
 
-	private ShowService showService;
-	private EnsaioService ensaioService;
-	private MusicoEventoService musicoEventoService;
-	private UsuarioService usuarioService;
-	private NotificacaoService notificacaoService;
-	private BandaService bandaService;
-	private RepertorioEventoService repertorioEventoService;
-	private EstudioService estudioService;
-	private LocalEventoService localEventoService;
+	private final ShowService showService;
+	private final EnsaioService ensaioService;
+	private final MusicoEventoService musicoEventoService;
+	private final UsuarioService usuarioService;
+	private final NotificacaoService notificacaoService;
+	private final BandaService bandaService;
+	private final RepertorioEventoService repertorioEventoService;
+	private final EstudioService estudioService;
+	private final LocalEventoService localEventoService;
+	private final ApplicationEventPublisher applicationEventPublisher;
 
 
 	@Override
@@ -148,8 +152,8 @@ public class EventoServiceImpl implements EventoService {
 
 	@Override
 	public void enviarConviteParaEvento(ConviteEventoDTO conviteEvento) {
-		notificacaoService.enviarConviteParaEvento(conviteEvento.getContato(), conviteEvento.getTipoContato(),
-				conviteEvento.getIdEvento(), conviteEvento.getTipoEvento(), conviteEvento.getIdUsuarioRemetente());
+//		notificacaoService.enviarConviteParaEvento(conviteEvento.getContato(), conviteEvento.getTipoContato(),
+//				conviteEvento.getIdEvento(), conviteEvento.getTipoEvento(), conviteEvento.getIdUsuarioRemetente());
 	}
 
 	@Override
@@ -233,6 +237,12 @@ public class EventoServiceImpl implements EventoService {
 			ensaio.setStatus(StatusEvento.PENDENTE);
 		}
 		setarEstudio(novoEnsaioDTO, ensaio);
+
+		if(ensaio.getEstudio() != null){
+			applicationEventPublisher.publishEvent(new SolicitacaoAgendarEnsaioEvent(
+					ensaio
+			));
+		}
 		ensaioService.salvar(ensaio);
 		incluirMusicosNoEvento(novoEnsaioDTO.getMusicos(), banda, ensaio, TipoEvento.ENSAIO);
 	}
@@ -251,29 +261,29 @@ public class EventoServiceImpl implements EventoService {
 
 	@Override
 	public Boolean isNotificacaoShowAceitaPorTodosMembros(Long idShow) {
-		List<Notificacao> notificacoes = notificacaoService
-				.buscarNotificacoesEventoMembros(buscarPorId(idShow, TipoEvento.SHOW));
-
-		if (notificacoes.isEmpty())
-			throw new NoContentException("Não existem notificações para este evento");
-
-		for (Notificacao notificacao : notificacoes) {
-			if (!notificacao.getStatusNotificacao().equals(StatusNotificacao.ACEITO))
-				return false;
-		}
+//		List<Notificacao> notificacoes = notificacaoService
+//				.buscarNotificacoesEventoMembros(buscarPorId(idShow, TipoEvento.SHOW));
+//
+//		if (notificacoes.isEmpty())
+//			throw new NoContentException("Não existem notificações para este evento");
+//
+//		for (Notificacao notificacao : notificacoes) {
+//			if (!notificacao.getStatusNotificacao().equals(StatusNotificacao.ACEITO))
+//				return false;
+//		}
 		return true;
 	}
 
 	@Override
 	public void recusarNotificacao(Long idNotificacao) {
-		notificacaoService.recusarNotificacao(idNotificacao);
+//		notificacaoService.recusarNotificacao(idNotificacao);
 	}
 
 	@Override
 	public void aceitarNotificacao(Long idNotificacao) {
-		Notificacao notificacao = notificacaoService.aceitarNotificacao(idNotificacao);
-		Evento evento = getEventoFromNotificacao(notificacao);
-		verificarSeEventoFoiAprovadoPorTodosMembros(evento);
+//		Notificacao notificacao = notificacaoService.aceitarNotificacao(idNotificacao);
+//		Evento evento = getEventoFromNotificacao(notificacao);
+//		verificarSeEventoFoiAprovadoPorTodosMembros(evento);
 	}
 
 	private void verificarSeEventoFoiAprovadoPorTodosMembros(Evento evento) {
@@ -284,26 +294,26 @@ public class EventoServiceImpl implements EventoService {
 	}
 
 	private boolean isNotificacaoEventoAceitaPorTodosMembros(Evento evento) {
-		List<Notificacao> notificacoes = notificacaoService.buscarNotificacoesEventoMembros(evento);
-
-		if (notificacoes.isEmpty())
-			throw new NoContentException("Não existem notificações para este evento");
-
-		for (Notificacao notificacao : notificacoes) {
-			if (!notificacao.getStatusNotificacao().equals(StatusNotificacao.ACEITO))
-				return false;
-		}
+//		List<Notificacao> notificacoes = notificacaoService.buscarNotificacoesEventoMembros(evento);
+//
+//		if (notificacoes.isEmpty())
+//			throw new NoContentException("Não existem notificações para este evento");
+//
+//		for (Notificacao notificacao : notificacoes) {
+//			if (!notificacao.getStatusNotificacao().equals(StatusNotificacao.ACEITO))
+//				return false;
+//		}
 		return true;
 	}
 
-	private static Evento getEventoFromNotificacao(Notificacao notificacao) {
-		Evento evento;
-		if (notificacao instanceof NotificacaoShow)
-			evento = ((NotificacaoShow) notificacao).getShow();
-		else
-			evento = ((NotificacaoEnsaio) notificacao).getEnsaio();
-		return evento;
-	}
+//	private static Evento getEventoFromNotificacao(Notificacao notificacao) {
+//		Evento evento;
+//		if (notificacao instanceof NotificacaoShow)
+//			evento = ((NotificacaoShow) notificacao).getShow();
+//		else
+//			evento = ((NotificacaoEnsaio) notificacao).getEnsaio();
+//		return evento;
+//	}
 
 	private void incluirMusicosNoEvento(List<MusicoEventoDTO> musicos, Banda banda, Evento evento,
 			TipoEvento tipoEvento) {
@@ -323,8 +333,11 @@ public class EventoServiceImpl implements EventoService {
 
 			if (evento.getStatus().equals(StatusEvento.AGUARDANDO_APROVACAO)) {
 				musicoEvento.setSituacao(SituacaoMusicoEvento.CONVITE_PENDENTE);
-				if (isMusicoDiferenteDoUsuarioLogado(musicoEvento))
-					enviarNotificacaoAprovacaoEvento(usuario, evento, tipoEvento);
+				if (isMusicoDiferenteDoUsuarioLogado(musicoEvento)){
+					//TODO:
+//					enviarNotificacaoAprovacaoEvento(usuario, evento, tipoEvento);
+					applicationEventPublisher.publishEvent(new SolicitarEntradaBandaEvent(1L, 1L));
+				}
 			} else {
 				musicoEvento.setSituacao(SituacaoMusicoEvento.ATIVO);
 			}
@@ -338,55 +351,55 @@ public class EventoServiceImpl implements EventoService {
 
 	}
 
-	private void enviarNotificacaoAprovacaoEvento(Usuario usuario, Evento evento, TipoEvento tipoEvento) {
-		notificacaoService.enviar(criarNotificacaoAprovacaoEvento(usuario, evento, tipoEvento));
-	}
+//	private void enviarNotificacaoAprovacaoEvento(Usuario usuario, Evento evento, TipoEvento tipoEvento) {
+//		notificacaoService.enviar(criarNotificacaoAprovacaoEvento(usuario, evento, tipoEvento));
+//	}
 
-	private Notificacao criarNotificacaoAprovacaoEvento(Usuario usuario, Evento evento, TipoEvento tipoEvento) {
-		switch (tipoEvento) {
-		case SHOW -> {
-			return criarNotificacaoAprovacaoShow(usuario, evento);
-		}
-		case ENSAIO -> {
-			return criarNotificacaoAprovacaoEnsaio(usuario, evento);
-		}
-		default -> {
-			throw new InvalidParamException("Tipo inválido");
-		}
-		}
-	}
+//	private Notificacao criarNotificacaoAprovacaoEvento(Usuario usuario, Evento evento, TipoEvento tipoEvento) {
+//		switch (tipoEvento) {
+//		case SHOW -> {
+//			return criarNotificacaoAprovacaoShow(usuario, evento);
+//		}
+//		case ENSAIO -> {
+//			return criarNotificacaoAprovacaoEnsaio(usuario, evento);
+//		}
+//		default -> {
+//			throw new InvalidParamException("Tipo inválido");
+//		}
+//		}
+//	}
 
-	private Notificacao criarNotificacaoAprovacaoEnsaio(Usuario usuario, Evento evento) {
-		NotificacaoEnsaio notificacaoEnsaio = new NotificacaoEnsaio();
-		notificacaoEnsaio.setEnsaio((Ensaio) evento);
-		notificacaoEnsaio.setDataEnsaio(evento.getData());
-		notificacaoEnsaio.setData(LocalDate.now());
-		notificacaoEnsaio.setBanda(evento.getBanda());
-		notificacaoEnsaio.setMensagem(
-				Context.getUsuarioLogado().getNome() + " está marcando um ensaio em " + evento.getLocal() + " - "
-						+ evento.getEndereco() + " na data " + DateUtils.localDateToString(evento.getData()) + ".");
-		notificacaoEnsaio.setTipoNotificacao(TipoNotificacao.APROVACAO_EVENTO);
-		notificacaoEnsaio.setDestinatario(usuario);
-		notificacaoEnsaio.setStatusNotificacao(StatusNotificacao.NAO_VISUALIZADO);
-		notificacaoEnsaio.setRemetente(Context.getUsuarioLogado());
-		return notificacaoEnsaio;
-	}
-
-	private Notificacao criarNotificacaoAprovacaoShow(Usuario usuario, Evento evento) {
-		NotificacaoShow notificacaoShow = new NotificacaoShow();
-		notificacaoShow.setShow((Show) evento);
-		notificacaoShow.setBanda(evento.getBanda());
-		notificacaoShow.setData(LocalDate.now());
-		notificacaoShow.setDataEvento(evento.getData());
-		notificacaoShow.setMensagem(Context.getUsuarioLogado().getNome() + " está marcando com "
-				+ evento.getBanda().getNome() + " um show em " + evento.getLocal() + " - " + evento.getEndereco().getCidade()
-				+ " na data " + DateUtils.localDateToString(evento.getData()) + ".");
-		notificacaoShow.setTipoNotificacao(TipoNotificacao.APROVACAO_EVENTO);
-		notificacaoShow.setDestinatario(usuario);
-		notificacaoShow.setStatusNotificacao(StatusNotificacao.NAO_VISUALIZADO);
-		notificacaoShow.setRemetente(Context.getUsuarioLogado());
-		return notificacaoShow;
-	}
+//	private Notificacao criarNotificacaoAprovacaoEnsaio(Usuario usuario, Evento evento) {
+//		NotificacaoEnsaio notificacaoEnsaio = new NotificacaoEnsaio();
+//		notificacaoEnsaio.setEnsaio((Ensaio) evento);
+//		notificacaoEnsaio.setDataEnsaio(evento.getData());
+//		notificacaoEnsaio.setData(LocalDate.now());
+//		notificacaoEnsaio.setBanda(evento.getBanda());
+//		notificacaoEnsaio.setMensagem(
+//				Context.getUsuarioLogado().getNome() + " está marcando um ensaio em " + evento.getLocal() + " - "
+//						+ evento.getEndereco() + " na data " + DateUtils.localDateToString(evento.getData()) + ".");
+//		notificacaoEnsaio.setTipoNotificacao(TipoNotificacao.APROVACAO_EVENTO);
+//		notificacaoEnsaio.setDestinatario(usuario);
+//		notificacaoEnsaio.setStatusNotificacao(StatusNotificacao.NAO_VISUALIZADO);
+//		notificacaoEnsaio.setRemetente(Context.getUsuarioLogado());
+//		return notificacaoEnsaio;
+//	}
+//
+//	private Notificacao criarNotificacaoAprovacaoShow(Usuario usuario, Evento evento) {
+//		NotificacaoShow notificacaoShow = new NotificacaoShow();
+//		notificacaoShow.setShow((Show) evento);
+//		notificacaoShow.setBanda(evento.getBanda());
+//		notificacaoShow.setData(LocalDate.now());
+//		notificacaoShow.setDataEvento(evento.getData());
+//		notificacaoShow.setMensagem(Context.getUsuarioLogado().getNome() + " está marcando com "
+//				+ evento.getBanda().getNome() + " um show em " + evento.getLocal() + " - " + evento.getEndereco().getCidade()
+//				+ " na data " + DateUtils.localDateToString(evento.getData()) + ".");
+//		notificacaoShow.setTipoNotificacao(TipoNotificacao.APROVACAO_EVENTO);
+//		notificacaoShow.setDestinatario(usuario);
+//		notificacaoShow.setStatusNotificacao(StatusNotificacao.NAO_VISUALIZADO);
+//		notificacaoShow.setRemetente(Context.getUsuarioLogado());
+//		return notificacaoShow;
+//	}
 
 	private boolean isUsuarioMembroDaBanda(Usuario usuario, Banda banda) {
 		for (MusicoBanda musicoBanda : banda.getMusicos()) {

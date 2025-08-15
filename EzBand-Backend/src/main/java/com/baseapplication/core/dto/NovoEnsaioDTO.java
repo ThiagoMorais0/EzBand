@@ -30,10 +30,12 @@ public class NovoEnsaioDTO {
     private BigDecimal valor;
     private List<MusicoEventoDTO> musicos;
 
-    public Ensaio toEntity(){
+    public Ensaio toEntity() {
         Ensaio ensaio = new Ensaio();
         BeanUtils.copyProperties(this, ensaio);
-        BeanUtils.copyProperties(this.getEndereco(), ensaio.getEndereco());
+        if (this.getEndereco() != null) {
+            BeanUtils.copyProperties(this.getEndereco(), ensaio.getEndereco());
+        }
         ensaio.setData(DateUtils.stringToLocalDate(this.dataEnsaio));
         ensaio.setDataInclusao(LocalDate.now());
         return ensaio;

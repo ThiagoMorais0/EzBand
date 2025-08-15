@@ -11,15 +11,15 @@ import com.baseapplication.core.model.superClasses.Notificacao;
 
 @Repository
 public interface NotificacaoDao extends JpaRepository<Notificacao, Long> {
-    @Query("SELECT n FROM Notificacao n " +
-            "WHERE n.destinatario.id = :idUsuario and n.statusNotificacao = :status")
-    List<Notificacao> buscarNotificacoesPorUsuario(Long idUsuario, StatusNotificacao status);
-
-    @Query("SELECT n FROM Notificacao n " +
-            "INNER JOIN NotificacaoShow ns on ns.show.id = :idShow")
-    List<Notificacao> buscarNotificacoesShowMembros(Long idShow);
-
-    @Query("SELECT n FROM Notificacao n " +
-            "INNER JOIN NotificacaoEnsaio ne on ne.ensaio.id = :idEnsaio")
-    List<Notificacao> buscarNotificacoesEnsaioMembros(Long idEnsaio);
+//    @Query("SELECT n FROM Notificacao n " +
+//            "WHERE n.destinatario.id = :idUsuario and n.statusNotificacao = :status")
+//    List<Notificacao> buscarNotificacoesPorUsuario(Long idUsuario, StatusNotificacao status);
+//
+//    @Query("SELECT n FROM Notificacao n " +
+//            "INNER JOIN NotificacaoShow ns on ns.show.id = :idShow")
+//    List<Notificacao> buscarNotificacoesShowMembros(Long idShow);
+//
+//    @Query("SELECT n FROM Notificacao n " +
+//            "INNER JOIN NotificacaoEnsaio ne on ne.ensaio.id = :idEnsaio")
+//    List<Notificacao> buscarNotificacoesEnsaioMembros(Long idEnsaio);
 }

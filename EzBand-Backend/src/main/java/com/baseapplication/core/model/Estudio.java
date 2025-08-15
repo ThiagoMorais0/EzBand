@@ -3,7 +3,9 @@ package com.baseapplication.core.model;
 import com.baseapplication.core.model.embedded.Endereco;
 import jakarta.persistence.*;
 import lombok.Data;
+
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -32,5 +34,19 @@ public class Estudio {
 
     @OneToMany(mappedBy = "estudio", fetch = FetchType.LAZY)
     private List<Ensaio> ensaios;
+
+    @OneToMany(mappedBy = "estudio", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AvaliacaoEstudio> avaliacoes = new ArrayList<>();
+
+    @Transient
+    public Double getMediaAvaliacoes() {
+        if (avaliacoes.isEmpty()) return 0.0;
+        return avaliacoes.stream()
+                .mapToInt(AvaliacaoEstudio::getExperienciaGeral) // ou combinar todos os critérios
+                .average()
+                .orElse(0.0);
+    }
+
+
 
 }

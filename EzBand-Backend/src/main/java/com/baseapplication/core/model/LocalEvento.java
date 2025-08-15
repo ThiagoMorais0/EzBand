@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -34,5 +35,17 @@ public class LocalEvento {
 
     @OneToMany(mappedBy = "localEvento", fetch = FetchType.LAZY)
     private List<Show> shows;
+
+    @OneToMany(mappedBy = "localEvento", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AvaliacaoLocalEvento> avaliacoes = new ArrayList<>();
+
+    @Transient
+    public Double getMediaAvaliacoes() {
+        if (avaliacoes.isEmpty()) return 0.0;
+        return avaliacoes.stream()
+                .mapToInt(AvaliacaoLocalEvento::getExperienciaGeral) // ou combinar todos os critérios
+                .average()
+                .orElse(0.0);
+    }
 
 }

@@ -3,7 +3,6 @@ package com.baseapplication.core.service.impl;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,13 +17,11 @@ import com.baseapplication.core.dto.EventosSeparadosDTO;
 import com.baseapplication.core.dto.InfoPerfilUsuarioDTO;
 import com.baseapplication.core.dto.InfoUsuarioPainelDTO;
 import com.baseapplication.core.enums.TipoContato;
-import com.baseapplication.core.exception.ConflictException;
 import com.baseapplication.core.exception.InternalException;
 import com.baseapplication.core.exception.InvalidParamException;
 import com.baseapplication.core.exception.ResourceNotFoundException;
 import com.baseapplication.core.model.Usuario;
 import com.baseapplication.core.model.dto.BandaDTO;
-import com.baseapplication.core.model.dto.superClasses.NotificacaoDTO;
 import com.baseapplication.core.service.BandaService;
 import com.baseapplication.core.service.EmailService;
 import com.baseapplication.core.service.EventoHelperService;
@@ -188,19 +185,13 @@ public class UsuarioServiceImpl implements UsuarioService {
 
 	@Override
 	public void enviarSolicitacaoParaIngressarBanda(Long idBanda, Long idUsuarioRemetente, String instrumento) {
-		notificacaoService.enviarSolicitacaoParaIngressarBanda(bandaService.buscarPorId(idBanda),
-				buscarPorId(idUsuarioRemetente), instrumento);
+//		notificacaoService.enviarSolicitacaoParaIngressarBanda(bandaService.buscarPorId(idBanda),
+//				buscarPorId(idUsuarioRemetente), instrumento);
 	}
 
 	@Override
 	public InfoPerfilUsuarioDTO buscarInformacoesDoPerfilPorId(Long idUsuario) {
 		return new InfoPerfilUsuarioDTO(buscarPorId(idUsuario));
-	}
-
-	@Override
-	public List<NotificacaoDTO> buscarNotificacoesUsuario(Long idUsuario) {
-		return notificacaoService.buscarNotificacoesPorUsuario(idUsuario).stream()
-				.map(i -> new NotificacaoDTO().toDTO(i)).collect(Collectors.toList());
 	}
 
 	@Override
@@ -229,10 +220,10 @@ public class UsuarioServiceImpl implements UsuarioService {
 				.map(BandaParticipacaoEspecialDTO::new).toList());
 	}
 
-	private CompletableFuture<List<NotificacaoDTO>> buscarNotificacoesAsync(Long idUsuario) {
-		return CompletableFuture.supplyAsync(() -> notificacaoService.buscarNotificacoesPorUsuario(idUsuario).stream()
-				.map(new NotificacaoDTO()::toDTO).toList());
-	}
+//	private CompletableFuture<List<NotificacaoDTO>> buscarNotificacoesAsync(Long idUsuario) {
+//		return CompletableFuture.supplyAsync(() -> notificacaoService.buscarNotificacoesPorUsuario(idUsuario).stream()
+//				.map(new NotificacaoDTO()::toDTO).toList());
+//	}
 
 	private CompletableFuture<List<BandaDTO>> buscarBandasDoUsuarioAsync(Long idUsuario) {
 		return CompletableFuture

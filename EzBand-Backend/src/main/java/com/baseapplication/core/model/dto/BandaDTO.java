@@ -43,15 +43,15 @@ public class BandaDTO {
         this.listarObservacaoRepertorio = banda.getParametros().getListarObservacaoRepertorio();
         this.quantidadeShows = banda.getShows().stream().filter(i -> i.getStatus().equals(StatusEvento.PENDENTE)).toList().size();
         this.quantidadeEnsaios = banda.getEnsaios().stream().filter(i -> i.getStatus().equals(StatusEvento.PENDENTE)).toList().size();
-
-        this.quantidadeNotificacoes = (int) banda.getNotificacaoShows().stream()
-                        .filter(notificacao -> notificacao.getStatusNotificacao().equals(StatusNotificacao.NAO_VISUALIZADO))
-                        .filter(notificacao -> notificacao.getDestinatario().equals(Context.getUsuarioLogado()))
-                        .count() +
-                        (int) banda.getNotificacaoEnsaios().stream()
-                                .filter(notificacao -> notificacao.getStatusNotificacao().equals(StatusNotificacao.NAO_VISUALIZADO))
-                                .filter(notificacao -> notificacao.getDestinatario().equals(Context.getUsuarioLogado()))
-                                .count();
+        this.quantidadeNotificacoes = 0;
+//        this.quantidadeNotificacoes = (int) banda.getNotificacaoShows().stream()
+//                        .filter(notificacao -> notificacao.getStatusNotificacao().equals(StatusNotificacao.NAO_VISUALIZADO))
+//                        .filter(notificacao -> notificacao.getDestinatario().equals(Context.getUsuarioLogado()))
+//                        .count() +
+//                        (int) banda.getNotificacaoEnsaios().stream()
+//                                .filter(notificacao -> notificacao.getStatusNotificacao().equals(StatusNotificacao.NAO_VISUALIZADO))
+//                                .filter(notificacao -> notificacao.getDestinatario().equals(Context.getUsuarioLogado()))
+//                                .count();
 
         this.quantidadeMembros = banda.getMusicos().size();
         this.membros = banda.getUsuariosMusicos().stream().map(InfoPerfilUsuarioDTO::new).collect(Collectors.toList());

@@ -10,7 +10,6 @@ import com.baseapplication.core.dto.InfoPerfilUsuarioDTO;
 import com.baseapplication.core.dto.InfoUsuarioPainelDTO;
 import com.baseapplication.core.enums.TipoContato;
 import com.baseapplication.core.model.Usuario;
-import com.baseapplication.core.model.dto.superClasses.NotificacaoDTO;
 
 public interface UsuarioService {
 
@@ -38,8 +37,6 @@ public interface UsuarioService {
 	void enviarSolicitacaoParaIngressarBanda(Long idBanda, Long idUsuarioRemetente, String instrumento);
 
 	InfoPerfilUsuarioDTO buscarInformacoesDoPerfilPorId(Long idUsuario);
-
-	List<NotificacaoDTO> buscarNotificacoesUsuario(Long id);
 
 	void reportarErro(String mensagem);
 

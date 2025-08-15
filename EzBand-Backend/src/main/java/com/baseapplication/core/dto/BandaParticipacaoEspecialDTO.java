@@ -30,6 +30,7 @@ public class BandaParticipacaoEspecialDTO {
         this.listarObservacaoRepertorio = banda.getParametros().getListarObservacaoRepertorio();
         this.quantidadeShows = banda.getShows().size();
         this.quantidadeEnsaios = banda.getEnsaios().size();
-        this.quantidadeNotificacoes = banda.getNotificacaoShows().size() + banda.getNotificacaoEnsaios().size();
+        this.quantidadeNotificacoes = 0;
+//                banda.getNotificacaoShows().size() + banda.getNotificacaoEnsaios().size();
     }
 }
