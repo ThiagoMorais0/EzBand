@@ -52,7 +52,7 @@ public class UsuarioController {
 
 	@GetMapping("/buscarQuantidadeNotificacoes")
 	public Integer buscarQuantidadeNotificacoes() {
-		return usuarioService.buscarQuantidadeNotificacoes(Context.getUsuarioLogado().getId());
+		return 0;
 	}
 
 	@GetMapping("/enviarSolicitacaoParaIngressarBanda")
