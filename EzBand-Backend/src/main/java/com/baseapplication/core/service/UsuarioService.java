@@ -32,7 +32,6 @@ public interface UsuarioService {
 
 	InfoPerfilUsuarioDTO editarUsuarioComImagem(String usuarioJson, MultipartFile imagem);
 
-	Integer buscarQuantidadeNotificacoes(Long idUsuario);
 
 	void enviarSolicitacaoParaIngressarBanda(Long idBanda, Long idUsuarioRemetente, String instrumento);
 

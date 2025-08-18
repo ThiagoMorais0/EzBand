@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @Entity
-@Table(name = "NOTIFICACAO_USUARIO")
+@Table(name = "RELACIONAMENTO_SEGUIDOR")
 public class RelacionamentoSeguidor {
 
     @EmbeddedId

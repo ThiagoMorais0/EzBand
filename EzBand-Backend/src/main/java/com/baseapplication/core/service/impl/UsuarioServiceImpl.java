@@ -77,17 +77,17 @@ public class UsuarioServiceImpl implements UsuarioService {
 
 		Long idUsuario = Context.getUsuarioLogado().getId();
 		CompletableFuture<List<BandaDTO>> bandasFuture = buscarBandasDoUsuarioAsync(idUsuario);
-		CompletableFuture<Integer> notificacoesFuture = buscarQuantidadeNotificacoesAsync(idUsuario);
+//		CompletableFuture<Integer> notificacoesFuture = buscarQuantidadeNotificacoesAsync(idUsuario);
 		CompletableFuture<Integer> participacoesEspeciaisFuture = buscarQuantidadeParticipacoesEspeciaisAsync(
 				idUsuario);
 		CompletableFuture<Integer> proximosEventosFuture = buscarQuantidadeProximosEventosAsync(idUsuario);
 
-		CompletableFuture.allOf(bandasFuture, notificacoesFuture, participacoesEspeciaisFuture, proximosEventosFuture)
+		CompletableFuture.allOf(bandasFuture, participacoesEspeciaisFuture, proximosEventosFuture)
 				.join();
 
 		InfoUsuarioPainelDTO retorno = null;
 		try {
-			retorno = new InfoUsuarioPainelDTO(bandasFuture.get(), notificacoesFuture.get(),
+			retorno = new InfoUsuarioPainelDTO(bandasFuture.get(), 0,
 					participacoesEspeciaisFuture.get(), proximosEventosFuture.get());
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
@@ -109,9 +109,9 @@ public class UsuarioServiceImpl implements UsuarioService {
 		return usuarioDao.buscarQuantidadeParticipacoesEspeciais(idUsuario);
 	}
 
-	private CompletableFuture<Integer> buscarQuantidadeNotificacoesAsync(Long idUsuario) {
-		return CompletableFuture.supplyAsync(() -> buscarQuantidadeNotificacoes(idUsuario));
-	}
+//	private CompletableFuture<Integer> buscarQuantidadeNotificacoesAsync(Long idUsuario) {
+////		return CompletableFuture.supplyAsync(() -> buscarQuantidadeNotificacoes(idUsuario));
+//	}
 
 	private Integer buscarQuantidadeProximosEventos(Long idUsuario) {
 		return usuarioDao.buscarQuantidadeProximosEventos(idUsuario);
@@ -176,11 +176,6 @@ public class UsuarioServiceImpl implements UsuarioService {
 		usuarioDao.save(usuario);
 		usuarioDTO.setUrlFotoPerfil(urlImagem);
 		return usuarioDTO;
-	}
-
-	@Override
-	public Integer buscarQuantidadeNotificacoes(Long idUsuario) {
-		return usuarioDao.buscarQuantidadeNotificacoes(idUsuario);
 	}
 
 	@Override

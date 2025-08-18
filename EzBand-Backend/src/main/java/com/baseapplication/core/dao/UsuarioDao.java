@@ -20,12 +20,6 @@ public interface UsuarioDao extends JpaRepository<Usuario, Long> {
     @Query(value = "SELECT u FROM Usuario u WHERE u.celular = :celular")
     Usuario findByCelular(String celular);
 
-    @Query(value = "select count(1) " +
-            "from notificacao n  " +
-            "where n.id_destinatario = :idUsuario and n.status_notificacao in ('NAO_VISUALIZADO', 'VISUALIZADO')",
-            nativeQuery = true)
-    Integer buscarQuantidadeNotificacoes(Long idUsuario);
-
     @Query(value = "SELECT COUNT(1)  " +
             "FROM musico_evento me " +
             "LEFT JOIN show s ON me.id_evento = s.id " +
