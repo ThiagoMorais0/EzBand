@@ -54,6 +54,6 @@ public class BandaDTO {
 //                                .count();
 
         this.quantidadeMembros = banda.getMusicos().size();
-        this.membros = banda.getUsuariosMusicos().stream().map(InfoPerfilUsuarioDTO::new).collect(Collectors.toList());
+        this.membros = banda.getMusicos().stream().map(InfoPerfilUsuarioDTO::new).collect(Collectors.toList());
     }
 }
