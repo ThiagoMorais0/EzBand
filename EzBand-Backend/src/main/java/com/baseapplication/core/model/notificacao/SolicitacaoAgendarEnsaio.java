@@ -19,8 +19,8 @@ public class SolicitacaoAgendarEnsaio extends Notificacao {
     public SolicitacaoAgendarEnsaio(Ensaio ensaio){
         super.setDataCriacao(new Date());
         super.setLida(false);
-        super.setMensagem("Banda " + ensaio.getBanda().getNome() +
-                " está solicitando um agendamento em " +
+        super.setMensagem("Banda \"" + ensaio.getBanda().getNome() +
+                "\" está solicitando um agendamento em " +
                 ensaio.getData().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) +
                 " às " + ensaio.getHorarioInicio());
 

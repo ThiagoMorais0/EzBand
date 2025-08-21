@@ -38,8 +38,14 @@ public class NotificacaoController {
                 k -> Sinks.many().multicast().onBackpressureBuffer()
         );
 
-        // Carrega notificações não lidas do banco
-        Flux<NotificacaoDTO> naoLidas = Flux.fromIterable(notificacaoService.buscarNaoLidas(destinatarioId, destinatarioTipo).stream().map(i -> new NotificacaoDTO(i.getMensagem(), i.getDestinatarioId(), i.getDestinatarioTipo().name())).toList());
+        Flux<NotificacaoDTO> naoLidas = Flux.fromIterable(notificacaoService
+                        .buscarNaoLidas(destinatarioId, destinatarioTipo).stream()
+                        .map(i -> new NotificacaoDTO(
+                                i.getMensagem(),
+                                i.getDestinatarioId(),
+                                i.getDestinatarioTipo().name(),
+                                i.getRemetenteTipo().name()))
+                        .toList());
 
         // Concatena as não lidas primeiro, e depois segue em tempo real
         return Flux.concat(
@@ -58,7 +64,8 @@ public class NotificacaoController {
             sink.tryEmitNext(new NotificacaoDTO(
                     notificacao.getMensagem(),
                     notificacao.getDestinatarioId(),
-                    notificacao.getDestinatarioTipo().name()
+                    notificacao.getDestinatarioTipo().name(),
+                    notificacao.getRemetenteTipo().name()
             ));
 
         }
