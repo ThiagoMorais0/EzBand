@@ -239,6 +239,7 @@ public class EventoServiceImpl implements EventoService {
 		setarEstudio(novoEnsaioDTO, ensaio);
 
 		if(ensaio.getEstudio() != null){
+			System.out.println("Publicando notificação");
 			applicationEventPublisher.publishEvent(new SolicitacaoAgendarEnsaioEvent(
 					ensaio
 			));

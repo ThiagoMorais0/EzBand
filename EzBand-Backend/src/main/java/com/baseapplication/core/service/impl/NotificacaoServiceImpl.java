@@ -4,9 +4,11 @@ import com.baseapplication.core.dao.NotificacaoDao;
 import com.baseapplication.core.enums.*;
 import com.baseapplication.core.exception.ResourceNotFoundException;
 import com.baseapplication.core.model.*;
+import com.baseapplication.core.model.notificacao.SolicitacaoAgendarEnsaio;
 import com.baseapplication.core.model.superClasses.Evento;
 import com.baseapplication.core.model.superClasses.Notificacao;
 import com.baseapplication.core.service.*;
+import lombok.RequiredArgsConstructor;
 import org.hibernate.service.spi.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,7 +18,25 @@ import java.util.Collections;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class NotificacaoServiceImpl implements NotificacaoService {
+
+    private final NotificacaoDao notificacaoDao;
+
+    @Override
+    public void salvarNotificacao(SolicitacaoAgendarEnsaio notificacao) {
+        notificacaoDao.save(notificacao);
+    }
+
+    @Override
+    public List<Notificacao> buscarNaoLidas(Long destinatarioId, TipoParticipante destinatarioTipo) {
+        return notificacaoDao.buscarNaoLidas(destinatarioId, destinatarioTipo);
+    }
+
+    @Override
+    public void deletarTodos() {
+        notificacaoDao.deleteAll();
+    }
 
 //    @Autowired
 //    private NotificacaoDao notificacaoDao;

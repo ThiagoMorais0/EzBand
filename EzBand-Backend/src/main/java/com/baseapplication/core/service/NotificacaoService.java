@@ -4,12 +4,19 @@ import java.util.List;
 
 import com.baseapplication.core.enums.TipoContato;
 import com.baseapplication.core.enums.TipoEvento;
+import com.baseapplication.core.enums.TipoParticipante;
 import com.baseapplication.core.model.Banda;
 import com.baseapplication.core.model.Usuario;
+import com.baseapplication.core.model.notificacao.SolicitacaoAgendarEnsaio;
 import com.baseapplication.core.model.superClasses.Evento;
 import com.baseapplication.core.model.superClasses.Notificacao;
 
 public interface NotificacaoService {
+    void salvarNotificacao(SolicitacaoAgendarEnsaio notificacao);
+
+    List<Notificacao> buscarNaoLidas(Long destinatarioId, TipoParticipante destinatarioTipo);
+
+    void deletarTodos();
 //    List<Notificacao> buscarNotificacoesPorUsuario(Long idUsuario);
 //    void enviarConviteParaEvento(String contato,
 //                                 TipoContato tipoContato,

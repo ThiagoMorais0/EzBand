@@ -2,8 +2,10 @@ package com.baseapplication.core.dao;
 
 import java.util.List;
 
+import com.baseapplication.core.enums.TipoParticipante;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.baseapplication.core.enums.StatusNotificacao;
@@ -11,6 +13,11 @@ import com.baseapplication.core.model.superClasses.Notificacao;
 
 @Repository
 public interface NotificacaoDao extends JpaRepository<Notificacao, Long> {
+
+    @Query("SELECT n FROM Notificacao n WHERE n.destinatarioId = :destinatarioId AND n.destinatarioTipo = :destinatarioTipo AND n.lida = false")
+    List<Notificacao> buscarNaoLidas(@Param("destinatarioId") Long destinatarioId,
+                                     @Param("destinatarioTipo") TipoParticipante destinatarioTipo);
+
 //    @Query("SELECT n FROM Notificacao n " +
 //            "WHERE n.destinatario.id = :idUsuario and n.statusNotificacao = :status")
 //    List<Notificacao> buscarNotificacoesPorUsuario(Long idUsuario, StatusNotificacao status);
