@@ -2,25 +2,23 @@ package com.baseapplication.core.service.impl;
 
 import com.baseapplication.core.dto.*;
 import com.baseapplication.core.dto.superClasses.InformacoesEventoDTO;
-import com.baseapplication.core.enums.*;
+import com.baseapplication.core.enums.SituacaoMusicoEvento;
+import com.baseapplication.core.enums.StatusEvento;
+import com.baseapplication.core.enums.TipoContato;
+import com.baseapplication.core.enums.TipoEvento;
 import com.baseapplication.core.event.events.SolicitacaoAgendarEnsaioEvent;
-import com.baseapplication.core.event.events.SolicitarEntradaBandaEvent;
 import com.baseapplication.core.exception.InternalException;
 import com.baseapplication.core.exception.InvalidParamException;
-import com.baseapplication.core.exception.NoContentException;
 import com.baseapplication.core.exception.ResourceNotFoundException;
 import com.baseapplication.core.model.*;
 import com.baseapplication.core.model.dto.EnsaioDTO;
 import com.baseapplication.core.model.dto.ShowDTO;
 import com.baseapplication.core.model.superClasses.Evento;
-import com.baseapplication.core.model.superClasses.Notificacao;
 import com.baseapplication.core.service.*;
 import com.baseapplication.core.utils.Context;
-import com.baseapplication.core.utils.DateUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -42,7 +40,6 @@ public class EventoServiceImpl implements EventoService {
 	private final RepertorioEventoService repertorioEventoService;
 	private final EstudioService estudioService;
 	private final LocalEventoService localEventoService;
-	private final ApplicationEventPublisher applicationEventPublisher;
 
 
 	@Override
@@ -240,9 +237,7 @@ public class EventoServiceImpl implements EventoService {
 
 		if(ensaio.getEstudio() != null){
 			System.out.println("Publicando notificação");
-			applicationEventPublisher.publishEvent(new SolicitacaoAgendarEnsaioEvent(
-					ensaio
-			));
+			notificacaoService.enviarNotificacao(new SolicitacaoAgendarEnsaioEvent(ensaio));
 		}
 		ensaioService.salvar(ensaio);
 		incluirMusicosNoEvento(novoEnsaioDTO.getMusicos(), banda, ensaio, TipoEvento.ENSAIO);
@@ -337,7 +332,7 @@ public class EventoServiceImpl implements EventoService {
 				if (isMusicoDiferenteDoUsuarioLogado(musicoEvento)){
 					//TODO:
 //					enviarNotificacaoAprovacaoEvento(usuario, evento, tipoEvento);
-					applicationEventPublisher.publishEvent(new SolicitarEntradaBandaEvent(1L, 1L));
+//					applicationEventPublisher.publishEvent(new SolicitarEntradaBandaEvent(1L, 1L));
 				}
 			} else {
 				musicoEvento.setSituacao(SituacaoMusicoEvento.ATIVO);

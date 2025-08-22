@@ -1,8 +1,14 @@
 package com.baseapplication.core.event.listeners;
 
 import com.baseapplication.core.controller.NotificacaoController;
+import com.baseapplication.core.event.events.ConviteParaUsuarioIngressarBandaEvent;
 import com.baseapplication.core.event.events.SolicitacaoAgendarEnsaioEvent;
+import com.baseapplication.core.event.events.UsuarioExpulsoDeBandaEvent;
+import com.baseapplication.core.event.events.resposta.RespostaSolicitacaoAgendarEnsaioEvent;
+import com.baseapplication.core.model.notificacao.ConviteParaUsuarioIngressarBanda;
 import com.baseapplication.core.model.notificacao.SolicitacaoAgendarEnsaio;
+import com.baseapplication.core.model.notificacao.UsuarioExpulsoDeBanda;
+import com.baseapplication.core.model.superClasses.Notificacao;
 import com.baseapplication.core.service.NotificacaoService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -16,19 +22,41 @@ public class NotificacaoListener {
     private final NotificacaoController notificacaoController;
     private final NotificacaoService notificacaoService;
 
-//    @EventListener
-//    public void handleSolicitarEntradaBanda(SolicitarEntradaBandaEvent event) {
-//        notificacaoController.enviarNotificacao(
-//                new SolicitarEntradaBandaEvent("Usuário solicitou entrar na banda " + event.getBandaId())
-//        );
-//    }
+    private void enviar(Notificacao notificacao) {
+        notificacaoService.salvarNotificacao(notificacao);
+        notificacaoController.enviarNotificacao(notificacao);
+    }
 
     @EventListener
     @Transactional
     public void handleSolicitacaoAgendarEnsaio(SolicitacaoAgendarEnsaioEvent event) {
         SolicitacaoAgendarEnsaio notificacao = new SolicitacaoAgendarEnsaio(event.getEnsaio());
-        notificacaoService.salvarNotificacao(notificacao);
-        notificacaoController.enviarNotificacao(notificacao);
+        enviar(notificacao);
     }
+
+    @EventListener
+    @Transactional
+    public void handleRespostaSolicitacaoAgendarEnsaio(RespostaSolicitacaoAgendarEnsaioEvent event) {;
+        notificacaoService.salvarNotificacao(event.getResposta());
+    }
+
+    @EventListener
+    @Transactional
+    public void handleUsuarioExpulsoDeBanda(UsuarioExpulsoDeBandaEvent event) {
+        UsuarioExpulsoDeBanda notificacao = new UsuarioExpulsoDeBanda(event.getIdBanda(), event.getIdUsuario());
+        enviar(notificacao);
+    }
+
+    @EventListener
+    @Transactional
+    public void handleConviteParaUsuarioIngressarBanda(ConviteParaUsuarioIngressarBandaEvent event) {
+        ConviteParaUsuarioIngressarBanda notificacao = new ConviteParaUsuarioIngressarBanda(
+                event.getIdBanda(),
+                event.getIdUsuarioConvidado()
+        );
+        enviar(notificacao);
+    }
+
+
 }
 

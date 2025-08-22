@@ -57,7 +57,7 @@ public class UsuarioController {
 
 	@GetMapping("/enviarSolicitacaoParaIngressarBanda")
 	public void enviarSolicitacaoParaIngressarBanda(@RequestParam Long idBanda, @RequestParam String instrumento) {
-		usuarioService.enviarSolicitacaoParaIngressarBanda(idBanda, Context.getUsuarioLogado().getId(), instrumento);
+		usuarioService.enviarSolicitacaoParaIngressarBanda(idBanda, instrumento);
 
 	}
 
@@ -85,4 +85,6 @@ public class UsuarioController {
 	public ResponseEntity<?> buscarProximosEventosDoUsuario(){
 		return usuarioService.buscarProximosEventosDoUsuario();
 	}
+
+
 }

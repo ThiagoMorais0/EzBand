@@ -33,7 +33,7 @@ public interface UsuarioService {
 	InfoPerfilUsuarioDTO editarUsuarioComImagem(String usuarioJson, MultipartFile imagem);
 
 
-	void enviarSolicitacaoParaIngressarBanda(Long idBanda, Long idUsuarioRemetente, String instrumento);
+	void enviarSolicitacaoParaIngressarBanda(Long idBanda, String instrumento);
 
 	InfoPerfilUsuarioDTO buscarInformacoesDoPerfilPorId(Long idUsuario);
 

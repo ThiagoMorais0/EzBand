@@ -17,7 +17,6 @@ import java.util.Date;
 public class SolicitacaoAgendarEnsaio extends Notificacao {
 
     public SolicitacaoAgendarEnsaio(Ensaio ensaio){
-        super.setDataCriacao(new Date());
         super.setLida(false);
         super.setMensagem("Banda \"" + ensaio.getBanda().getNome() +
                 "\" está solicitando um agendamento em " +

@@ -8,10 +8,12 @@ import java.util.stream.Collectors;
 
 import com.baseapplication.core.dto.*;
 import com.baseapplication.core.enums.PermissaoMusico;
-import com.baseapplication.core.enums.PermissaoUsuario;
+import com.baseapplication.core.event.events.ConviteParaUsuarioIngressarBandaEvent;
+import com.baseapplication.core.event.events.UsuarioExpulsoDeBandaEvent;
 import com.baseapplication.core.model.embedded.ParametrosBanda;
+import com.baseapplication.core.service.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,32 +31,19 @@ import com.baseapplication.core.model.dto.BandaDTO;
 import com.baseapplication.core.model.dto.EnsaioDTO;
 import com.baseapplication.core.model.dto.ShowDTO;
 import com.baseapplication.core.model.embedded.Musica;
-import com.baseapplication.core.service.BandaService;
-import com.baseapplication.core.service.EventoHelperService;
-import com.baseapplication.core.service.ImagemService;
-import com.baseapplication.core.service.MusicoBandaService;
-import com.baseapplication.core.service.RepertorioBandaService;
 import com.baseapplication.core.utils.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
+@RequiredArgsConstructor
 public class BandaServiceImpl implements BandaService {
-
-	@Autowired
-	private BandaDao bandaDao;
-
-	@Autowired
-	private MusicoBandaService musicoBandaService;
-
-	@Autowired
-	private ImagemService imagemService;
-
-	@Autowired
-	private EventoHelperService eventoHelperService;
-
-	@Autowired
-	private RepertorioBandaService repertorioBandaService;
+	private final BandaDao bandaDao;
+	private final MusicoBandaService musicoBandaService;
+	private final ImagemService imagemService;
+	private final EventoHelperService eventoHelperService;
+	private final RepertorioBandaService repertorioBandaService;
+	private final NotificacaoService notificacaoService;
 
 	@Override
 	public List<Banda> buscarBandasPorUsuario(Long idUsuario) {
@@ -85,6 +74,7 @@ public class BandaServiceImpl implements BandaService {
 	@Override
 	public void expulsarUsuario(Long idBanda, Long idUsuario) {
 		musicoBandaService.expulsar(idBanda, idUsuario);
+		notificacaoService.enviarNotificacao(new UsuarioExpulsoDeBandaEvent(idUsuario, idBanda));
 	}
 
 	@Override
@@ -135,6 +125,11 @@ public class BandaServiceImpl implements BandaService {
 			throw new InternalException("Músico não encontrado");
 		}
 		return musicoBanda.getPermissoes().stream().map(Enum::toString).toList();
+	}
+
+	@Override
+	public void enviarConviteParaUsuarioIngressarBanda(Long idBanda, Long idUsuarioConvidado) {
+		notificacaoService.enviarNotificacao(new ConviteParaUsuarioIngressarBandaEvent(idUsuarioConvidado, idBanda));
 	}
 
 	private void setarInformacoesEditadas(Banda banda, EdicaoBandaDTO bandaDTO, String urlLogo) {

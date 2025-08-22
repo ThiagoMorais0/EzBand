@@ -7,8 +7,6 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class SolicitacaoAgendarEnsaioEvent {
+public class SolicitacaoAgendarEnsaioEvent implements NotificacaoEvent{
     private final Ensaio ensaio;
-
-
 }

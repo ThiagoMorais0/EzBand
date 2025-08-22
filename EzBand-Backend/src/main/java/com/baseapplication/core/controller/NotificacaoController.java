@@ -2,14 +2,13 @@ package com.baseapplication.core.controller;
 
 import com.baseapplication.core.dto.NotificacaoDTO;
 import com.baseapplication.core.enums.TipoParticipante;
+import com.baseapplication.core.model.dto.RespostaNotificacaoDTO;
 import com.baseapplication.core.model.superClasses.Notificacao;
 import com.baseapplication.core.service.NotificacaoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Sinks;
 
@@ -41,10 +40,12 @@ public class NotificacaoController {
         Flux<NotificacaoDTO> naoLidas = Flux.fromIterable(notificacaoService
                         .buscarNaoLidas(destinatarioId, destinatarioTipo).stream()
                         .map(i -> new NotificacaoDTO(
+                                i.getId(),
                                 i.getMensagem(),
                                 i.getDestinatarioId(),
                                 i.getDestinatarioTipo().name(),
-                                i.getRemetenteTipo().name()))
+                                i.getRemetenteTipo().name(),
+                                i.isLida()))
                         .toList());
 
         // Concatena as não lidas primeiro, e depois segue em tempo real
@@ -62,10 +63,12 @@ public class NotificacaoController {
         if (sink != null) {
             System.out.println("Enviando notificação para " + chave + ": " + notificacao.getMensagem());
             sink.tryEmitNext(new NotificacaoDTO(
+                    notificacao.getId(),
                     notificacao.getMensagem(),
                     notificacao.getDestinatarioId(),
                     notificacao.getDestinatarioTipo().name(),
-                    notificacao.getRemetenteTipo().name()
+                    notificacao.getRemetenteTipo().name(),
+                    notificacao.isLida()
             ));
 
         }
@@ -74,5 +77,14 @@ public class NotificacaoController {
     @GetMapping("/deletarTodas")
     public void deletarTodas(){
         notificacaoService.deletarTodos();
+    }
+
+    @PostMapping("/responder/{id}")
+    public ResponseEntity<Void> responder(
+            @PathVariable Long id,
+            @RequestBody RespostaNotificacaoDTO respostaDTO) {
+
+        notificacaoService.responderNotificacao(id, respostaDTO);
+        return ResponseEntity.ok().build();
     }
 }
