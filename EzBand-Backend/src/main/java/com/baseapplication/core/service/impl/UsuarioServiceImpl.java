@@ -4,8 +4,9 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
+import com.baseapplication.core.event.events.SolicitacaoIngressarBandaEvent;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -35,28 +36,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
+@RequiredArgsConstructor
 public class UsuarioServiceImpl implements UsuarioService {
-
-	@Autowired
-	private UsuarioDao usuarioDao;
-
-	@Autowired
-	private BandaService bandaService;
-
-	@Autowired
-	private NotificacaoService notificacaoService;
-
-	@Autowired
-	private EventoHelperService eventoHelperService;
-
-	@Autowired
-	private ImagemService imagemService;
-
-	@Autowired
-	private ReporteDeErroService reporteDeErroService;
-
-	@Autowired
-	private EmailService emailService;
+	private final UsuarioDao usuarioDao;
+	private final BandaService bandaService;
+	private final NotificacaoService notificacaoService;
+	private final EventoHelperService eventoHelperService;
+	private final ImagemService imagemService;
+	private final ReporteDeErroService reporteDeErroService;
+	private final EmailService emailService;
 
 //    @Override
 //    public Usuario findByLogin(String login) {
@@ -180,9 +168,10 @@ public class UsuarioServiceImpl implements UsuarioService {
 	}
 
 	@Override
-	public void enviarSolicitacaoParaIngressarBanda(Long idBanda, Long idUsuarioRemetente, String instrumento) {
-//		notificacaoService.enviarSolicitacaoParaIngressarBanda(bandaService.buscarPorId(idBanda),
-//				buscarPorId(idUsuarioRemetente), instrumento);
+	public void enviarSolicitacaoParaIngressarBanda(Long idBanda, String instrumento) {
+		notificacaoService.enviarNotificacao(new SolicitacaoIngressarBandaEvent(
+				Context.getUsuarioLogado(), idBanda, instrumento
+		));
 	}
 
 	@Override

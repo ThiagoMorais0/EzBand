@@ -1,14 +1,23 @@
 package com.baseapplication.core.service.impl;
 
 import com.baseapplication.core.dao.NotificacaoDao;
+import com.baseapplication.core.dao.RespostaNotificacaoDao;
 import com.baseapplication.core.enums.*;
+import com.baseapplication.core.event.events.NotificacaoEvent;
+import com.baseapplication.core.event.events.resposta.RespostaSolicitacaoAgendarEnsaioEvent;
 import com.baseapplication.core.exception.ResourceNotFoundException;
+import com.baseapplication.core.factory.RespostaNotificacaoFactory;
 import com.baseapplication.core.model.*;
+import com.baseapplication.core.model.dto.RespostaNotificacaoDTO;
+import com.baseapplication.core.model.notificacao.RespostaNotificacao;
+import com.baseapplication.core.model.notificacao.SolicitacaoAgendarEnsaio;
 import com.baseapplication.core.model.superClasses.Evento;
 import com.baseapplication.core.model.superClasses.Notificacao;
 import com.baseapplication.core.service.*;
+import lombok.RequiredArgsConstructor;
 import org.hibernate.service.spi.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -16,7 +25,49 @@ import java.util.Collections;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class NotificacaoServiceImpl implements NotificacaoService {
+
+    private final NotificacaoDao notificacaoDao;
+    private final RespostaNotificacaoDao respostaNotificacaoDao;
+    private final ApplicationEventPublisher applicationEventPublisher;
+
+    @Override
+    public void salvarNotificacao(Notificacao notificacao) {
+        notificacaoDao.save(notificacao);
+    }
+
+    @Override
+    public List<Notificacao> buscarNaoLidas(Long destinatarioId, TipoParticipante destinatarioTipo) {
+        return notificacaoDao.buscarNaoLidas(destinatarioId, destinatarioTipo);
+    }
+
+    @Override
+    public void deletarTodos() {
+        notificacaoDao.deleteAll();
+    }
+
+    @Override
+    public void enviarNotificacao(NotificacaoEvent notificacaoEvent) {
+        applicationEventPublisher.publishEvent(notificacaoEvent);
+    }
+
+    @Override
+    public void responderNotificacao(Long idNotificacao, RespostaNotificacaoDTO respostaDTO) {
+        respostaNotificacaoDao.save(respostaDTO.toEntity(idNotificacao));
+        criarEEnviarNotificacaoResposta(idNotificacao, respostaDTO);
+    }
+
+    private void criarEEnviarNotificacaoResposta(Long idNotificacao, RespostaNotificacaoDTO respostaDTO) {
+        Notificacao notificacao = notificacaoDao.findById(idNotificacao)
+                .orElseThrow(() -> new RuntimeException("Notificação não encontrada"));
+        Notificacao notificacaoResposta = RespostaNotificacaoFactory.criarNotificacaoResposta(notificacao, respostaDTO.getAcao() );
+        notificacaoDao.save(notificacaoResposta);
+        enviarNotificacao(new RespostaSolicitacaoAgendarEnsaioEvent(notificacaoResposta));
+    }
+
+
+
 
 //    @Autowired
 //    private NotificacaoDao notificacaoDao;

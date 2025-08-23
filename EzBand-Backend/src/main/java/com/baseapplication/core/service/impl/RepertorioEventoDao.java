@@ -13,8 +13,8 @@ import jakarta.transaction.Transactional;
 @Repository
 public interface RepertorioEventoDao extends JpaRepository<RepertorioEvento, RepertorioEventoId> {
 
-    @Transactional
-    @Modifying
-    @Query(value = "delete from repertorio_evento where id_evento = :idEvento and tipo_evento = :tipoEvento", nativeQuery = true)
-    void limparRepertorioEvento(Long idEvento, String tipoEvento);
+	@Transactional
+	@Modifying
+	@Query(value = "delete from repertorio_evento where id_evento = :idEvento and tipo_evento = :tipoEvento", nativeQuery = true)
+	void limparRepertorioEvento(Long idEvento, String tipoEvento);
 }

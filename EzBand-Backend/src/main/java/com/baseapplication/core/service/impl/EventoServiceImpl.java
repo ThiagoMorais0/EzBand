@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.BeanUtils;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,7 +26,6 @@ import com.baseapplication.core.enums.StatusEvento;
 import com.baseapplication.core.enums.TipoContato;
 import com.baseapplication.core.enums.TipoEvento;
 import com.baseapplication.core.event.events.SolicitacaoAgendarEnsaioEvent;
-import com.baseapplication.core.event.events.SolicitarEntradaBandaEvent;
 import com.baseapplication.core.exception.InternalException;
 import com.baseapplication.core.exception.InvalidParamException;
 import com.baseapplication.core.exception.ResourceNotFoundException;
@@ -74,7 +72,6 @@ public class EventoServiceImpl implements EventoService {
 	private final RepertorioEventoService repertorioEventoService;
 	private final EstudioService estudioService;
 	private final LocalEventoService localEventoService;
-	private final ApplicationEventPublisher applicationEventPublisher;
 
 	@Override
 	public Evento buscarPorId(Long idEvento, TipoEvento tipoEvento) {
@@ -280,7 +277,8 @@ public class EventoServiceImpl implements EventoService {
 		setarEstudio(novoEnsaioDTO, ensaio);
 
 		if (ensaio.getEstudio() != null) {
-			applicationEventPublisher.publishEvent(new SolicitacaoAgendarEnsaioEvent(ensaio));
+			System.out.println("Publicando notificação");
+			notificacaoService.enviarNotificacao(new SolicitacaoAgendarEnsaioEvent(ensaio));
 		}
 		ensaioService.salvar(ensaio);
 		incluirMusicosNoEvento(novoEnsaioDTO.getMusicos(), banda, ensaio, TipoEvento.ENSAIO);
@@ -375,7 +373,7 @@ public class EventoServiceImpl implements EventoService {
 				if (isMusicoDiferenteDoUsuarioLogado(musicoEvento)) {
 					// TODO:
 //					enviarNotificacaoAprovacaoEvento(usuario, evento, tipoEvento);
-					applicationEventPublisher.publishEvent(new SolicitarEntradaBandaEvent(1L, 1L));
+//					applicationEventPublisher.publishEvent(new SolicitarEntradaBandaEvent(1L, 1L));
 				}
 			} else {
 				musicoEvento.setSituacao(SituacaoMusicoEvento.ATIVO);

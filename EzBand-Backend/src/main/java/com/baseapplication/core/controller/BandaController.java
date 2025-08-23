@@ -140,4 +140,11 @@ public class BandaController {
         bandaService.editarBanda(bandaJson, logo);
     }
 
+    @PostMapping("/enviarConviteParaUsuarioIngressarBanda")
+    public void enviarConviteParaUsuarioIngressarBanda(
+            @RequestParam Long idBanda,
+            @RequestParam Long idUsuarioConvidado){
+        bandaService.enviarConviteParaUsuarioIngressarBanda(idBanda, idUsuarioConvidado);
+    }
+
 }
