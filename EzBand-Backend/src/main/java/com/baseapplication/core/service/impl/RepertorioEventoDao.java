@@ -9,6 +9,11 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import com.baseapplication.core.model.RepertorioEvento;
+import com.baseapplication.core.model.RepertorioEventoId;
+
+import jakarta.transaction.Transactional;
+
 @Repository
 public interface RepertorioEventoDao extends JpaRepository<RepertorioEvento, RepertorioEventoId> {
 

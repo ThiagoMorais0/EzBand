@@ -33,6 +33,22 @@ services:
     volumes:
       - app_logs_dev:/app/logs
 
+  minio:
+    image: quay.io/minio/minio:latest
+    container_name: minio
+    ports:
+      - "9000:9000"   # API S3
+      - "9090:9090"   # Console web
+    volumes:
+      - ~/minio/data:/data
+    env_file: .env
+    networks:
+      - ezband_app_network
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ADMIN_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ADMIN_PASSWORD}
+    command: server /data --console-address ":9090"
+    
 volumes:
   postgres_data_dev:
   app_logs_dev:

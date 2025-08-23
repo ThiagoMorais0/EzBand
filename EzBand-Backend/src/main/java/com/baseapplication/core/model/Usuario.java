@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.baseapplication.core.dto.CadastroDTO;
 import com.baseapplication.core.dto.CadastroUsuarioDTO;
@@ -73,7 +74,7 @@ public class Usuario implements UserDetails {
         return musicoBandaList.stream().map(MusicoBanda::getBanda).collect(Collectors.toList());
     }
 
-    public Usuario(CadastroUsuarioDTO usuarioDTO, String urlImagem){
+    public Usuario(CadastroUsuarioDTO usuarioDTO){
         this.nome = usuarioDTO.getNome();
         this.email = usuarioDTO.getEmail();
         this.senha = usuarioDTO.getSenha();
@@ -83,7 +84,6 @@ public class Usuario implements UserDetails {
         this.dataNascimento = DateUtils.stringToLocalDate(usuarioDTO.getNascimento());
         this.ativo = true;
         this.bloqueado = false;
-        this.urlFotoPerfil = urlImagem;
         this.dataCriacao = LocalDate.now();
     }
 
@@ -124,4 +124,5 @@ public class Usuario implements UserDetails {
     public boolean isEnabled() {
         return ativo;
     }
+    
 }

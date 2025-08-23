@@ -11,19 +11,22 @@ import java.io.IOException;
 @Service
 public class ImagemServiceImpl implements ImagemService {
 
-    @Autowired
-    private GoogleCloudStorageServiceImpl storageService;
-    @Override
-    public String salvarImagemNoBucket(MultipartFile imagem) {
-        try {
-            return storageService.uploadImage(imagem);
-        } catch (IOException e) {
-            throw new InternalException("Erro ao realizar upload da imagem");
-        }
-    }
+	@Autowired
+	private MinioStorageServiceImpl minioStorageServiceImpl;
 
-    @Override
-    public String saveImageAndGetUrl(MultipartFile image) {
-        return image != null ? salvarImagemNoBucket(image) : "default";
-    }
+	@Override
+	public String salvarImagemNoBucket(MultipartFile imagem, String bucketName, String fileName) {
+		System.out.println("imagem: " + imagem);
+		try {
+			return minioStorageServiceImpl.uploadImage(imagem, bucketName, fileName);
+		} catch (IOException e) {
+			throw new InternalException("Erro ao realizar upload da imagem");
+		}
+	}
+
+	@Override
+	public String saveImageAndGetUrl(MultipartFile image, String bucketName, String fileName) {
+		System.out.println("imagem: " + image);
+		return image != null ? salvarImagemNoBucket(image, bucketName, fileName) : "default";
+	}
 }

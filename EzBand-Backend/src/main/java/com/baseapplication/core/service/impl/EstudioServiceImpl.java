@@ -14,6 +14,7 @@ import com.baseapplication.core.service.EnsaioService;
 import com.baseapplication.core.service.EstudioService;
 import com.baseapplication.core.service.ImagemService;
 import com.baseapplication.core.utils.Context;
+import com.baseapplication.core.utils.FileUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -67,8 +68,9 @@ public class EstudioServiceImpl implements EstudioService {
 
     @Override
     public ResponseEntity<?> cadastrarComImagem(CadastroEstudioDTO estudioDTO, MultipartFile imagem) {
-        String urlImagem = imagemService.saveImageAndGetUrl(imagem);
         Estudio estudio =  estudioDTO.toEntity();
+        cadastrar(estudio);
+        String urlImagem = imagemService.saveImageAndGetUrl(imagem, "studiologo", estudio.getId() + "." + FileUtils.getSufix(imagem));
         estudio.setUrlFotoPerfil(urlImagem);
         cadastrar(estudio);
         return ResponseEntity.ok(null);
@@ -82,8 +84,8 @@ public class EstudioServiceImpl implements EstudioService {
         } catch (JsonProcessingException e) {
             throw new InternalException(e.getMessage());
         }
-        String urlImagem = imagemService.saveImageAndGetUrl(imagem);
         Estudio estudio = buscarPorId(estudioDTO.getId());
+        String urlImagem = imagemService.saveImageAndGetUrl(imagem, "studiologo", estudioDTO.getId() + "." + FileUtils.getSufix(imagem));
         BeanUtils.copyProperties(estudioDTO, estudio);
         estudio.setUrlFotoPerfil(urlImagem);
         dao.save(estudio);

@@ -1,6 +1,5 @@
 package com.baseapplication.core.service.impl;
 
-import org.hibernate.service.spi.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +11,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.baseapplication.core.config.TokenService;
@@ -25,6 +25,7 @@ import com.baseapplication.core.model.Usuario;
 import com.baseapplication.core.service.AuthenticationService;
 import com.baseapplication.core.service.ImagemService;
 import com.baseapplication.core.service.UsuarioService;
+import com.baseapplication.core.utils.FileUtils;
 
 @Service
 public class AuthenticationServiceImpl implements AuthenticationService {
@@ -36,10 +37,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	private UsuarioService usuarioService;
 
 	@Autowired
-	private TokenService tokenService;
+	private ImagemService imagemService;
 
 	@Autowired
-	private ImagemService imagemService;
+	private TokenService tokenService;
 
 	@Override
 	public ResponseEntity<LoginResponseDTO> login(LoginDTO data) {
@@ -98,15 +99,19 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	}
 
 	@Override
-	public ResponseEntity<?> cadastrarUsuarioComImagem(CadastroUsuarioDTO usuario, MultipartFile imagem) {
-		try{
-			verificaUsuarioJaCadastrado(usuario);
+	public ResponseEntity<?> cadastrarUsuarioComImagem(@RequestPart("usuario") CadastroUsuarioDTO cadastroUsuarioDTO,
+			@RequestPart("imagem") MultipartFile imagem) {
+		System.out.println("imagem: " + imagem);
+		try {
+			verificaUsuarioJaCadastrado(cadastroUsuarioDTO);
 		} catch (ConflictException e) {
 			return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
 		}
-		String urlImagem = imagemService.saveImageAndGetUrl(imagem);
-		usuario.setSenha(criptografar(usuario.getSenha()));
-		usuarioService.salvar(new Usuario(usuario, urlImagem));
+		cadastroUsuarioDTO.setSenha(criptografar(cadastroUsuarioDTO.getSenha()));
+		Usuario usuario = usuarioService.salvar(new Usuario(cadastroUsuarioDTO));
+		usuario.setUrlFotoPerfil(imagemService.saveImageAndGetUrl(imagem, "profilepictures",
+				usuario.getId() + "." + FileUtils.getSufix(imagem)));
+		usuarioService.salvar(usuario);
 		return ResponseEntity.ok(null);
 	}
 }
