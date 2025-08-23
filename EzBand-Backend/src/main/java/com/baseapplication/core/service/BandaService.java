@@ -53,7 +53,7 @@ public interface BandaService {
 
     void editarBanda(String bandaJson, MultipartFile logo);
 
-    List<String> getNivelPermissoesUsuarioMusico(Long idBanda, Long id);
+    List<String> getPermissoesMusico(Long idBanda, Long id);
 
     void enviarConviteParaUsuarioIngressarBanda(Long idBanda, Long idUsuarioConvidado);
 }

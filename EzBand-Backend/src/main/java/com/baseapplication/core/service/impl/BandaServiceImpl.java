@@ -119,7 +119,7 @@ public class BandaServiceImpl implements BandaService {
 	}
 
 	@Override
-	public List<String> getNivelPermissoesUsuarioMusico(Long idBanda, Long idUsuario) {
+	public List<String> getPermissoesMusico(Long idBanda, Long idUsuario) {
 		MusicoBanda musicoBanda = musicoBandaService.buscarPorIdUsuarioEIdBanda(idUsuario, idBanda);
 		if(musicoBanda == null){
 			throw new InternalException("Músico não encontrado");
@@ -164,22 +164,25 @@ public class BandaServiceImpl implements BandaService {
 
 	@Override
 	public Integer buscarQuantidadeDeShows(Long idBanda) {
-		return bandaDao.buscarQuantidadeDeShows(idBanda, Context.getUsuarioLogado().getId());
+		Banda banda = buscarPorId(idBanda);
+		return banda == null ? 0 : banda.getShows().size();
 	}
 
 	@Override
 	public Integer buscarQuantidadeDeEnsaios(Long idBanda) {
-		return bandaDao.buscarQuantidadeDeEnsaios(idBanda, Context.getUsuarioLogado().getId());
+		Banda banda = buscarPorId(idBanda);
+		return banda == null ? 0 : banda.getEnsaios().size();
 	}
 
 	@Override
 	public Integer buscarQuantidadeDeNotificacoes(Long idBanda) {
-		return bandaDao.buscarQuantidadeDeNotificacoes(idBanda);
+		return 0;
 	}
 
 	@Override
 	public Integer buscarQuantidadeDeMembros(Long idBanda) {
-		return bandaDao.buscarQuantidadeDeMembros(idBanda);
+		Banda banda = buscarPorId(idBanda);
+		return banda == null ? 0 : banda.getMusicos().size();
 	}
 
 	@Override

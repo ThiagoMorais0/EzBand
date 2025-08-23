@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,6 +18,7 @@ import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 
 @Service
+@RequiredArgsConstructor
 public class GoogleCloudStorageServiceImpl {
     private final String bucketName = "ezband-images"; // Nome do bucket do Google Cloud Storage
 
@@ -31,7 +33,7 @@ public class GoogleCloudStorageServiceImpl {
             //URLConnection connection = url.openConnection();
             //InputStream inputStream = connection.getInputStream();
             // Carregar as credenciais de serviço a partir do arquivo
-            GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream("C:\\Users\\aluno\\dev\\EzBand\\EzBand-Backend\\src\\main\\java\\com\\baseapplication\\core\\service\\impl\\sunlit-virtue-382013-efe3e81b47ab.json"));
+            GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream("D:\\ezband\\EzBand\\EzBand-Backend\\src\\main\\java\\com\\baseapplication\\core\\service\\impl\\sunlit-virtue-382013-efe3e81b47ab.json"));
 
 
             // Configurar as credenciais e criar a instância do Storage

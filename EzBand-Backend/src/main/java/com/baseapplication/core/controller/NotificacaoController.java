@@ -1,10 +1,14 @@
 package com.baseapplication.core.controller;
 
 import com.baseapplication.core.dto.NotificacaoDTO;
+import com.baseapplication.core.enums.PermissaoMusico;
 import com.baseapplication.core.enums.TipoParticipante;
+import com.baseapplication.core.model.MusicoBanda;
+import com.baseapplication.core.model.Usuario;
 import com.baseapplication.core.model.dto.RespostaNotificacaoDTO;
 import com.baseapplication.core.model.superClasses.Notificacao;
 import com.baseapplication.core.service.NotificacaoService;
+import com.baseapplication.core.service.UsuarioService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -29,31 +33,11 @@ public class NotificacaoController {
 
     @GetMapping(value = "/{destinatarioId}/{destinatarioTipo}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<NotificacaoDTO> streamNotificacoes(@PathVariable Long destinatarioId,
-                                                @PathVariable TipoParticipante destinatarioTipo) {
-        String chave = key(destinatarioId, destinatarioTipo);
+                                                   @PathVariable TipoParticipante destinatarioTipo) {
 
-        Sinks.Many<NotificacaoDTO> sink = sinks.computeIfAbsent(
-                chave,
-                k -> Sinks.many().multicast().onBackpressureBuffer()
-        );
-
-        Flux<NotificacaoDTO> naoLidas = Flux.fromIterable(notificacaoService
-                        .buscarNaoLidas(destinatarioId, destinatarioTipo).stream()
-                        .map(i -> new NotificacaoDTO(
-                                i.getId(),
-                                i.getMensagem(),
-                                i.getDestinatarioId(),
-                                i.getDestinatarioTipo().name(),
-                                i.getRemetenteTipo().name(),
-                                i.isLida()))
-                        .toList());
-
-        // Concatena as não lidas primeiro, e depois segue em tempo real
-        return Flux.concat(
-                naoLidas,
-                sink.asFlux().doFinally(signal -> sinks.remove(chave))
-        );
+        return notificacaoService.streamNotificacoes(destinatarioId, destinatarioTipo);
     }
+
 
 
     public void enviarNotificacao(Notificacao notificacao) {

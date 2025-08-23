@@ -11,7 +11,7 @@ import java.util.Date;
 @Data
 @Table(name = "NOTIFICACAO")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE) // ou JOINED, dependendo
-@DiscriminatorColumn(name = "tipo")
+@DiscriminatorColumn(name = "tipo", discriminatorType = DiscriminatorType.STRING, length = 100)
 public abstract class Notificacao {
 
     @Id

@@ -56,9 +56,13 @@ public class UsuarioController {
 	}
 
 	@GetMapping("/enviarSolicitacaoParaIngressarBanda")
-	public void enviarSolicitacaoParaIngressarBanda(@RequestParam Long idBanda, @RequestParam String instrumento) {
-		usuarioService.enviarSolicitacaoParaIngressarBanda(idBanda, instrumento);
-
+	public ResponseEntity<?> enviarSolicitacaoParaIngressarBanda(@RequestParam Long idBanda, @RequestParam String instrumento) {
+		try{
+			usuarioService.enviarSolicitacaoParaIngressarBanda(idBanda, instrumento);
+			return ResponseEntity.ok("Solicitacao enviada com sucesso");
+		}catch (Exception e){
+			return ResponseEntity.status(500).body(e.getMessage());
+		}
 	}
 
 	@GetMapping("/buscarInformacoesDoPerfilPorId")
