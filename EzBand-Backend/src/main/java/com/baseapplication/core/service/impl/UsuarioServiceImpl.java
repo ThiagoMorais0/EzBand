@@ -30,6 +30,7 @@ import com.baseapplication.core.service.NotificacaoService;
 import com.baseapplication.core.service.ReporteDeErroService;
 import com.baseapplication.core.service.UsuarioService;
 import com.baseapplication.core.utils.Context;
+import com.baseapplication.core.utils.FileUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -68,8 +69,8 @@ public class UsuarioServiceImpl implements UsuarioService {
 	}
 
 	@Override
-	public void salvar(Usuario usuario) {
-		usuarioDao.save(usuario);
+	public Usuario salvar(Usuario usuario) {
+		return usuarioDao.save(usuario);
 	}
 
 	@Override
@@ -168,8 +169,8 @@ public class UsuarioServiceImpl implements UsuarioService {
 			e.printStackTrace();
 			throw new InternalException(e.getMessage());
 		}
-		String urlImagem = imagemService.saveImageAndGetUrl(imagem);
 		Usuario usuario = buscarPorContato(usuarioDTO.getEmail(), TipoContato.EMAIL);
+		String urlImagem = imagemService.saveImageAndGetUrl(imagem, "profilepictures", usuario.getId() + "." + FileUtils.getSufix(imagem));
 		BeanUtils.copyProperties(usuarioDTO, usuario);
 		usuario.setUrlFotoPerfil(urlImagem);
 		usuario.setAtivo(true);
