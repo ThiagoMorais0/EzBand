@@ -1,13 +1,10 @@
 package com.baseapplication.core.service.impl;
 
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.DisabledException;
-import org.springframework.security.authentication.LockedException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -56,7 +53,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 			} else {
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 			}
-		} catch (BadCredentialsException | LockedException | DisabledException e) {
+		} catch (InternalAuthenticationServiceException | BadCredentialsException | LockedException | DisabledException e) {
 			// Trate diferentes exceções de autenticação aqui, se necessário
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 		}
@@ -99,6 +96,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	}
 
 	@Override
+	@Transactional
 	public ResponseEntity<?> cadastrarUsuarioComImagem(@RequestPart("usuario") CadastroUsuarioDTO cadastroUsuarioDTO,
 			@RequestPart("imagem") MultipartFile imagem) {
 		System.out.println("imagem: " + imagem);
