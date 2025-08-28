@@ -1,34 +1,23 @@
 package com.baseapplication.core.model.superClasses;
 
-import java.sql.Time;
-import java.time.LocalDate;
-import java.util.List;
-
-import org.springframework.format.annotation.DateTimeFormat;
-
 import com.baseapplication.core.enums.StatusEvento;
 import com.baseapplication.core.enums.TipoEvento;
 import com.baseapplication.core.model.Banda;
 import com.baseapplication.core.model.MusicoEvento;
 import com.baseapplication.core.model.RepertorioEvento;
+import com.baseapplication.core.model.Usuario;
 import com.baseapplication.core.model.embedded.Endereco;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MappedSuperclass;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.sql.Time;
+import java.time.LocalDate;
+import java.util.List;
+
 
 @MappedSuperclass
 @Getter
@@ -36,34 +25,34 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public abstract class Evento {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-	@ManyToOne
-	@JoinColumn(name = "id_banda")
-	private Banda banda;
-	@Column(name = "DATA_INCLUSAO")
-	@DateTimeFormat(pattern = "dd/MM/yyyy")
-	private LocalDate dataInclusao;
-	@DateTimeFormat(pattern = "dd/MM/yyyy")
-	private LocalDate data;
-	private Time duracao;
-	private Time horarioInicio;
-	@Embedded
-	private Endereco endereco;
-	private String local;
-	private String observacoes;
-	@Enumerated(EnumType.STRING)
-	private StatusEvento status;
+    @ManyToOne
+    @JoinColumn(name = "id_banda")
+    private Banda banda;
+    @Column(name = "DATA_INCLUSAO")
+    @DateTimeFormat(pattern = "dd/MM/yyyy")
+    private LocalDate dataInclusao;
+    @DateTimeFormat(pattern = "dd/MM/yyyy")
+    private LocalDate data;
+    private Time duracao;
+    private Time horarioInicio;
+    @Embedded
+    private Endereco endereco;
+    private String local;
+    private String observacoes;
+    @Enumerated(EnumType.STRING)
+    private StatusEvento status;
 
-	@Enumerated(EnumType.STRING)
-	private TipoEvento tipoEvento;
+    @Enumerated(EnumType.STRING)
+    private TipoEvento tipoEvento;
 
-	@OneToMany(mappedBy = "id.idEvento", fetch = FetchType.LAZY)
-	private List<RepertorioEvento> repertorio;
+    @OneToMany(mappedBy = "id.idEvento", fetch = FetchType.LAZY)
+    private List<RepertorioEvento> repertorio;
 
-	@OneToMany(mappedBy = "id.idUsuario", fetch = FetchType.LAZY)
-	private List<MusicoEvento> participantes;
+    @OneToMany(mappedBy = "id.idUsuario", fetch = FetchType.LAZY)
+    private List<MusicoEvento> participantes;
 
 }

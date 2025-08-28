@@ -2,6 +2,8 @@ package com.baseapplication.core.service.impl;
 
 import com.baseapplication.core.dao.NotificacaoDao;
 import com.baseapplication.core.dao.RespostaNotificacaoDao;
+import com.baseapplication.core.dao.UsuarioDao;
+import com.baseapplication.core.dto.NotificacaoDTO;
 import com.baseapplication.core.enums.*;
 import com.baseapplication.core.event.events.NotificacaoEvent;
 import com.baseapplication.core.event.events.resposta.RespostaSolicitacaoAgendarEnsaioEvent;
@@ -19,10 +21,14 @@ import org.hibernate.service.spi.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Sinks;
 
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +37,8 @@ public class NotificacaoServiceImpl implements NotificacaoService {
     private final NotificacaoDao notificacaoDao;
     private final RespostaNotificacaoDao respostaNotificacaoDao;
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final UsuarioDao usuarioDao;
+    private final Map<String, Sinks.Many<NotificacaoDTO>> sinks = new ConcurrentHashMap<>();
 
     @Override
     public void salvarNotificacao(Notificacao notificacao) {
@@ -39,7 +47,17 @@ public class NotificacaoServiceImpl implements NotificacaoService {
 
     @Override
     public List<Notificacao> buscarNaoLidas(Long destinatarioId, TipoParticipante destinatarioTipo) {
-        return notificacaoDao.buscarNaoLidas(destinatarioId, destinatarioTipo);
+        List<Notificacao> notificacoesUsuario = notificacaoDao.buscarNaoLidas(destinatarioId, destinatarioTipo);
+        if(destinatarioTipo.equals(TipoParticipante.USUARIO)) {
+            Usuario usuario = usuarioDao.findById(destinatarioId).get();
+            for(MusicoBanda musicoBanda : usuario.getMusicoBandaList()) {
+                if(musicoBanda.getPermissoes().contains(PermissaoMusico.ADMINISTRADOR)) {
+                    List<Notificacao> notificacoesBanda = buscarNaoLidas(musicoBanda.getBanda().getId(), TipoParticipante.BANDA);
+                    notificacoesUsuario.addAll(notificacoesBanda);
+                }
+            }
+        }
+        return notificacoesUsuario;
     }
 
     @Override
@@ -56,6 +74,60 @@ public class NotificacaoServiceImpl implements NotificacaoService {
     public void responderNotificacao(Long idNotificacao, RespostaNotificacaoDTO respostaDTO) {
         respostaNotificacaoDao.save(respostaDTO.toEntity(idNotificacao));
         criarEEnviarNotificacaoResposta(idNotificacao, respostaDTO);
+    }
+
+    private String key(Long id, TipoParticipante tipo) {
+        return id + ":" + tipo.name();
+    }
+
+    @Override
+    public Flux<NotificacaoDTO> streamNotificacoes(Long destinatarioId, TipoParticipante destinatarioTipo) {
+        String chave = key(destinatarioId, destinatarioTipo);
+
+        Sinks.Many<NotificacaoDTO> sink = sinks.computeIfAbsent(
+                chave,
+                k -> Sinks.many().multicast().onBackpressureBuffer()
+        );
+
+        // Busca notificações não lidas
+        Flux<NotificacaoDTO> naoLidas = Flux.fromIterable(
+                buscarNaoLidas(destinatarioId, destinatarioTipo).stream()
+                        .map(i -> new NotificacaoDTO(
+                                i.getId(),
+                                i.getMensagem(),
+                                i.getDestinatarioId(),
+                                i.getDestinatarioTipo().name(),
+                                i.getRemetenteTipo().name(),
+                                i.isLida()))
+                        .toList()
+        );
+
+        // Se for usuário, cria “bridge” para bandas que ele administra
+        if (destinatarioTipo == TipoParticipante.USUARIO) {
+            Usuario usuario = usuarioDao.findById(destinatarioId).get();
+
+            for (MusicoBanda musicoBanda : usuario.getMusicoBandaList()) {
+                if (musicoBanda.getPermissoes().contains(PermissaoMusico.ADMINISTRADOR)) {
+                    Long bandaId = musicoBanda.getBanda().getId();
+                    String chaveBanda = key(bandaId, TipoParticipante.BANDA);
+
+                    // Conecta o flux da banda ao sink do usuário
+                    Sinks.Many<NotificacaoDTO> sinkBanda = sinks.computeIfAbsent(
+                            chaveBanda,
+                            k -> Sinks.many().multicast().onBackpressureBuffer()
+                    );
+
+                    // Toda notificação que cair no sink da banda é replicada para o sink do usuário
+                    sinkBanda.asFlux().subscribe(sink::tryEmitNext);
+                }
+            }
+        }
+
+        // Concatena notificações não lidas primeiro, depois segue em tempo real
+        return Flux.concat(
+                naoLidas,
+                sink.asFlux().doFinally(signal -> sinks.remove(chave))
+        );
     }
 
     private void criarEEnviarNotificacaoResposta(Long idNotificacao, RespostaNotificacaoDTO respostaDTO) {

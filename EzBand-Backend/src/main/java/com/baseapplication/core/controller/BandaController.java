@@ -99,11 +99,11 @@ public class BandaController {
 
     }
 
-    @GetMapping("/getNivelPermissoesUsuarioMusico")
-    public ResponseEntity<?> getNivelPermissoesUsuarioMusico(@RequestParam Long idBanda) {
+    @GetMapping("/getPermissoesMusico")
+    public ResponseEntity<?> getPermissoesMusico(@RequestParam Long idBanda) {
         try {
             return ResponseEntity.ok(
-                    bandaService.getNivelPermissoesUsuarioMusico(idBanda, Context.getUsuarioLogado().getId())
+                    bandaService.getPermissoesMusico(idBanda, Context.getUsuarioLogado().getId())
             );
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

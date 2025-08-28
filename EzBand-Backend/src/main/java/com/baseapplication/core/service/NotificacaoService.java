@@ -2,6 +2,7 @@ package com.baseapplication.core.service;
 
 import java.util.List;
 
+import com.baseapplication.core.dto.NotificacaoDTO;
 import com.baseapplication.core.enums.TipoContato;
 import com.baseapplication.core.enums.TipoEvento;
 import com.baseapplication.core.enums.TipoParticipante;
@@ -12,6 +13,7 @@ import com.baseapplication.core.model.dto.RespostaNotificacaoDTO;
 import com.baseapplication.core.model.notificacao.SolicitacaoAgendarEnsaio;
 import com.baseapplication.core.model.superClasses.Evento;
 import com.baseapplication.core.model.superClasses.Notificacao;
+import reactor.core.publisher.Flux;
 
 public interface NotificacaoService {
     void salvarNotificacao(Notificacao notificacao);
@@ -23,6 +25,8 @@ public interface NotificacaoService {
     void enviarNotificacao(NotificacaoEvent notificacaoEvent);
 
     void responderNotificacao(Long idNotificacao, RespostaNotificacaoDTO respostaDTO);
+
+    Flux<NotificacaoDTO> streamNotificacoes(Long destinatarioId, TipoParticipante destinatarioTipo);
 //    List<Notificacao> buscarNotificacoesPorUsuario(Long idUsuario);
 //    void enviarConviteParaEvento(String contato,
 //                                 TipoContato tipoContato,

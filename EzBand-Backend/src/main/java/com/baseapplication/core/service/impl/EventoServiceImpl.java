@@ -1,25 +1,6 @@
 package com.baseapplication.core.service.impl;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.BeanUtils;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
-
-import com.baseapplication.core.dto.AtualizacaoRepertorioEventoDTO;
-import com.baseapplication.core.dto.ConviteEventoDTO;
-import com.baseapplication.core.dto.DisponibilidadeMusicoParaEventoDTO;
-import com.baseapplication.core.dto.EventosSeparadosDTO;
-import com.baseapplication.core.dto.InformacoesEnsaioDTO;
-import com.baseapplication.core.dto.InformacoesShowDTO;
-import com.baseapplication.core.dto.MusicoEventoDTO;
-import com.baseapplication.core.dto.NovoEnsaioDTO;
-import com.baseapplication.core.dto.NovoShowDTO;
-import com.baseapplication.core.dto.RepertorioEventoDTO;
+import com.baseapplication.core.dto.*;
 import com.baseapplication.core.dto.superClasses.InformacoesEventoDTO;
 import com.baseapplication.core.enums.SituacaoMusicoEvento;
 import com.baseapplication.core.enums.StatusEvento;
@@ -29,35 +10,22 @@ import com.baseapplication.core.event.events.SolicitacaoAgendarEnsaioEvent;
 import com.baseapplication.core.exception.InternalException;
 import com.baseapplication.core.exception.InvalidParamException;
 import com.baseapplication.core.exception.ResourceNotFoundException;
-import com.baseapplication.core.model.Banda;
-import com.baseapplication.core.model.Ensaio;
-import com.baseapplication.core.model.Estudio;
-import com.baseapplication.core.model.LocalEvento;
-import com.baseapplication.core.model.MusicoBanda;
-import com.baseapplication.core.model.MusicoEvento;
-import com.baseapplication.core.model.MusicoEventoId;
-import com.baseapplication.core.model.RepertorioEvento;
-import com.baseapplication.core.model.Show;
-import com.baseapplication.core.model.Usuario;
+import com.baseapplication.core.model.*;
 import com.baseapplication.core.model.dto.EnsaioDTO;
 import com.baseapplication.core.model.dto.ShowDTO;
 import com.baseapplication.core.model.superClasses.Evento;
-import com.baseapplication.core.service.BandaService;
-import com.baseapplication.core.service.EnsaioService;
-import com.baseapplication.core.service.EstudioService;
-import com.baseapplication.core.service.EventoService;
-import com.baseapplication.core.service.LocalEventoService;
-import com.baseapplication.core.service.MusicoEventoService;
-import com.baseapplication.core.service.NotificacaoService;
-import com.baseapplication.core.service.RepertorioEventoService;
-import com.baseapplication.core.service.ShowService;
-import com.baseapplication.core.service.UsuarioService;
+import com.baseapplication.core.service.*;
 import com.baseapplication.core.utils.Context;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.BeanUtils;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -72,6 +40,7 @@ public class EventoServiceImpl implements EventoService {
 	private final RepertorioEventoService repertorioEventoService;
 	private final EstudioService estudioService;
 	private final LocalEventoService localEventoService;
+
 
 	@Override
 	public Evento buscarPorId(Long idEvento, TipoEvento tipoEvento) {
@@ -193,11 +162,9 @@ public class EventoServiceImpl implements EventoService {
 	@Override
 	public void atualizarRepertorioEvento(AtualizacaoRepertorioEventoDTO atualizacaoRepertorio) {
 		Evento evento = buscarEvento(atualizacaoRepertorio.getIdEvento(), atualizacaoRepertorio.getTipoEvento());
-		if (evento == null)
-			throw new ResourceNotFoundException("Evento não encontrado");
+		if (evento == null) throw new ResourceNotFoundException("Evento não encontrado");
 
-		List<RepertorioEvento> repertorio = atualizacaoRepertorio.getMusicas().stream()
-				.map(i -> montarMusicaRepertorioEvento(i, evento)).toList();
+		List<RepertorioEvento> repertorio = atualizacaoRepertorio.getMusicas().stream().map(i -> montarMusicaRepertorioEvento(i, evento)).toList();
 		repertorioEventoService.limparRepertorioEvento(evento.getId(), evento.getTipoEvento());
 		repertorioEventoService.salvarLista(repertorio);
 
@@ -209,8 +176,7 @@ public class EventoServiceImpl implements EventoService {
 	}
 
 	private RepertorioEvento montarMusicaRepertorioEvento(RepertorioEventoDTO repertorioEventoDTO, Evento evento) {
-		return RepertorioEventoDTO.toEntity(repertorioEventoDTO, evento.getId(), evento.getBanda().getId(),
-				evento.getTipoEvento());
+		return RepertorioEventoDTO.toEntity(repertorioEventoDTO, evento.getId(), evento.getBanda().getId(), evento.getTipoEvento());
 	}
 
 	@Override
@@ -229,17 +195,10 @@ public class EventoServiceImpl implements EventoService {
 
 	@Transactional
 	@Override
-	public void marcarShow(@RequestBody NovoShowDTO novoShowDTO) {
-		try {
-			System.out.println(new ObjectMapper().writeValueAsString(novoShowDTO));
-		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	public void marcarShow(NovoShowDTO novoShowDTO) {
 		Show show = novoShowDTO.toEntity();
 		Banda banda = bandaService.buscarPorId(novoShowDTO.getIdBanda());
-		if (banda == null)
-			throw new ResourceNotFoundException("Banda não encontrada");
+		if (banda == null) throw new ResourceNotFoundException("Banda não encontrada");
 		show.setBanda(banda);
 		if (banda.getParametros().getExigirAprovacaoCompromissos()) {
 			show.setStatus(StatusEvento.AGUARDANDO_APROVACAO);
@@ -253,11 +212,11 @@ public class EventoServiceImpl implements EventoService {
 	}
 
 	private void setarLocalEvento(NovoShowDTO novoShowDTO, Show show) {
-		if (novoShowDTO.getIdLocalEvento() != null) {
+		if(novoShowDTO.getIdLocalEvento() != null){
 			LocalEvento localEvento = localEventoService.buscarPorId(novoShowDTO.getIdLocalEvento());
-			if (localEvento == null) {
+			if(localEvento == null){
 				throw new InternalException("Local de evento não encontrado");
-			} else {
+			}else{
 				show.setLocalEvento(localEvento);
 				show.setEndereco(null);
 			}
@@ -276,7 +235,7 @@ public class EventoServiceImpl implements EventoService {
 		}
 		setarEstudio(novoEnsaioDTO, ensaio);
 
-		if (ensaio.getEstudio() != null) {
+		if(ensaio.getEstudio() != null){
 			System.out.println("Publicando notificação");
 			notificacaoService.enviarNotificacao(new SolicitacaoAgendarEnsaioEvent(ensaio));
 		}
@@ -285,11 +244,11 @@ public class EventoServiceImpl implements EventoService {
 	}
 
 	private void setarEstudio(NovoEnsaioDTO novoEnsaioDTO, Ensaio ensaio) {
-		if (novoEnsaioDTO.getIdEstudio() != null) {
+		if(novoEnsaioDTO.getIdEstudio() != null){
 			Estudio estudio = estudioService.buscarPorId(novoEnsaioDTO.getIdEstudio());
-			if (estudio == null) {
+			if(estudio == null){
 				throw new InternalException("Estúdio não encontrado");
-			} else {
+			}else{
 				ensaio.setEstudio(estudio);
 				estudio.setEndereco(null);
 			}
@@ -370,8 +329,8 @@ public class EventoServiceImpl implements EventoService {
 
 			if (evento.getStatus().equals(StatusEvento.AGUARDANDO_APROVACAO)) {
 				musicoEvento.setSituacao(SituacaoMusicoEvento.CONVITE_PENDENTE);
-				if (isMusicoDiferenteDoUsuarioLogado(musicoEvento)) {
-					// TODO:
+				if (isMusicoDiferenteDoUsuarioLogado(musicoEvento)){
+					//TODO:
 //					enviarNotificacaoAprovacaoEvento(usuario, evento, tipoEvento);
 //					applicationEventPublisher.publishEvent(new SolicitarEntradaBandaEvent(1L, 1L));
 				}

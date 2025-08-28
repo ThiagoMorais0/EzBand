@@ -3,10 +3,12 @@ package com.baseapplication.core.event.listeners;
 import com.baseapplication.core.controller.NotificacaoController;
 import com.baseapplication.core.event.events.ConviteParaUsuarioIngressarBandaEvent;
 import com.baseapplication.core.event.events.SolicitacaoAgendarEnsaioEvent;
+import com.baseapplication.core.event.events.SolicitacaoIngressarBandaEvent;
 import com.baseapplication.core.event.events.UsuarioExpulsoDeBandaEvent;
 import com.baseapplication.core.event.events.resposta.RespostaSolicitacaoAgendarEnsaioEvent;
 import com.baseapplication.core.model.notificacao.ConviteParaUsuarioIngressarBanda;
 import com.baseapplication.core.model.notificacao.SolicitacaoAgendarEnsaio;
+import com.baseapplication.core.model.notificacao.SolicitacaoParaIngressarBanda;
 import com.baseapplication.core.model.notificacao.UsuarioExpulsoDeBanda;
 import com.baseapplication.core.model.superClasses.Notificacao;
 import com.baseapplication.core.service.NotificacaoService;
@@ -53,6 +55,17 @@ public class NotificacaoListener {
         ConviteParaUsuarioIngressarBanda notificacao = new ConviteParaUsuarioIngressarBanda(
                 event.getIdBanda(),
                 event.getIdUsuarioConvidado()
+        );
+        enviar(notificacao);
+    }
+
+    @EventListener
+    @Transactional
+    public void handleSolicitacaoIngressarBanda(SolicitacaoIngressarBandaEvent event) {
+        SolicitacaoParaIngressarBanda notificacao = new SolicitacaoParaIngressarBanda(
+                event.getUsuario(),
+                event.getIdBanda(),
+                event.getInstrumento()
         );
         enviar(notificacao);
     }

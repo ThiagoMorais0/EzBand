@@ -1,5 +1,7 @@
 package com.baseapplication.core.service;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,7 +16,7 @@ public interface UsuarioService {
 //    Usuario findByLogin(String nome);
 	Usuario findByEmail(String nome);
 
-	Usuario salvar(Usuario usuario);
+	void salvar(Usuario usuario);
 
 	InfoUsuarioPainelDTO buscarInfoPainel();
 
