@@ -63,8 +63,8 @@ public class MinioStorageServiceImpl {
 
 			System.out.println("Upload concluído: " + file.getOriginalFilename());
 
-			return getPresignedUrl(bucketName, fileName);
-//			return String.format("http://localhost:9000/%s/%s", bucketName, fileName);
+//			return getPresignedUrl(bucketName, fileName);
+			return String.format("http://localhost:9000/%s/%s", bucketName, fileName);
 		}
 
 

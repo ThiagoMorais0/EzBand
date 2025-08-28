@@ -282,15 +282,20 @@ public class EventoServiceImpl implements EventoService {
 		if (banda.getParametros().getExigirAprovacaoCompromissos()) {
 			ensaio.setStatus(StatusEvento.AGUARDANDO_APROVACAO);
 		} else {
-			ensaio.setStatus(StatusEvento.PENDENTE);
+			if(novoEnsaioDTO.getIdEstudio() != null){
+				ensaio.setStatus(StatusEvento.AGUARDANDO_APROVACAO);
+			}else{
+				ensaio.setStatus(StatusEvento.PENDENTE);
+			}
 		}
+
 		setarEstudio(novoEnsaioDTO, ensaio);
+		ensaio = ensaioService.salvar(ensaio);
 
 		if (ensaio.getEstudio() != null) {
 			System.out.println("Publicando notificação");
 			notificacaoService.enviarNotificacao(new SolicitacaoAgendarEnsaioEvent(ensaio));
 		}
-		ensaioService.salvar(ensaio);
 		incluirMusicosNoEvento(novoEnsaioDTO.getMusicos(), banda, ensaio, TipoEvento.ENSAIO);
 	}
 

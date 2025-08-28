@@ -3,6 +3,7 @@ package com.baseapplication.core.service.impl;
 import com.baseapplication.core.dao.EnsaioDao;
 import com.baseapplication.core.enums.StatusEvento;
 import com.baseapplication.core.enums.TipoEvento;
+import com.baseapplication.core.exception.ResourceNotFoundException;
 import com.baseapplication.core.model.Ensaio;
 import com.baseapplication.core.model.Show;
 import com.baseapplication.core.service.EnsaioService;
@@ -22,7 +23,7 @@ public class EnsaioServiceImpl implements EnsaioService {
 
     @Override
     public Ensaio buscarPorId(Long idEvento) {
-        return ensaioDao.findById(idEvento).get();
+        return ensaioDao.findById(idEvento).orElseThrow(() -> new ResourceNotFoundException("Ensaio não encontrado"));
     }
 
     @Override
@@ -35,8 +36,8 @@ public class EnsaioServiceImpl implements EnsaioService {
     }
 
     @Override
-    public void salvar(Ensaio ensaio) {
-        ensaioDao.save(ensaio);
+    public Ensaio salvar(Ensaio ensaio) {
+        return ensaioDao.save(ensaio);
     }
 
     @Override
