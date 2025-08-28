@@ -49,9 +49,42 @@ services:
       MINIO_ROOT_PASSWORD: ${MINIO_ADMIN_PASSWORD}
     command: server /data --console-address ":9090"
     
+
+  mongodb:
+    image: mongo:latest
+    container_name: chat-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    env_file: .env
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - ezband_app_network
+
+  chat-service:
+    build: ./ChatService # caminho do seu microservice
+    container_name: chat-service
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    env_file: .env
+    environment:
+      PORT: 3001
+      MONGO_URI: mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017/chat?authSource=admin
+      JWT_SECRET: ${JWT_SECRET}
+    depends_on:
+      - mongodb
+    networks:
+      - ezband_app_network
+
 volumes:
   postgres_data_dev:
   app_logs_dev:
+  mongo-data:
 
 networks:
   ezband_app_network:
