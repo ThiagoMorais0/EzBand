@@ -2,6 +2,7 @@ package com.baseapplication.core.service;
 
 import com.baseapplication.core.dto.*;
 import com.baseapplication.core.dto.superClasses.InformacoesEventoDTO;
+import com.baseapplication.core.enums.StatusEvento;
 import com.baseapplication.core.enums.TipoContato;
 import com.baseapplication.core.enums.TipoEvento;
 import com.baseapplication.core.model.Ensaio;
@@ -25,4 +26,6 @@ public interface EventoHelperService {
     List<Ensaio> buscarEnsaiosAguardandoPorBandaEUsuarioOrdenadoPorData(Long idBanda, Long idUsuario);
 
     List<Ensaio> buscarEnsaiosPendentesPorBandaEUsuarioOrdenadoPorData(Long idBanda, Long idUsuario);
+
+    void alterarStatus(Long idEvento, TipoEvento tipoEvento, StatusEvento novoStatus);
 }

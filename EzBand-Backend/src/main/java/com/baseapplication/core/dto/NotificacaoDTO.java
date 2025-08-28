@@ -9,5 +9,8 @@ public record NotificacaoDTO(
         Long destinatarioId,
         String name,
         String tipoRemetente,
-        Boolean lida) {
+        Boolean lida,
+        String urlImagem,
+        String titulo,
+        String tipoNotificacao) {
 }

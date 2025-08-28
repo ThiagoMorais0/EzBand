@@ -7,25 +7,19 @@ import com.baseapplication.core.dto.NotificacaoDTO;
 import com.baseapplication.core.enums.*;
 import com.baseapplication.core.event.events.NotificacaoEvent;
 import com.baseapplication.core.event.events.resposta.RespostaSolicitacaoAgendarEnsaioEvent;
-import com.baseapplication.core.exception.ResourceNotFoundException;
 import com.baseapplication.core.factory.RespostaNotificacaoFactory;
 import com.baseapplication.core.model.*;
 import com.baseapplication.core.model.dto.RespostaNotificacaoDTO;
-import com.baseapplication.core.model.notificacao.RespostaNotificacao;
 import com.baseapplication.core.model.notificacao.SolicitacaoAgendarEnsaio;
-import com.baseapplication.core.model.superClasses.Evento;
 import com.baseapplication.core.model.superClasses.Notificacao;
 import com.baseapplication.core.service.*;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.service.spi.ServiceException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Sinks;
 
-import java.time.LocalDate;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -38,6 +32,7 @@ public class NotificacaoServiceImpl implements NotificacaoService {
     private final RespostaNotificacaoDao respostaNotificacaoDao;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final UsuarioDao usuarioDao;
+    private final EventoHelperService eventoHelperService;
     private final Map<String, Sinks.Many<NotificacaoDTO>> sinks = new ConcurrentHashMap<>();
 
     @Override
@@ -98,7 +93,9 @@ public class NotificacaoServiceImpl implements NotificacaoService {
                                 i.getDestinatarioId(),
                                 i.getDestinatarioTipo().name(),
                                 i.getRemetenteTipo().name(),
-                                i.isLida()))
+                                i.isLida(),
+                                i.getUrlImagem(),
+                                i.getTitulo(), i.getTipoNotificacao()))
                         .toList()
         );
 
@@ -124,21 +121,57 @@ public class NotificacaoServiceImpl implements NotificacaoService {
         }
 
         // Concatena notificações não lidas primeiro, depois segue em tempo real
-        return Flux.concat(
+        return Flux.merge(
                 naoLidas,
                 sink.asFlux().doFinally(signal -> sinks.remove(chave))
         );
     }
 
+    @Override
+    public void enviarNotificacaoSink(Notificacao notificacao) {
+        String chave = key(notificacao.getDestinatarioId(), notificacao.getDestinatarioTipo());
+        Sinks.Many<NotificacaoDTO> sink = sinks.get(chave);
+        System.out.println("Tentando enviar notificação para " + chave + ": " + notificacao.getMensagem());
+        if (sink != null) {
+            System.out.println("Enviando notificação para " + chave + ": " + notificacao.getMensagem());
+            sink.tryEmitNext(new NotificacaoDTO(
+                    notificacao.getId(),
+                    notificacao.getMensagem(),
+                    notificacao.getDestinatarioId(),
+                    notificacao.getDestinatarioTipo().name(),
+                    notificacao.getRemetenteTipo().name(),
+                    notificacao.isLida(),
+                    notificacao.getUrlImagem(),
+                    notificacao.getTitulo(),
+                    notificacao.getTipoNotificacao()
+            ));
+        }
+    }
+
+    @Transactional
     private void criarEEnviarNotificacaoResposta(Long idNotificacao, RespostaNotificacaoDTO respostaDTO) {
         Notificacao notificacao = notificacaoDao.findById(idNotificacao)
                 .orElseThrow(() -> new RuntimeException("Notificação não encontrada"));
+
+        notificacao.setLida(true);
+        notificacaoDao.save(notificacao);
+        executarAcao(notificacao);
+
         Notificacao notificacaoResposta = RespostaNotificacaoFactory.criarNotificacaoResposta(notificacao, respostaDTO.getAcao() );
         notificacaoDao.save(notificacaoResposta);
         enviarNotificacao(new RespostaSolicitacaoAgendarEnsaioEvent(notificacaoResposta));
     }
 
-
+    private void executarAcao(Notificacao notificacao) {
+        switch (notificacao.getTipoNotificacao()){
+            case "SOLICITACAO_PARA_AGENDAR_ENSAIO":
+                SolicitacaoAgendarEnsaio solicitacao = (SolicitacaoAgendarEnsaio) notificacao;
+                eventoHelperService.alterarStatus(solicitacao.getIdEnsaio(), TipoEvento.ENSAIO, StatusEvento.PENDENTE);
+                return;
+            default:
+                return;
+        }
+    }
 
 
 //    @Autowired

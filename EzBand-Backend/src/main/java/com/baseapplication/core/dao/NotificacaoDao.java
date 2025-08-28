@@ -14,7 +14,7 @@ import com.baseapplication.core.model.superClasses.Notificacao;
 @Repository
 public interface NotificacaoDao extends JpaRepository<Notificacao, Long> {
 
-    @Query("SELECT n FROM Notificacao n WHERE n.destinatarioId = :destinatarioId AND n.destinatarioTipo = :destinatarioTipo AND n.lida = false")
+    @Query("SELECT n FROM Notificacao n WHERE n.destinatarioId = :destinatarioId AND n.destinatarioTipo = :destinatarioTipo")
     List<Notificacao> buscarNaoLidas(@Param("destinatarioId") Long destinatarioId,
                                      @Param("destinatarioTipo") TipoParticipante destinatarioTipo);
 

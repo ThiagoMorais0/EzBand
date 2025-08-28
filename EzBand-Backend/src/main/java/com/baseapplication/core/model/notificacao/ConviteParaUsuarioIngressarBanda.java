@@ -20,4 +20,9 @@ public class ConviteParaUsuarioIngressarBanda extends Notificacao {
         super.setRemetenteId(idUsuario);
         super.setRemetenteTipo(TipoParticipante.USUARIO);
     }
+
+    @Override
+    public String getTipoNotificacao() {
+        return "CONVITE_PARA_USUARIO_INGRESSAR_BANDA";
+    }
 }

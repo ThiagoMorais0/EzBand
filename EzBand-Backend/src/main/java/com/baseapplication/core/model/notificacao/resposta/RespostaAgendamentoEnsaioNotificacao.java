@@ -27,4 +27,9 @@ public class RespostaAgendamentoEnsaioNotificacao extends Notificacao {
         super.setDestinatarioId(solicitacao.getRemetenteId());
         super.setDestinatarioTipo(solicitacao.getRemetenteTipo());
     }
+
+    @Override
+    public String getTipoNotificacao() {
+        return "RESPOSTA_AGENDAMENTO_ENSAIO";
+    }
 }

@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.baseapplication.core.model.Ensaio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -64,5 +65,12 @@ public class ShowServiceImpl implements ShowService {
 	public Evento buscarPrimeiroPorUsuarioEData(Long idUsuario, LocalDate data) {
 		return showDao.buscarPrimeiroPorUsuarioEData(idUsuario, data);
 	}
+
+    @Override
+    public void alterarStatus(Long idShow, StatusEvento novoStatus) {
+		Show show = buscarPorId(idShow);
+		show.setStatus(novoStatus);
+		salvar(show);
+    }
 
 }

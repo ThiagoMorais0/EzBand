@@ -2,6 +2,7 @@ package com.baseapplication.core.service.impl;
 
 import com.baseapplication.core.dao.EnsaioDao;
 import com.baseapplication.core.enums.StatusEvento;
+import com.baseapplication.core.enums.TipoEvento;
 import com.baseapplication.core.model.Ensaio;
 import com.baseapplication.core.model.Show;
 import com.baseapplication.core.service.EnsaioService;
@@ -41,5 +42,12 @@ public class EnsaioServiceImpl implements EnsaioService {
     @Override
     public List<Ensaio> buscarEnsaiosPorStatusBandaEUsuarioOrdenadoPorData(Long idBanda, Long idUsuario, String status) {
         return ensaioDao.buscarEnsaiosPorStatusBandaEUsuarioOrdenadoPorData(idBanda, idUsuario, status);
+    }
+
+    @Override
+    public void alterarStatus(Long idEnsaio, StatusEvento novoStatus) {
+        Ensaio ensaio = buscarPorId(idEnsaio);
+        ensaio.setStatus(novoStatus);
+        salvar(ensaio);
     }
 }

@@ -6,15 +6,21 @@ import com.baseapplication.core.model.superClasses.Notificacao;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
+@Getter
+@Setter
 @Entity
 @DiscriminatorValue("SOLICITACAO_PARA_AGENDAR_ENSAIO")
 @NoArgsConstructor
 public class SolicitacaoAgendarEnsaio extends Notificacao {
+
+    private Long idEnsaio;
 
     public SolicitacaoAgendarEnsaio(Ensaio ensaio){
         super.setLida(false);
@@ -28,5 +34,10 @@ public class SolicitacaoAgendarEnsaio extends Notificacao {
 
         super.setRemetenteId(ensaio.getBanda().getId());
         super.setRemetenteTipo(TipoParticipante.BANDA);
+    }
+
+    @Override
+    public String getTipoNotificacao() {
+        return "SOLICITACAO_PARA_AGENDAR_ENSAIO";
     }
 }

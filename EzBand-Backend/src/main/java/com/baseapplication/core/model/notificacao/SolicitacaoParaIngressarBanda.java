@@ -22,4 +22,9 @@ public class SolicitacaoParaIngressarBanda extends Notificacao {
         super.setRemetenteId(usuario.getId());
         super.setRemetenteTipo(TipoParticipante.USUARIO);
     }
+
+    @Override
+    public String getTipoNotificacao() {
+        return "SOLICITACAO_PARA_INGRESSAR_BANDA";
+    }
 }

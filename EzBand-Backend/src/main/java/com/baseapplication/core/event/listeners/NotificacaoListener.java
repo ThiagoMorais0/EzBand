@@ -33,6 +33,9 @@ public class NotificacaoListener {
     @Transactional
     public void handleSolicitacaoAgendarEnsaio(SolicitacaoAgendarEnsaioEvent event) {
         SolicitacaoAgendarEnsaio notificacao = new SolicitacaoAgendarEnsaio(event.getEnsaio());
+        notificacao.setIdEnsaio(event.getEnsaio().getId());
+        notificacao.setUrlImagem(event.getEnsaio().getBanda().getUrlLogo());
+        notificacao.setTitulo("Novo agendamento!");
         enviar(notificacao);
     }
 

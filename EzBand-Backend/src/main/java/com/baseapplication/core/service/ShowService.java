@@ -1,5 +1,6 @@
 package com.baseapplication.core.service;
 
+import com.baseapplication.core.enums.StatusEvento;
 import com.baseapplication.core.model.RepertorioEvento;
 import com.baseapplication.core.model.Show;
 import com.baseapplication.core.model.superClasses.Evento;
@@ -22,4 +23,6 @@ public interface ShowService {
     List<Show> buscarShowsPorStatusBandaEUsuarioOrdenadoPorData(Long idBanda, Long idUsuario, String status);
 
     Evento buscarPrimeiroPorUsuarioEData(Long idUsuario, LocalDate data);
+
+    void alterarStatus(Long idShow, StatusEvento novoStatus);
 }

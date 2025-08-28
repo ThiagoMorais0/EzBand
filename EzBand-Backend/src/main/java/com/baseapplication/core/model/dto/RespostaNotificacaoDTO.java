@@ -14,6 +14,7 @@ import lombok.Setter;
 public class RespostaNotificacaoDTO {
     private String acao;
     private String mensagem;
+    private String tipo;
 
     public RespostaNotificacao toEntity(Long idNotificacao){
         RespostaNotificacao entity = new RespostaNotificacao();

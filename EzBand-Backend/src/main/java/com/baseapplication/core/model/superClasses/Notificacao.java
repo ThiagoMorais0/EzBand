@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Entity
 @Data
@@ -26,4 +25,9 @@ public abstract class Notificacao {
     private Long destinatarioId;
     @Enumerated(EnumType.STRING)
     private TipoParticipante destinatarioTipo;
+    @Column(length = 1000)
+    private String urlImagem;
+    private String titulo;
+
+    public abstract String getTipoNotificacao();
 }

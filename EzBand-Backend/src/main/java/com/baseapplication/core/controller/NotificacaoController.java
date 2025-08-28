@@ -23,8 +23,6 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequestMapping("/notificacoes")
 @RequiredArgsConstructor
 public class NotificacaoController {
-
-    private final Map<String, Sinks.Many<NotificacaoDTO>> sinks = new ConcurrentHashMap<>();
     private final NotificacaoService notificacaoService;
 
     private String key(Long id, TipoParticipante tipo) {
@@ -41,21 +39,7 @@ public class NotificacaoController {
 
 
     public void enviarNotificacao(Notificacao notificacao) {
-        String chave = key(notificacao.getDestinatarioId(), notificacao.getDestinatarioTipo());
-        Sinks.Many<NotificacaoDTO> sink = sinks.get(chave);
-        System.out.println("Tentando enviar notificação para " + chave + ": " + notificacao.getMensagem());
-        if (sink != null) {
-            System.out.println("Enviando notificação para " + chave + ": " + notificacao.getMensagem());
-            sink.tryEmitNext(new NotificacaoDTO(
-                    notificacao.getId(),
-                    notificacao.getMensagem(),
-                    notificacao.getDestinatarioId(),
-                    notificacao.getDestinatarioTipo().name(),
-                    notificacao.getRemetenteTipo().name(),
-                    notificacao.isLida()
-            ));
-
-        }
+       notificacaoService.enviarNotificacaoSink(notificacao);
     }
 
     @GetMapping("/deletarTodas")

@@ -27,6 +27,8 @@ public interface NotificacaoService {
     void responderNotificacao(Long idNotificacao, RespostaNotificacaoDTO respostaDTO);
 
     Flux<NotificacaoDTO> streamNotificacoes(Long destinatarioId, TipoParticipante destinatarioTipo);
+
+    void enviarNotificacaoSink(Notificacao notificacao);
 //    List<Notificacao> buscarNotificacoesPorUsuario(Long idUsuario);
 //    void enviarConviteParaEvento(String contato,
 //                                 TipoContato tipoContato,

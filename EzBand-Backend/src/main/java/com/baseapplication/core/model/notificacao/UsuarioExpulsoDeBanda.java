@@ -24,4 +24,9 @@ public class UsuarioExpulsoDeBanda extends Notificacao {
         super.setRemetenteId(idUsuario);
         super.setRemetenteTipo(TipoParticipante.USUARIO);
     }
+
+    @Override
+    public String getTipoNotificacao() {
+        return "USUARIO_EXPULSO_DE_BANDA";
+    }
 }

@@ -7,4 +7,9 @@ import jakarta.persistence.Entity;
 @Entity
 @DiscriminatorValue("NOVO_SEGUIDOR")
 public class NovoSeguidor extends Notificacao {
+
+    @Override
+    public String getTipoNotificacao() {
+        return "NOVO_SEGUIDOR";
+    }
 }

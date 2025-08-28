@@ -7,4 +7,9 @@ import jakarta.persistence.Entity;
 @Entity
 @DiscriminatorValue("MENSAGEM_DIRETA")
 public class MensagemDireta extends Notificacao {
+
+    @Override
+    public String getTipoNotificacao() {
+        return "MENSAGEM_DIRETA";
+    }
 }

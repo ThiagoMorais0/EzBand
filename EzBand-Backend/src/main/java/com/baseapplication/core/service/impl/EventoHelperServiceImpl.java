@@ -59,6 +59,14 @@ public class EventoHelperServiceImpl implements EventoHelperService {
     }
 
     @Override
+    public void alterarStatus(Long idEvento, TipoEvento tipoEvento, StatusEvento novoStatus) {
+        switch (tipoEvento){
+            case ENSAIO -> ensaioService.alterarStatus(idEvento, novoStatus);
+            case SHOW -> showService.alterarStatus(idEvento, novoStatus);
+        }
+    }
+
+    @Override
     public List<Ensaio> buscarEnsaiosAguardandoPorBandaEUsuarioOrdenadoPorData(Long idBanda, Long idUsuario) {
         return ensaioService.buscarEnsaiosPorStatusBandaEUsuarioOrdenadoPorData(idBanda, idUsuario, StatusEvento.AGUARDANDO_APROVACAO.toString());
     }

@@ -26,6 +26,7 @@ public class Banda {
     private String categoria;
     @DateTimeFormat(pattern = "dd/MM/yyyy")
     private LocalDate dataInclusao;
+    @Column(length = 1000)
     private String urlLogo;
     @Embedded
     private Endereco endereco;

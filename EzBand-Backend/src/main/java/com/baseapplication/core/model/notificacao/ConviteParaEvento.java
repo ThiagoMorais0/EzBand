@@ -7,4 +7,9 @@ import jakarta.persistence.Entity;
 @Entity
 @DiscriminatorValue("CONVITE_PARA_EVENTO")
 public class ConviteParaEvento extends Notificacao {
+
+    @Override
+    public String getTipoNotificacao() {
+        return "CONVITE_PARA_EVENTO";
+    }
 }
