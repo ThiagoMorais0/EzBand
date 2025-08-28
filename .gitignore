@@ -1,3 +1,4 @@
 .env
 logs
 EzBand-Backend/src/main/resources/application.properties
+ChatService/node_modules

@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Teste Chat (Socket.IO) - local</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+            margin: 16px;
+        }
+
+        .box {
+            border: 1px solid #ddd;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+
+        label {
+            display: block;
+            margin-top: 8px;
+            font-size: 14px;
+        }
+
+        input,
+        select,
+        textarea,
+        button {
+            font-size: 14px;
+            padding: 6px;
+            margin-top: 6px;
+        }
+
+        #mensagens {
+            list-style: none;
+            padding-left: 0;
+            height: 320px;
+            overflow: auto;
+            border: 1px solid #eee;
+            padding: 8px;
+            border-radius: 6px;
+            background: #fafafa;
+        }
+
+        #mensagens li {
+            margin-bottom: 8px;
+            padding: 6px;
+            border-radius: 4px;
+        }
+
+        .msg-me {
+            background: #e6f7ff;
+        }
+
+        .msg-other {
+            background: #fff;
+            border: 1px solid #f0f0f0;
+        }
+
+        .meta {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .status {
+            margin-left: 8px;
+            font-weight: 600;
+        }
+
+        .row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .col {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .small {
+            font-size: 13px;
+            color: #555;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>Teste Chat WebSocket (Socket.IO)</h2>
+    <p class="small">Abra em <strong>várias abas</strong> para simular usuários. Serviço em
+        <code>http://localhost:3001</code>.
+    </p>
+
+    <div class="box">
+        <div class="row">
+            <div class="col" style="flex:1">
+                <label>Seu tipo</label>
+                <select id="myType">
+                    <option value="USUARIO">USUARIO</option>
+                    <option value="ESTUDIO">ESTUDIO</option>
+                    <option value="BANDA">BANDA</option>
+                    <option value="LOCAL_EVENTO">LOCAL_EVENTO</option>
+                </select>
+                <label>Seu id</label>
+                <input id="myId" placeholder="ex: 123" />
+            </div>
+            <div class="col" style="flex:1">
+                <label>Conectar ao servidor (URL)</label>
+                <input id="serverUrl" value="http://localhost:3001" />
+                <div style="margin-top:6px;">
+                    <button id="btnConnect">Conectar / Registrar</button>
+                    <span id="connStatus" class="status">desconectado</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="box">
+        <div class="row">
+            <div class="col" style="flex:1">
+                <label>Tipo do destinatário</label>
+                <select id="recvType">
+                    <option value="USUARIO">USUARIO</option>
+                    <option value="ESTUDIO">ESTUDIO</option>
+                    <option value="BANDA">BANDA</option>
+                    <option value="LOCAL_EVENTO">LOCAL_EVENTO</option>
+                </select>
+                <label>Id do destinatário</label>
+                <input id="recvId" placeholder="ex: 45" />
+            </div>
+            <div class="col" style="flex:1">
+                <div style="margin-top:6px;">
+                    <button id="btnJoinRoom">Entrar na sala do destinatário</button>
+                    <button id="btnLeaveRoom">Sair da sala</button>
+                    <span id="roomStatus" class="small" style="margin-left:8px;">nenhuma</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="box">
+        <label>Mensagem</label>
+        <textarea id="messageText" rows="3" style="width:100%" placeholder="Digite a mensagem..."></textarea>
+        <div style="margin-top:8px; display:flex; gap:8px;">
+            <button id="btnSend">Enviar</button>
+            <button id="btnHistory">Carregar histórico</button>
+        </div>
+    </div>
+
+    <div class="box">
+        <h3>Mensagens</h3>
+        <ul id="mensagens"></ul>
+    </div>
+
+    <script>
+        const serverUrlEl = document.getElementById('serverUrl');
+        const btnConnect = document.getElementById('btnConnect');
+        const connStatus = document.getElementById('connStatus');
+
+        const myIdEl = document.getElementById('myId');
+        const myTypeEl = document.getElementById('myType');
+        const recvIdEl = document.getElementById('recvId');
+        const recvTypeEl = document.getElementById('recvType');
+
+        const btnSend = document.getElementById('btnSend');
+        const messageText = document.getElementById('messageText');
+        const mensagensEl = document.getElementById('mensagens');
+
+        const btnJoinRoom = document.getElementById('btnJoinRoom');
+        const btnLeaveRoom = document.getElementById('btnLeaveRoom');
+        const roomStatus = document.getElementById('roomStatus');
+        const btnHistory = document.getElementById('btnHistory');
+
+        let socket = null;
+        let currentRoom = null;
+
+        function addMensagem(text, isMe = false, meta = '') {
+            const li = document.createElement('li');
+            li.className = isMe ? 'msg-me' : 'msg-other';
+            li.innerHTML = `<div>${text}</div><div class="meta">${meta}</div>`;
+            mensagensEl.appendChild(li);
+            mensagensEl.scrollTop = mensagensEl.scrollHeight;
+        }
+
+        function setConnStatus(text, color) {
+            connStatus.innerText = text;
+            connStatus.style.color = color || '#000';
+        }
+
+        btnConnect.addEventListener('click', () => {
+            const url = serverUrlEl.value.trim();
+            const myId = myIdEl.value.trim();
+            const myType = myTypeEl.value;
+            if (!url) return alert('Informe URL do servidor');
+            if (!myId) return alert('Informe seu id');
+            if (socket && socket.connected) {
+                socket.emit('registerUser', { id: myId, type: myType });
+                addMensagem('Re-registrado no servidor', true);
+                return;
+            }
+            socket = io(url, {
+                autoConnect: true,
+                auth: { token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJhdXRoLWFwaSIsInN1YiI6ImNhaW9AZ21haWwuY29tIiwiZXhwIjoxNzU2MzYxNjYyfQ.aX-tlwkP0PojE1i_6fLDv8XbqUPCWrZzrVatFB1GjVc" }
+            }
+            );
+            socket.on('connect', () => {
+                setConnStatus('conectado', 'green');
+                addMensagem('Conectado ao servidor', true);
+                socket.emit('registerUser', { id: myId, type: myType });
+                addMensagem(`Registrando como ${myType}:${myId}`, true);
+            });
+            socket.on('disconnect', reason => {
+                setConnStatus('desconectado', 'red');
+                addMensagem('Desconectado: ' + reason);
+            });
+            socket.on('connect_error', err => {
+                setConnStatus('erro', 'orange');
+                addMensagem('Erro de conexão: ' + (err.message || JSON.stringify(err)));
+            });
+            socket.on('roomHistory', msgs => {
+                addMensagem('--- histórico recebido ---', false);
+                msgs.forEach(m => {
+                    const who = `${m.sender.type}:${m.sender.id}`;
+                    const text = `${who} → ${m.receiver.type}:${m.receiver.id} — ${m.content}`;
+                    const isMe = (m.sender.id === myId && m.sender.type === myType);
+                    addMensagem(text, isMe, new Date(m.createdAt).toLocaleString());
+                });
+            });
+            socket.on('receiveMessage', m => {
+                const who = `${m.sender.type}:${m.sender.id}`;
+                const text = `${who}: ${m.content}`;
+                const myId = myIdEl.value.trim();
+                const myType = myTypeEl.value;
+                const isMe = (m.sender.id === myId && m.sender.type === myType);
+                addMensagem(text, isMe, new Date(m.createdAt).toLocaleString());
+            });
+        });
+
+        btnJoinRoom.addEventListener('click', () => {
+            if (!socket || !socket.connected) return alert('Conecte-se primeiro');
+            const myId = myIdEl.value.trim();
+            const myType = myTypeEl.value;
+            const recvId = recvIdEl.value.trim();
+            const recvType = recvTypeEl.value;
+            if (!recvId) return alert('Preencha id do destinatário');
+            // envia apenas os participantes, backend decide room
+            socket.emit('joinRoom', [
+                { id: myId, type: myType },
+                { id: recvId, type: recvType }
+            ]);
+            currentRoom = `${myType}:${myId}↔${recvType}:${recvId}`; // para exibir no front
+            roomStatus.innerText = currentRoom;
+            addMensagem(`Solicitado entrar na sala com ${recvType}:${recvId}`, true);
+        });
+
+        btnLeaveRoom.addEventListener('click', () => {
+            if (!socket || !socket.connected) return alert('Conecte-se primeiro');
+            if (!currentRoom) return alert('Não está em nenhuma sala');
+            socket.emit('leaveRoom'); // backend decide
+            addMensagem(`Saiu da sala`, true);
+            currentRoom = null;
+            roomStatus.innerText = 'nenhuma';
+        });
+
+        btnSend.addEventListener('click', () => {
+            if (!socket || !socket.connected) return alert('Conecte-se primeiro');
+            const myId = myIdEl.value.trim();
+            const myType = myTypeEl.value;
+            const recvId = recvIdEl.value.trim();
+            const recvType = recvTypeEl.value;
+            const content = messageText.value.trim();
+            if (!recvId) return alert('Preencha id do destinatário');
+            if (!content) return alert('Digite a mensagem');
+            socket.emit('sendMessage', {
+                sender: { id: myId, type: myType },
+                receiver: { id: recvId, type: recvType },
+                content
+            });
+            addMensagem(`(enviado) ${myType}:${myId} → ${recvType}:${recvId} — ${content}`, true, new Date().toLocaleString());
+            messageText.value = '';
+        });
+
+        btnHistory.addEventListener('click', () => {
+            if (!socket || !socket.connected) return alert('Conecte-se primeiro');
+            const myId = myIdEl.value.trim();
+            const myType = myTypeEl.value;
+            const recvId = recvIdEl.value.trim();
+            const recvType = recvTypeEl.value;
+            if (!recvId) return alert('Preencha id do destinatário');
+            // envia apenas os participantes
+            socket.emit('joinRoom', [
+                { id: myId, type: myType },
+                { id: recvId, type: recvType }
+            ]);
+            currentRoom = `${myType}:${myId}↔${recvType}:${recvId}`;
+            roomStatus.innerText = currentRoom;
+        });
+    </script>
+</body>
+
+</html>
