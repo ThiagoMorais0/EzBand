@@ -155,18 +155,18 @@ public class NotificacaoServiceImpl implements NotificacaoService {
 
         notificacao.setLida(true);
         notificacaoDao.save(notificacao);
-        executarAcao(notificacao);
+        executarAcao(notificacao, AcaoResposta.findByName(respostaDTO.getAcao()));
 
         Notificacao notificacaoResposta = RespostaNotificacaoFactory.criarNotificacaoResposta(notificacao, respostaDTO.getAcao() );
         notificacaoDao.save(notificacaoResposta);
         enviarNotificacao(new RespostaSolicitacaoAgendarEnsaioEvent(notificacaoResposta));
     }
 
-    private void executarAcao(Notificacao notificacao) {
+    private void executarAcao(Notificacao notificacao, AcaoResposta acao) {
         switch (notificacao.getTipoNotificacao()){
             case "SOLICITACAO_PARA_AGENDAR_ENSAIO":
                 SolicitacaoAgendarEnsaio solicitacao = (SolicitacaoAgendarEnsaio) notificacao;
-                eventoHelperService.alterarStatus(solicitacao.getIdEnsaio(), TipoEvento.ENSAIO, StatusEvento.PENDENTE);
+                eventoHelperService.alterarStatus(solicitacao.getIdEnsaio(), TipoEvento.ENSAIO, acao.equals(AcaoResposta.ACEITAR) ? StatusEvento.PENDENTE : StatusEvento.CANCELADO);
                 return;
             default:
                 return;
