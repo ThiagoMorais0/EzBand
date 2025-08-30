@@ -17,6 +17,7 @@ public class EnderecoDTO {
     private String rua;
     private String numero;
     private String cep;
+    private String complemento;
 
     public EnderecoDTO(Endereco endereco){
         if(endereco != null){

@@ -18,4 +18,6 @@ public interface EnsaioService {
     List<Ensaio> buscarEnsaiosPorStatusBandaEUsuarioOrdenadoPorData(Long idBanda, Long idUsuario, String string);
 
     void alterarStatus(Long idEvento, StatusEvento novoStatus);
+
+    List<Ensaio> buscarComDataAnteriorAHoje();
 }

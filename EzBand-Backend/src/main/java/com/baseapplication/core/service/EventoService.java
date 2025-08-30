@@ -42,4 +42,6 @@ public interface EventoService {
     void aceitarNotificacao(Long idNotificacao);
 
     void recusarNotificacao(Long idNotificacao);
+
+    List<Evento> buscarComDataAnteriorAHoje();
 }

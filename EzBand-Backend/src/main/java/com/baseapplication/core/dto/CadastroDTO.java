@@ -14,7 +14,6 @@ import lombok.Setter;
 public class CadastroDTO {
 
     private String nome;
-    private String login;
     private String email;
     private String senha;
     private LocalDate dataNascimento;

@@ -1,8 +1,9 @@
 package com.baseapplication.core.service.impl;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.BeanUtils;
@@ -276,8 +277,9 @@ public class EventoServiceImpl implements EventoService {
 
 	@Override
 	public void marcarEnsaio(NovoEnsaioDTO novoEnsaioDTO) {
-		Ensaio ensaio = novoEnsaioDTO.toEntity();
-		Banda banda = bandaService.buscarPorId(novoEnsaioDTO.getIdBanda());
+        validarDataEnsaio(novoEnsaioDTO.getDataEnsaio());
+        Ensaio ensaio = novoEnsaioDTO.toEntity();
+        Banda banda = bandaService.buscarPorId(novoEnsaioDTO.getIdBanda());
 		ensaio.setBanda(banda);
 		if (banda.getParametros().getExigirAprovacaoCompromissos()) {
 			ensaio.setStatus(StatusEvento.AGUARDANDO_APROVACAO);
@@ -299,7 +301,22 @@ public class EventoServiceImpl implements EventoService {
 		incluirMusicosNoEvento(novoEnsaioDTO.getMusicos(), banda, ensaio, TipoEvento.ENSAIO);
 	}
 
-	private void setarEstudio(NovoEnsaioDTO novoEnsaioDTO, Ensaio ensaio) {
+    private void validarDataEnsaio(String dataEnsaio) {
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            LocalDate data = LocalDate.parse(dataEnsaio, formatter);
+
+            LocalDate hoje = LocalDate.now();
+            if (data.isBefore(hoje)) {
+                throw new InternalException("Data inválida! A data do ensaio não pode ser anterior ao dia atual.");
+            }
+        } catch (DateTimeParseException e) {
+            System.out.println("Formato de data inválido. Use o formato dd/MM/yyyy.");
+            // também pode lançar exceção aqui se quiser
+        }
+    }
+
+    private void setarEstudio(NovoEnsaioDTO novoEnsaioDTO, Ensaio ensaio) {
 		if (novoEnsaioDTO.getIdEstudio() != null) {
 			Estudio estudio = estudioService.buscarPorId(novoEnsaioDTO.getIdEstudio());
 			if (estudio == null) {
@@ -331,7 +348,18 @@ public class EventoServiceImpl implements EventoService {
 //		notificacaoService.recusarNotificacao(idNotificacao);
 	}
 
-	@Override
+    @Override
+    public List<Evento> buscarComDataAnteriorAHoje() {
+        List<Ensaio> ensaios = ensaioService.buscarComDataAnteriorAHoje();
+        List<Show> shows = showService.buscarComDataAnteriorAHoje();
+
+        List<Evento> eventos = new ArrayList<>();
+        eventos.addAll(ensaios);
+        eventos.addAll(shows);
+        return eventos;
+    }
+
+    @Override
 	public void aceitarNotificacao(Long idNotificacao) {
 //		Notificacao notificacao = notificacaoService.aceitarNotificacao(idNotificacao);
 //		Evento evento = getEventoFromNotificacao(notificacao);

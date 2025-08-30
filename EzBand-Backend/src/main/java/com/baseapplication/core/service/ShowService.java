@@ -25,4 +25,6 @@ public interface ShowService {
     Evento buscarPrimeiroPorUsuarioEData(Long idUsuario, LocalDate data);
 
     void alterarStatus(Long idShow, StatusEvento novoStatus);
+
+    List<Show> buscarComDataAnteriorAHoje();
 }

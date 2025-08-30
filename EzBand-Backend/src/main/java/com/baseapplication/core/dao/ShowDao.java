@@ -1,5 +1,6 @@
 package com.baseapplication.core.dao;
 
+import com.baseapplication.core.enums.StatusEvento;
 import com.baseapplication.core.model.Show;
 import com.baseapplication.core.model.superClasses.Evento;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -34,4 +35,7 @@ public interface ShowDao extends JpaRepository<Show, Long> {
             "WHERE s.data = :data AND me.usuario.id = :idUsuario " +
             "ORDER BY s.data DESC LIMIT 1")
     Evento buscarPrimeiroPorUsuarioEData(Long idUsuario, LocalDate data);
+
+    @Query(value = "SELECT e FROM Show e WHERE e.data = :now and e.status <> :status ")
+    List<Show> buscarComDataAnteriorAHoje(LocalDate now, StatusEvento status);
 }

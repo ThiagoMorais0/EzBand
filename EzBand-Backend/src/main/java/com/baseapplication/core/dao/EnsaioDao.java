@@ -1,7 +1,9 @@
 package com.baseapplication.core.dao;
 
+import java.time.LocalDate;
 import java.util.List;
 
+import com.baseapplication.core.enums.StatusEvento;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -27,4 +29,7 @@ public interface EnsaioDao extends JpaRepository<Ensaio, Long> {
             "      mb.permissao in ('ADMINISTRADOR', 'FUNDADOR')  " +
             "      or me.id_usuario = :idUsuario)", nativeQuery = true)
     List<Ensaio> buscarEnsaiosPorStatusBandaEUsuarioOrdenadoPorData(Long idBanda, Long idUsuario, String status);
+
+    @Query(value = "SELECT e FROM Ensaio e WHERE e.data < :now and e.status <> :status ")
+    List<Ensaio> buscarComDataAnteriorAHoje(LocalDate now, StatusEvento status);
 }
