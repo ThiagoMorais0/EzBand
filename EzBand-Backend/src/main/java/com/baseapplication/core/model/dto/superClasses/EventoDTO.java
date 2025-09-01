@@ -31,7 +31,6 @@ public class EventoDTO {
     private EnderecoDTO endereco;
     private String observacoes;
     private String status;
-    private TipoEvento evento;
     private BandaDTO banda;
 
     public EventoDTO(Evento evento){

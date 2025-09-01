@@ -10,6 +10,7 @@ import com.baseapplication.core.model.superClasses.Notificacao;
 import com.baseapplication.core.service.NotificacaoService;
 import com.baseapplication.core.service.UsuarioService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -54,5 +55,15 @@ public class NotificacaoController {
 
         notificacaoService.responderNotificacao(id, respostaDTO);
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/lerNotificacao")
+    public ResponseEntity<?> lerNotificacao(@RequestBody Long id){
+        try{
+            notificacaoService.lerNotificacao(id);
+            return ResponseEntity.ok().build();
+        }catch(Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }

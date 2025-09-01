@@ -19,6 +19,7 @@ public abstract class Notificacao {
     private String mensagem;
     private LocalDateTime dataCriacao = LocalDateTime.now();
     private boolean lida = false;
+    private boolean permiteResposta = true;
     private Long remetenteId;
     @Enumerated(EnumType.STRING)
     private TipoParticipante remetenteTipo;

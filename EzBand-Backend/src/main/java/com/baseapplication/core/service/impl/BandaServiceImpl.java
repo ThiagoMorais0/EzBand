@@ -10,8 +10,10 @@ import com.baseapplication.core.dto.*;
 import com.baseapplication.core.enums.PermissaoMusico;
 import com.baseapplication.core.event.events.ConviteParaUsuarioIngressarBandaEvent;
 import com.baseapplication.core.event.events.UsuarioExpulsoDeBandaEvent;
+import com.baseapplication.core.model.Show;
 import com.baseapplication.core.model.embedded.ParametrosBanda;
 import com.baseapplication.core.service.*;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.ResponseEntity;
@@ -94,6 +96,7 @@ public class BandaServiceImpl implements BandaService {
 				.collect(Collectors.toList());
 	}
 
+	@Transactional
 	@Override
 	public void novaBanda(String bandaJson, MultipartFile logo) {
 		CadastroBandaDTO bandaDTO;
@@ -145,6 +148,16 @@ public class BandaServiceImpl implements BandaService {
 	@Override
 	public void enviarConviteParaUsuarioIngressarBanda(Long idBanda, Long idUsuarioConvidado) {
 		notificacaoService.enviarNotificacao(new ConviteParaUsuarioIngressarBandaEvent(idUsuarioConvidado, idBanda));
+	}
+
+	@Override
+	public List<EnsaioDTO> buscarEnsaios(Long idBanda) {
+		return buscarPorId(idBanda).getEnsaios().stream().map(EnsaioDTO::new).toList();
+	}
+
+	@Override
+	public List<ShowDTO> buscarShows(Long idBanda) {
+		return buscarPorId(idBanda).getShows().stream().map(ShowDTO::new).toList();
 	}
 
 	private void setarInformacoesEditadas(Banda banda, EdicaoBandaDTO bandaDTO, String urlLogo) {
@@ -327,7 +340,7 @@ public class BandaServiceImpl implements BandaService {
 	}
 
 	public Banda buscarPorId(Long idBanda) {
-		return bandaDao.findById(idBanda).orElse(null);
+		return bandaDao.findById(idBanda).orElseThrow();
 	}
 
 	private static void verificarSeBandaPermiteEntradaPorConvite(Banda banda) {

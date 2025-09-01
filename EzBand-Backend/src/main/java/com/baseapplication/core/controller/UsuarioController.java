@@ -5,7 +5,10 @@ import com.baseapplication.core.dto.InfoPerfilUsuarioDTO;
 import com.baseapplication.core.dto.InfoUsuarioPainelDTO;
 import com.baseapplication.core.service.UsuarioService;
 import com.baseapplication.core.utils.Context;
+import jakarta.validation.constraints.Null;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -37,10 +40,20 @@ public class UsuarioController {
 	}
 
 	@PostMapping("/editarUsuarioComImagem")
-	public InfoPerfilUsuarioDTO editarUsuarioComImagem(@RequestParam("usuario") String usuarioJson,
-			MultipartFile imagem) {
-		return usuarioService.editarUsuarioComImagem(usuarioJson, imagem);
+	public ResponseEntity<?> editarUsuarioComImagem(
+			@RequestParam("usuario") String usuarioJson,
+			@RequestParam(required = false) MultipartFile imagem,
+			@RequestParam Boolean removerImagemDePerfil) {
+		try {
+			Object dto = usuarioService.editarUsuarioComImagem(usuarioJson, imagem, removerImagemDePerfil);
+			return ResponseEntity.ok()
+					.contentType(MediaType.APPLICATION_JSON) // força JSON
+					.body(dto);
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
 	}
+
 
 	@GetMapping("/verificarEmailJaCadastrado")
 	@CrossOrigin(origins = "*")

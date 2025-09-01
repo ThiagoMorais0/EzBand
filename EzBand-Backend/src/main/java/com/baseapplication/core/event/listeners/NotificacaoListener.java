@@ -67,7 +67,7 @@ public class NotificacaoListener {
     public void handleSolicitacaoIngressarBanda(SolicitacaoIngressarBandaEvent event) {
         SolicitacaoParaIngressarBanda notificacao = new SolicitacaoParaIngressarBanda(
                 event.getUsuario(),
-                event.getIdBanda(),
+                event.getBanda(),
                 event.getInstrumento()
         );
         enviar(notificacao);

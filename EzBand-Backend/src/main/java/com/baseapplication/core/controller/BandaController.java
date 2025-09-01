@@ -2,6 +2,7 @@ package com.baseapplication.core.controller;
 
 import java.util.List;
 
+import com.baseapplication.core.model.dto.EnsaioDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -124,6 +125,25 @@ public class BandaController {
     public EnsaiosFuturosDTO buscarEnsaiosFuturosBanda(@RequestParam Long idBanda) {
         return bandaService.buscarEnsaiosFuturosBanda(idBanda, Context.getUsuarioLogado().getId());
     }
+
+    @GetMapping("/buscarEnsaios")
+    public ResponseEntity<?> buscarEnsaios(@RequestParam Long idBanda) {
+        try{
+            return ResponseEntity.ok(bandaService.buscarEnsaios(idBanda));
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/buscarShows")
+    public ResponseEntity<?> buscarShows(@RequestParam Long idBanda) {
+        try{
+            return ResponseEntity.ok(bandaService.buscarShows(idBanda));
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
 
     @GetMapping("/buscarRepertorio")
     public List<MusicaDTO> buscarRepertorio(@RequestParam Long idBanda) {

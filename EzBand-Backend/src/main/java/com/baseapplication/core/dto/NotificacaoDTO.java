@@ -12,5 +12,6 @@ public record NotificacaoDTO(
         Boolean lida,
         String urlImagem,
         String titulo,
-        String tipoNotificacao) {
+        String tipoNotificacao,
+        Boolean permiteResposta) {
 }

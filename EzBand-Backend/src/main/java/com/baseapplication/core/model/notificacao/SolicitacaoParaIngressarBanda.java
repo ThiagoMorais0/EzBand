@@ -1,22 +1,33 @@
 package com.baseapplication.core.model.notificacao;
 
 import com.baseapplication.core.enums.TipoParticipante;
+import com.baseapplication.core.model.Banda;
 import com.baseapplication.core.model.Usuario;
 import com.baseapplication.core.model.superClasses.Notificacao;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @DiscriminatorValue("SOLICITACAO_PARA_INGRESSAR_BANDA")
 @NoArgsConstructor
+@Setter
+@Getter
 public class SolicitacaoParaIngressarBanda extends Notificacao {
 
-    public SolicitacaoParaIngressarBanda(Usuario usuario, Long idBanda, String instrumento) {
-        super.setMensagem(usuario.getNome() + " deseja ingressar na banda tocando " + instrumento);
+    private String instrumento;
 
-        super.setDestinatarioId(idBanda);
+    public SolicitacaoParaIngressarBanda(Usuario usuario, Banda banda, String instrumento) {
+        super.setMensagem(usuario.getNome() + " deseja ingressar na banda tocando " + instrumento.toLowerCase());
+
+        super.setTitulo(banda.getNome() + " - Solicitação");
+        super.setUrlImagem(banda.getUrlLogo());
+        this.setInstrumento(instrumento);
+
+        super.setDestinatarioId(banda.getId());
         super.setDestinatarioTipo(TipoParticipante.BANDA);
 
         super.setRemetenteId(usuario.getId());

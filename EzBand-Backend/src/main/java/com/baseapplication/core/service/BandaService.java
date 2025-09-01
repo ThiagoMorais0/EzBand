@@ -2,6 +2,8 @@ package com.baseapplication.core.service;
 
 import java.util.List;
 
+import com.baseapplication.core.model.dto.EnsaioDTO;
+import com.baseapplication.core.model.dto.ShowDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -56,4 +58,8 @@ public interface BandaService {
     List<String> getPermissoesMusico(Long idBanda, Long id);
 
     void enviarConviteParaUsuarioIngressarBanda(Long idBanda, Long idUsuarioConvidado);
+
+    List<EnsaioDTO> buscarEnsaios(Long idBanda);
+
+    List<ShowDTO> buscarShows(Long idBanda);
 }

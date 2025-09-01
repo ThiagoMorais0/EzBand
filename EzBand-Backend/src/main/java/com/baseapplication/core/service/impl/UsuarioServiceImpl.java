@@ -5,6 +5,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 import com.baseapplication.core.event.events.SolicitacaoIngressarBandaEvent;
+import com.baseapplication.core.model.Banda;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.ResponseEntity;
@@ -149,7 +150,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 	}
 
 	@Override
-	public InfoPerfilUsuarioDTO editarUsuarioComImagem(String usuarioJson, MultipartFile imagem) {
+	public InfoPerfilUsuarioDTO editarUsuarioComImagem(String usuarioJson, MultipartFile imagem, Boolean removerImagemDePerfil) {
 		InfoPerfilUsuarioDTO usuarioDTO = null;
 		try {
 			usuarioDTO = new ObjectMapper().readValue(usuarioJson, InfoPerfilUsuarioDTO.class);
@@ -158,7 +159,12 @@ public class UsuarioServiceImpl implements UsuarioService {
 			throw new InternalException(e.getMessage());
 		}
 		Usuario usuario = buscarPorContato(usuarioDTO.getEmail(), TipoContato.EMAIL);
-		String urlImagem = imagemService.saveImageAndGetUrl(imagem, "profilepictures", usuario.getId() + "." + FileUtils.getSufix(imagem));
+		String urlImagem = usuario.getUrlFotoPerfil();
+		if(imagem != null){
+			 urlImagem = imagemService.saveImageAndGetUrl(imagem, "profilepictures", usuario.getId() + "." + FileUtils.getSufix(imagem));
+		}else if(removerImagemDePerfil){
+			urlImagem = "default";
+		}
 		BeanUtils.copyProperties(usuarioDTO, usuario);
 		usuario.setUrlFotoPerfil(urlImagem);
 		usuario.setAtivo(true);
@@ -169,8 +175,14 @@ public class UsuarioServiceImpl implements UsuarioService {
 
 	@Override
 	public void enviarSolicitacaoParaIngressarBanda(Long idBanda, String instrumento) {
+		Banda banda = bandaService.buscarPorId(idBanda);
+
+		if(banda == null)
+			throw new InternalException("Banda não encontrada");
+
+
 		notificacaoService.enviarNotificacao(new SolicitacaoIngressarBandaEvent(
-				Context.getUsuarioLogado(), idBanda, instrumento
+				Context.getUsuarioLogado(), banda, instrumento
 		));
 	}
 

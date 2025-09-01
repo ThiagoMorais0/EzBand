@@ -1,5 +1,6 @@
 package com.baseapplication.core.service.impl;
 
+import com.baseapplication.core.dao.BandaDao;
 import com.baseapplication.core.dao.NotificacaoDao;
 import com.baseapplication.core.dao.RespostaNotificacaoDao;
 import com.baseapplication.core.dao.UsuarioDao;
@@ -11,6 +12,7 @@ import com.baseapplication.core.factory.RespostaNotificacaoFactory;
 import com.baseapplication.core.model.*;
 import com.baseapplication.core.model.dto.RespostaNotificacaoDTO;
 import com.baseapplication.core.model.notificacao.SolicitacaoAgendarEnsaio;
+import com.baseapplication.core.model.notificacao.SolicitacaoParaIngressarBanda;
 import com.baseapplication.core.model.superClasses.Notificacao;
 import com.baseapplication.core.service.*;
 import jakarta.transaction.Transactional;
@@ -33,6 +35,8 @@ public class NotificacaoServiceImpl implements NotificacaoService {
     private final ApplicationEventPublisher applicationEventPublisher;
     private final UsuarioDao usuarioDao;
     private final EventoHelperService eventoHelperService;
+    private final MusicoBandaService musicoBandaService;
+    private final BandaDao bandaDao;
     private final Map<String, Sinks.Many<NotificacaoDTO>> sinks = new ConcurrentHashMap<>();
 
     @Override
@@ -95,7 +99,7 @@ public class NotificacaoServiceImpl implements NotificacaoService {
                                 i.getRemetenteTipo().name(),
                                 i.isLida(),
                                 i.getUrlImagem(),
-                                i.getTitulo(), i.getTipoNotificacao()))
+                                i.getTitulo(), i.getTipoNotificacao(), i.isPermiteResposta()))
                         .toList()
         );
 
@@ -143,12 +147,19 @@ public class NotificacaoServiceImpl implements NotificacaoService {
                     notificacao.isLida(),
                     notificacao.getUrlImagem(),
                     notificacao.getTitulo(),
-                    notificacao.getTipoNotificacao()
+                    notificacao.getTipoNotificacao(),
+                    notificacao.isPermiteResposta()
             ));
         }
     }
 
-    @Transactional
+    @Override
+    public void lerNotificacao(Long id) {
+        Notificacao notificacao = notificacaoDao.findById(id).orElseThrow();
+        notificacao.setLida(true);
+        salvarNotificacao(notificacao);
+    }
+
     private void criarEEnviarNotificacaoResposta(Long idNotificacao, RespostaNotificacaoDTO respostaDTO) {
         Notificacao notificacao = notificacaoDao.findById(idNotificacao)
                 .orElseThrow(() -> new RuntimeException("Notificação não encontrada"));
@@ -162,12 +173,30 @@ public class NotificacaoServiceImpl implements NotificacaoService {
         enviarNotificacao(new RespostaSolicitacaoAgendarEnsaioEvent(notificacaoResposta));
     }
 
+/* <<<<<<<<<<<<<<  ✨ Windsurf Command ⭐ >>>>>>>>>>>>>>>> */
+    /**
+     * Executa a ação definida pela resposta da notificação.
+     *
+     * @param notificacao notificação que gerou a resposta
+     * @param acao ação a ser executada
+     */
+/* <<<<<<<<<<  3ff63d7c-6af9-4e73-8126-03051a58a770  >>>>>>>>>>> */
     private void executarAcao(Notificacao notificacao, AcaoResposta acao) {
         switch (notificacao.getTipoNotificacao()){
             case "SOLICITACAO_PARA_AGENDAR_ENSAIO":
                 SolicitacaoAgendarEnsaio solicitacao = (SolicitacaoAgendarEnsaio) notificacao;
                 eventoHelperService.alterarStatus(solicitacao.getIdEnsaio(), TipoEvento.ENSAIO, acao.equals(AcaoResposta.ACEITAR) ? StatusEvento.PENDENTE : StatusEvento.CANCELADO);
                 return;
+            case "SOLICITACAO_PARA_INGRESSAR_BANDA":
+                SolicitacaoParaIngressarBanda solicitacaoBanda = (SolicitacaoParaIngressarBanda) notificacao;
+                if(acao.equals(AcaoResposta.ACEITAR)){
+                    musicoBandaService.cadastrarUsuarioEmBanda(
+                            usuarioDao.findById(solicitacaoBanda.getRemetenteId()).orElseThrow(),
+                            bandaDao.findById(solicitacaoBanda.getDestinatarioId()).orElseThrow(),
+                            solicitacaoBanda.getInstrumento(),
+                            List.of(PermissaoMusico.MEMBRO_REGULAR)
+                    );
+                }
             default:
                 return;
         }
