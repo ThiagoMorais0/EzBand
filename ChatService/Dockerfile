@@ -17,4 +17,4 @@ COPY . .
 EXPOSE 3001
 
 # Comando para iniciar a aplicação
-CMD ["node", "src/index.js"]
+CMD ["node", "src/ws/wsServer.js"]

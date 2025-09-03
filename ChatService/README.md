@@ -1,103 +1,137 @@
-# 📄 Documentação do Serviço WebSocket – Chat 1x1
+    # 📡 Documentação do WebSocket - Chat 1x1
 
-## 🔹 Visão Geral
-
-Este serviço permite comunicação **1x1 entre usuários** via WebSocket. Ele utiliza **Node.js**, **Socket.IO** e **MongoDB** para persistência das mensagens.
-
-* Cada usuário possui um **id** e um **tipo** (ex: `user`).
-* As mensagens são salvas no MongoDB com informações do remetente (`sender`), destinatário (`receiver`) e o texto (`text`).
-* Conexões simultâneas do mesmo usuário derrubam sessões antigas.
+Este serviço implementa um **servidor WebSocket** para comunicação em tempo real **1x1** (usuário para usuário).  
+Todas as mensagens trocadas são persistidas no MongoDB.
 
 ---
 
-## 🛠 Estrutura de Código
+## 🔑 Autenticação
 
-### socketService.js
+A autenticação é feita via **token JWT**, enviado na URL de conexão do WebSocket.  
+Além do token, é necessário passar também o identificador lógico (`tipoId`) do cliente.
 
-| Função                       | Descrição                                                                                                                                                                                                           |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `registerUser(socket, user)` | Registra um usuário conectado e armazena seu socket em memória (`connectedUsers`). Se já existir uma conexão do mesmo usuário, a sessão antiga é desconectada. Remove o usuário do `connectedUsers` ao desconectar. |
-| `sendMessage(message)`       | Salva a mensagem no MongoDB e envia para o destinatário conectado, se existir.                                                                                                                                      |
+### Exemplo de URL de conexão:
+`ws://localhost:3001/?token=SEU_JWT_AQUI&tipoId=user:1` _OBS: quando estiver containerizado, não é localhost_
 
-**Exemplo de uso:**
+- `token` → JWT válido, gerado pelo seu back-end.  
+- `tipoId` → Identificador único do cliente (ex: `user:1`, `banda:2`).  
 
-```js
-registerUser(socket, { id: '1', type: 'user' });
-
-sendMessage({
-  sender: { id: '1', type: 'user' },
-  receiver: { id: '2', type: 'user' },
-  text: 'Olá!'
-});
-```
-
-### Message.js
-
-Schema do MongoDB:
-
-```js
-const userRefSchema = new mongoose.Schema({
-  id: { type: String, required: true },
-  type: { type: String, required: true },
-}, { _id: false });
-
-const messageSchema = new mongoose.Schema({
-  sender: { type: userRefSchema, required: true },
-  receiver: { type: userRefSchema, required: true },
-  text: { type: String, required: true },
-  createdAt: { type: Date, default: Date.now }
-});
-```
-
-* `sender` e `receiver` são **subdocumentos** com `id` e `type`.
-* `text` é a mensagem enviada.
-* `createdAt` é preenchido automaticamente com a data/hora da criação.
+Se o token for inválido ou ausente, a conexão será fechada.
 
 ---
 
-## 🌐 Eventos do WebSocket
+## 🔌 Conexão
 
-| Evento           | Payload                                                                                                  | Descrição                            | Resposta                             |
-| ---------------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------ | ------------------------------------ |
-| `register`       | `{ "id": "1", "type": "user" }`                                                                          | Registra o usuário conectado.        | —                                    |
-| `sendMessage`    | `{ "sender": { "id": "1", "type": "user" }, "receiver": { "id": "2", "type": "user" }, "text": "Olá!" }` | Envia uma mensagem e salva no banco. | `receiveMessage` para o destinatário |
-| `receiveMessage` | `{ "sender": { "id": "1", "type": "user" }, "receiver": { "id": "2", "type": "user" }, "text": "Olá!" }` | Mensagem recebida pelo destinatário. | —                                    |
+Exemplo em JavaScript:
 
-**Exemplo de envio:**
-
-```js
-socket.emit('sendMessage', {
-  sender: { id: '1', type: 'user' },
-  receiver: { id: '2', type: 'user' },
-  text: 'Olá!'
-});
 ```
+const token = "SEU_JWT_AQUI";
+const tipoId = "user:1";
 
-**Exemplo de recepção:**
+const socket = new WebSocket(`ws://localhost:3001/?token=${token}&tipoId=${tipoId}`); _OBS: quando estiver containerizado, não é localhost_
 
-```js
-socket.on('receiveMessage', (msg) => {
-  console.log(`Mensagem de ${msg.sender.type}:${msg.sender.id} -> ${msg.text}`);
-});
+socket.onopen = () => {
+  console.log("Conectado ao servidor!");
+};
+
+socket.onclose = () => {
+  console.log("Conexão encerrada.");
+};
+
+socket.onerror = (err) => {
+  console.error("Erro:", err);
+};
 ```
 
 ---
 
-## 💡 Observações importantes
+## 📤 Envio de mensagens
 
-1. O serviço mantém **todos os usuários conectados em memória** (Map) para enviar mensagens em tempo real.
-2. Se o destinatário não estiver online, a mensagem é salva, mas **não será emitida** até que ele se conecte.
-3. MongoDB deve estar configurado corretamente com usuário e senha:
+As mensagens são enviadas em formato JSON com o seguinte esquema:
 
-```js
-const uri = `mongodb://root:example@mongo:27017/chat?authSource=admin`;
+```
+{
+  "type": "message",
+  "from": "user:1",
+  "to": "user:2",
+  "msg": "Olá, tudo bem?"
+}
 ```
 
-4. Para múltiplos containers, use o **nome do serviço MongoDB** (`mongo`) em vez do IP.
-5. Campos obrigatórios: `sender.id`, `sender.type`, `receiver.id`, `receiver.type`, `text`.
+- `type` → Sempre `"message"` para envio de mensagens.  
+- `from` → Identificador do remetente (`tipoId`).  
+- `to` → Identificador do destinatário (`tipoId`).  
+- `msg` → Texto da mensagem.  
+
+Exemplo em JavaScript:
+
+```
+socket.send(JSON.stringify({
+  type: "message",
+  from: "user:1",
+  to: "user:2",
+  msg: "Olá, tudo bem?"
+}));
+```
 
 ---
 
-## ⚡ Sugestão
+## 📥 Recebimento de mensagens
 
-Você pode gerar documentação interativa utilizando **AsyncAPI** se quiser compartilhar com outros desenvolvedores ou equipes.
+As mensagens recebidas também chegam em formato JSON.
+
+### Estrutura de mensagem recebida:
+```
+{
+  "from": "user:2",
+  "message": "Oi! Estou bem, e você?"
+}
+```
+
+### Estrutura de mensagem do sistema:
+```
+{
+  "system": "Usuário user:2 não está online"
+}
+```
+
+Exemplo em JavaScript:
+
+```
+socket.onmessage = (event) => {
+  const data = JSON.parse(event.data);
+
+  if (data.system) {
+    console.log("[SISTEMA]", data.system);
+  } else {
+    console.log(`${data.from}: ${data.message}`);
+  }
+};
+```
+
+---
+
+## 💾 Persistência
+
+Todas as mensagens trocadas são salvas no MongoDB na coleção `messages`, com a seguinte estrutura:
+
+```
+{
+  from: String,      // Remetente
+  to: String,        // Destinatário
+  msg: String,       // Texto da mensagem
+  createdAt: Date    // Data/hora do envio
+}
+```
+
+---
+
+## ✅ Fluxo resumido
+
+1. Cliente conecta via WebSocket com `token` e `tipoId`.  
+2. Servidor valida o JWT.  
+3. Cliente pode enviar mensagens para outros `tipoId`.  
+4. Mensagens são:
+   - Salvas no MongoDB.  
+   - Encaminhadas em tempo real ao destinatário (se online).  
+   - Caso o destinatário esteja offline, remetente recebe notificação do sistema.  
