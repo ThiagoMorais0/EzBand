@@ -3,6 +3,13 @@ set -e
 
 echo ">> Iniciando container de backup"
 
+# Espera MinIO prod subir
+echo '>> Esperando MinIO prod...'
+until curl -s http://minio:9000/minio/health/live > /dev/null; do
+  echo '>> MinIO prod ainda não disponível, aguardando...'
+  sleep 5
+done
+
 # Espera MinIO backup subir
 echo '>> Esperando MinIO backup...'
 until curl -s http://minio-backup:9000/minio/health/live > /dev/null; do
@@ -14,6 +21,11 @@ done
 echo '>> Configurando Aliases MC...'
 mc alias set prod http://minio:9000 ${MINIO_ADMIN_USER} ${MINIO_ADMIN_PASSWORD}
 mc alias set backup http://minio-backup:9000 ${MINIO_BACKUP_USER} ${MINIO_BACKUP_PASSWORD}
+echo ">> Aliases configurados:"
+mc alias list
+
+mc mb --ignore-existing backup/backups
+mc mb --ignore-existing backup/app-buckets
 
 # Diretórios temporários
 mkdir -p /backup/postgres /backup/mongo /backup/logs
@@ -38,7 +50,12 @@ while true; do
   mc cp /backup/logs/logs_$(date +%F).tar.gz backup/backups/logs/
 
   # --- MinIO mirror ---
-  mc -v mirror --overwrite prod/bandlogos backup/app-bucket/bandlogos
+  # Espelhando buckets necessários
+  readarray -t bucket_array <<< "$(mc ls prod | awk '{print $NF}' | sed 's:/$::')"
+  for bucket in "${bucket_array[@]}"; do
+    echo "Bucket encontrado: $bucket"
+    mc mirror --overwrite prod/$bucket backup/app-buckets/$bucket
+  done
 
   echo ">> Backup concluído. Próxima execução em 24h."
   sleep 86400

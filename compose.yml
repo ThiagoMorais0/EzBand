@@ -38,7 +38,7 @@ services:
       - "9000:9000"   # API S3
       - "9090:9090"   # Console web
     volumes:
-      - ~/minio/data:/data
+      - minio_data:/data
     env_file: .env
     networks:
       - ezband_app_network
@@ -54,7 +54,7 @@ services:
       - "9100:9000"   # API S3 do backup
       - "9190:9090"   # Console web do backup
     volumes:
-      - ~/minio-backup/data:/data
+      - minio_backup:/data
     env_file: .env
     networks:
       - ezband_app_network
@@ -124,6 +124,8 @@ volumes:
   postgres_data_dev:
   app_logs_dev:
   mongo-data:
+  minio_data:
+  minio_backup:
 
 networks:
   ezband_app_network:
