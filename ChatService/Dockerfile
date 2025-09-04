@@ -1,5 +1,5 @@
 # Usar Node.js LTS
-FROM node:latest
+FROM node:iron-alpine3.21
 
 # Definir diretório de trabalho
 WORKDIR /app
