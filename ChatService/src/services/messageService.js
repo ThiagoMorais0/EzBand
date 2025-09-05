@@ -1,18 +1,18 @@
 const Message = require('../models/Message');
+const { getClientData } = require('../services/clientsService')
 
 const saveMessage = async (data) => {
     const newMsg = new Message(data);
     await newMsg.save();
 };
 
-const sendMessage = async (data) => {
+const sendMessage = async (fromWs, data) => {
     const targetClient = getClientData(data.to);
 
     if (targetClient) {
-        targetClient.ws.send(JSON.stringify({
+        targetClient.send(JSON.stringify({
             from: data.from,
-            msg: data.msg,
-            read: isChatOpen
+            msg: data.msg
         }));
     } else {
         fromWs.send(JSON.stringify({

@@ -36,7 +36,7 @@ wss.on("connection", async (ws, req) => {
                     let msg = data;
                     msg.from = ws.key;
                     await saveMessage(msg);
-                    await sendMessage(msg); 
+                    await sendMessage(ws, msg); 
                 }
 
                 // Solicitação de mais chats

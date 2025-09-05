@@ -10,8 +10,12 @@ const removeClient = (key) => {
     clients.delete(key);
 };
 
+const getClientData = (key) => {
+    return clients.get(key)
+}
 
 module.exports = {
     addClient,
-    removeClient
+    removeClient,
+    getClientData
 };
