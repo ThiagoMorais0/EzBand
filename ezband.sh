@@ -45,22 +45,27 @@ fi
 # ----------------------
 # Função para criar .env temporário seguro
 # ----------------------
-create_env() {
+authenticate_create_env() {
+    local createTemp=$1   # parâmetro booleano (true/false)
+
     if [ ! -f ".env.gpg" ]; then
         echo "Arquivo .env.gpg não encontrado!"
         exit 1
     fi
 
-    echo "Digite a senha do GPG para descriptografar o .env:"
+    echo "Digite a senha do GPG para continuar:"
     read -s GPG_PASSPHRASE
     echo
 
-    # Descriptografa para arquivo temporário seguro
-    gpg --batch --yes --passphrase "$GPG_PASSPHRASE" -d .env.gpg > "$TEMP_ENV"
-    chmod 600 "$TEMP_ENV"
+    if [ "$createTemp" = "true" ]; then
 
-    # Garante que o arquivo seja apagado ao sair
-    trap 'rm -f "$TEMP_ENV"' EXIT
+        # Descriptografa para arquivo temporário seguro
+        gpg --batch --yes --passphrase "$GPG_PASSPHRASE" -d .env.gpg > "$TEMP_ENV"
+        chmod 600 "$TEMP_ENV"
+
+        # Garante que o arquivo seja apagado ao sair
+        trap 'rm -f "$TEMP_ENV"' EXIT
+    fi
 }
 
 # ----------------------
@@ -68,6 +73,7 @@ create_env() {
 # ----------------------
 case "$COMMAND" in
     build)
+        authenticate_create_env false
         if [[ ${#SERVICES[@]} -eq 0 ]]; then
             # Nenhum serviço passado → sobe todos
             docker compose build 
@@ -76,7 +82,7 @@ case "$COMMAND" in
         fi
         ;;
     start)
-        create_env
+        authenticate_create_env true
         if [[ ${#SERVICES[@]} -eq 0 ]]; then
             # Nenhum serviço passado → sobe todos
             docker compose --env-file "$TEMP_ENV" up -d
@@ -85,6 +91,7 @@ case "$COMMAND" in
         fi
         ;;
     stop)
+        authenticate_create_env false
         if [[ ${#SERVICES[@]} -eq 0 ]]; then
             docker compose down
         else
@@ -92,7 +99,7 @@ case "$COMMAND" in
         fi
         ;;
     restart)
-        create_env
+        authenticate_create_env true
         if [[ ${#SERVICES[@]} -eq 0 ]]; then
             docker compose --env-file "$TEMP_ENV" up -d --build
         else
