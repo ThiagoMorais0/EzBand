@@ -2,7 +2,7 @@ const { WebSocketServer } = require("ws");
 const { verifyToken } = require('../config/jwt');
 const connectDB = require('../config/db');
 const { addClient, removeClient } = require('../services/clientsService');
-const { saveMessage, sendMessage } = require('../services/messageService');
+const { saveMessage, sendMessage, getUserChats, getChatMessages } = require('../services/messageService');
 
 const wss = new WebSocketServer({ port: 3001 });
 
@@ -24,10 +24,36 @@ wss.on("connection", async (ws, req) => {
         addClient(tipoIdConectado, ws);
         console.log(`Usuário conectado: ${tipoIdConectado}`);
 
+        const chats = await getUserChats(ws.key);
+        ws.send(JSON.stringify({ type: 'chats', data: chats }));
+
         ws.on("message", async (msg) => {
             try {
                 const data = JSON.parse(msg);
                 console.log(data);
+
+                // Solicitação de mais chats
+                if (data.type === "getChats") {
+                    const page = data.page || 1;
+                    const chats = await getUserChats(ws.key, page, 10);
+                    ws.send(JSON.stringify({ type: "chats", data: chats }));
+                    return;
+                }
+
+                if (data.type === "chatOpened") {
+                    setCurrentChat(ws.key, data.userB);
+                    return;
+                }
+
+                // Busca as mensagens do chat
+                if (data.type === "getChatMessages") {
+                    const { userB, page = 1 } = data;
+
+                    const messages = await getChatMessages(ws.key, userB, page)
+
+                    ws.send(JSON.stringify({ type: "chatMessages", data: messages }));
+                    return;
+                }
 
                 await saveMessage(data);
 

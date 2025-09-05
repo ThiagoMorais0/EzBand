@@ -23,6 +23,7 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_DB_DATABASE: ${MONGO_DB_DATABASE}
     volumes:
       - mongo-data:/data/db
     networks:
@@ -55,6 +56,9 @@ services:
       PORT: 3001
       MONGO_URI: mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017/chat?authSource=admin
       JWT_SECRET: ${JWT_SECRET}
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_DB_DATABASE: ${MONGO_DB_DATABASE}
     depends_on:
       - mongodb
     networks:

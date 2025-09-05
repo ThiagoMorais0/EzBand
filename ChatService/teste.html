@@ -43,6 +43,17 @@
             color: gray;
             font-style: italic;
         }
+
+        .chat-summary {
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .chat-btn {
+            margin-left: 10px;
+            cursor: pointer;
+        }
     </style>
 </head>
 
@@ -51,77 +62,131 @@
 
     <label>Token JWT:</label>
     <input id="token" type="text" placeholder="Cole seu JWT aqui" />
-
     <label>tipoID:</label>
     <input id="tipoId" type="text" placeholder="tipo ID remetente" />
-
     <button onclick="connect()">Conectar</button>
+
+    <h3>Chats disponíveis</h3>
+    <div id="chatList"></div>
 
     <h3>Mensagens</h3>
     <div id="messages"></div>
+    <button id="loadMoreBtn" style="display:none;">Carregar mais chats</button>
+    <button id="loadMoreMsgsBtn" style="display:none;">Carregar mais mensagens</button>
 
     <h3>Enviar mensagem</h3>
-    <label>Destinatário (ex: user:2, banda:1):</label>
-    <input id="to" type="text" placeholder="tipo:id" />
-
     <label>Mensagem:</label>
     <textarea id="msg"></textarea>
     <button onclick="sendMessage()">Enviar</button>
 
     <script>
         let socket;
+        let userId = "";
+        let currentPage = 1;
+        let currentChat = null;
+        let chatPage = 1;
+
+        document.getElementById("loadMoreBtn").onclick = () => {
+            if (!socket || socket.readyState !== WebSocket.OPEN) return;
+            currentPage++;
+            socket.send(JSON.stringify({ type: "getChats", page: currentPage }));
+        };
+
+        document.getElementById("loadMoreMsgsBtn").onclick = () => {
+            if (!socket || socket.readyState !== WebSocket.OPEN || !currentChat) return;
+            chatPage++;
+            socket.send(JSON.stringify({
+                type: "getChatMessages",
+                userB: currentChat,
+                page: chatPage
+            }));
+        };
 
         function connect() {
+            userId = document.getElementById("tipoId").value.trim();
             const token = document.getElementById("token").value.trim();
-            const tipoId = document.getElementById("tipoId").value.trim();
-            if (!token) {
-                alert("Insira um token JWT válido!");
-                return;
-            }
+            if (!token) { alert("Insira um token JWT válido!"); return; }
 
-            socket = new WebSocket(`ws://localhost:3001/?token=${token}&tipoId=${tipoId}`);
+            socket = new WebSocket(`ws://localhost:3001/?token=${token}&tipoId=${userId}`);
 
             socket.onopen = () => {
                 addMessage("Conectado ao servidor!", "system");
+                document.getElementById("loadMoreBtn").style.display = "block";
             };
 
             socket.onmessage = (event) => {
                 const data = JSON.parse(event.data);
-                if (data.system) {
-                    addMessage(data.system, "system");
-                } else {
-                    const who = data.from || "desconhecido";
-                    addMessage(`${who}: ${data.msg}`, who === "me" ? "me" : "other");
+
+                if (data.system) { addMessage(data.system, "system"); return; }
+
+                // Lista de chats
+                if (data.type === "chats" && Array.isArray(data.data)) {
+                    const chatListDiv = document.getElementById("chatList");
+
+                    // Só limpa se for a primeira página
+                    if (currentPage === 1) chatListDiv.innerHTML = "";
+
+                    data.data.forEach(chat => {
+                        const otherUser = chat.userA === userId ? chat.userB : chat.userA;
+                        const readStatus = chat.lastMessage.read ? "✅" : "📩";
+                        const div = document.createElement("div");
+                        div.className = "chat-summary";
+                        div.innerHTML = `${otherUser}: ${chat.lastMessage.content} (${readStatus}) 
+                         <button class="chat-btn" onclick="selectChat('${otherUser}')">Abrir</button>`;
+                        chatListDiv.appendChild(div);
+                    });
+                    return;
+                }
+
+                // Mensagens de chat
+                if (data.type === "chatMessages" && Array.isArray(data.data)) {
+                    const msgs = data.data.slice().reverse(); // do mais antigo para o mais recente
+                    msgs.forEach(msg => {
+                        const cls = msg.from === userId ? "me" : "other";
+                        addMessage(`${msg.from}: ${msg.msg}`, cls);
+                    });
+                    document.getElementById("loadMoreMsgsBtn").style.display = "block";
+                    return;
+                }
+
+                // Mensagem enviada em tempo real
+                // Mensagem recebida em tempo real
+                if (data.type === "message") {
+                    // Se o chat estiver aberto com o remetente, mostra na tela
+                    if (currentChat && (data.from === currentChat || data.to === currentChat)) {
+                        const cls = data.from === userId ? "me" : "other";
+                        addMessage(`${data.from}: ${data.msg}`, cls);
+                    }
+                    // Opcional: atualizar resumo de chats (última mensagem)
+                    updateChatSummary(data);
                 }
             };
 
-            socket.onclose = () => {
-                addMessage("Conexão fechada.", "system");
-            };
+            socket.onclose = () => { addMessage("Conexão fechada.", "system"); };
+            socket.onerror = (err) => { addMessage("Erro na conexão: " + err.message, "system"); };
+        }
 
-            socket.onerror = (err) => {
-                addMessage("Erro na conexão: " + err.message, "system");
-            };
+        function selectChat(otherUser) {
+            currentChat = otherUser;
+            chatPage = 1;
+            document.getElementById("messages").innerHTML = "";
+            socket.send(JSON.stringify({
+                type: "getChatMessages",
+                userB: otherUser,
+                page: chatPage
+            }));
         }
 
         function sendMessage() {
-
-            if (!socket || socket.readyState !== WebSocket.OPEN) {
-                alert("Conecte-se primeiro!");
+            if (!socket || socket.readyState !== WebSocket.OPEN || !currentChat) {
+                alert("Conecte-se primeiro e selecione um chat!");
                 return;
             }
-
-            const from = document.getElementById("tipoId").value.trim();
-            const to = document.getElementById("to").value.trim();
             const msg = document.getElementById("msg").value.trim();
+            if (!msg) { alert("Digite a mensagem!"); return; }
 
-            if (!to || !msg) {
-                alert("Preencha destinatário e mensagem!");
-                return;
-            }
-
-            socket.send(JSON.stringify({ type: "message", from, to, msg }));
-            addMessage(`Você -> ${to}: ${msg}`, "me");
+            socket.send(JSON.stringify({ type: "message", from: userId, to: currentChat, msg }));
+            addMessage(`Você -> ${currentChat}: ${msg}`, "me");
             document.getElementById("msg").value = "";
         }
 
