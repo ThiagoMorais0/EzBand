@@ -1,18 +1,18 @@
 const Message = require('../models/Message');
-const { getClient } = require('./clientsService');
 
 const saveMessage = async (data) => {
     const newMsg = new Message(data);
     await newMsg.save();
 };
 
-const sendMessage = (fromWs, data) => {
-    const target = getClient(data.to);
+const sendMessage = async (data) => {
+    const targetClient = getClientData(data.to);
 
-    if (target) {
-        target.send(JSON.stringify({
-            from: fromWs.key,
+    if (targetClient) {
+        targetClient.ws.send(JSON.stringify({
+            from: data.from,
             msg: data.msg,
+            read: isChatOpen
         }));
     } else {
         fromWs.send(JSON.stringify({
@@ -22,8 +22,6 @@ const sendMessage = (fromWs, data) => {
 };
 
 const getUserChats = async (userId, page = 1, pageSize = 10) => {
-    console.log("userId: " + userId);
-
     const skip = (page - 1) * pageSize;
 
     const chats = await Message.aggregate([
@@ -81,15 +79,15 @@ const getChatMessages = async (userA, userB, page = 1) => {
         .limit(pageSize)
         .lean();
 
-    // Marcar como lidas as mensagens enviadas para o usuário conectado
-    await Message.updateMany(
-        { to: userA, from: userB, read: false },
-        { $set: { read: true } }
-    );
 
     return messages;
+};
+
+const readChat = async (userA, userB) => {
+    await Message.updateMany(
+        { from: userB, to: userA, read: false },
+        { $set: { read: true } }
+    );
 }
 
-
-
-module.exports = { saveMessage, sendMessage, getUserChats, getChatMessages };
+module.exports = { saveMessage, sendMessage, getUserChats, getChatMessages, readChat };
