@@ -1,8 +1,8 @@
 services:
   # BANCOS DE DADOS
-  db:
+  db_postgres:
     image: postgres
-    container_name: ezband_db_dev
+    container_name: db_postgres
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -10,13 +10,13 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data_dev:/var/lib/postgresql/data
+      - db_postgres_data:/var/lib/postgresql/data
     networks:
       - ezband_app_network
   
-  mongodb:
+  db_mongo:
     image: mongo
-    container_name: chat-mongo
+    container_name: db_mongo
     restart: unless-stopped
     ports:
       - "27017:27017"
@@ -25,7 +25,7 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
       MONGO_DB_DATABASE: ${MONGO_DB_DATABASE}
     volumes:
-      - mongo-data:/data/db
+      - db_mongo_data:/data/db
     networks:
       - ezband_app_network
 
@@ -54,13 +54,13 @@ services:
       - "3001:3001"
     environment:
       PORT: 3001
-      MONGO_URI: mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017/chat?authSource=admin
+      MONGO_URI: db_mongo://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@db_mongo:27017/chat?authSource=admin
       JWT_SECRET: ${JWT_SECRET}
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
       MONGO_DB_DATABASE: ${MONGO_DB_DATABASE}
     depends_on:
-      - mongodb
+      - db_mongo
     networks:
       - ezband_app_network
 
@@ -70,9 +70,9 @@ services:
     build: 
       context: ./EzBand-Backend
       dockerfile: Dockerfile
-    container_name: ezband_backend_dev
+    container_name: api
     depends_on:
-      - db
+      - db_postgres
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -83,20 +83,20 @@ services:
     networks:
       - ezband_app_network
     volumes:
-      - app_logs_dev:/app/logs
+      - app_logs:/app/logs
 
   # BACKUP 
   backup:
     build: ./BackupService
-    container_name: ezband_backup
+    container_name: backup
     depends_on:
-      - db
-      - mongodb
+      - db_postgres
+      - db_mongo
       - minio
     volumes:
-      - postgres_data_dev:/data/postgres:ro
-      - mongo-data:/data/mongo:ro
-      - app_logs_dev:/data/logs:ro
+      - db_postgres_data:/data/postgres:ro
+      - db_mongo_data:/data/mongo:ro
+      - app_logs:/data/logs:ro
       - ./backup-temp:/backup
     environment:
       MINIO_ADMIN_USER: ${MINIO_ADMIN_USER}
@@ -112,9 +112,9 @@ services:
 
 
 volumes:
-  postgres_data_dev:
-  app_logs_dev:
-  mongo-data:
+  db_postgres_data:
+  app_logs:
+  db_mongo_data:
   minio_data:
 
 networks:

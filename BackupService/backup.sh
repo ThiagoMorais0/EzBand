@@ -35,11 +35,11 @@ echo ">> Iniciando backup: $(date)"
 find /backup/postgres /backup/mongo /backup/logs -type f -mtime +7 -delete
 
 # --- PostgreSQL dump ---
-pg_dump -h db -U $POSTGRES_USER -d $POSTGRES_DB | gzip > /backup/postgres/postgres_$(date +%F).sql.gz
+pg_dump -h db_postgres -U $POSTGRES_USER -d $POSTGRES_DB | gzip > /backup/postgres/postgres_$(date +%F).sql.gz
 mc cp /backup/postgres/postgres_$(date +%F).sql.gz prod/backups/postgres/
 
 # --- MongoDB dump ---
-mongodump --uri="mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017/${MONGO_DB_DATABASE}?authSource=admin" \
+mongodump --uri="mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@db_mongo:27017/${MONGO_DB_DATABASE}?authSource=admin" \
 --archive=/backup/mongo/mongo_$(date +%F).gz --gzip
 mc cp /backup/mongo/mongo_$(date +%F).gz prod/backups/mongo/
 
