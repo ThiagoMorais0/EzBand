@@ -9,6 +9,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.baseapplication.core.enums.StatusNotificacao;
+import com.baseapplication.core.enums.TipoEvento;
+import com.baseapplication.core.model.notificacao.ConviteParaEvento;
 import com.baseapplication.core.model.superClasses.Notificacao;
 
 @Repository
@@ -18,15 +20,7 @@ public interface NotificacaoDao extends JpaRepository<Notificacao, Long> {
     List<Notificacao> buscarNaoLidas(@Param("destinatarioId") Long destinatarioId,
                                      @Param("destinatarioTipo") TipoParticipante destinatarioTipo);
 
-//    @Query("SELECT n FROM Notificacao n " +
-//            "WHERE n.destinatario.id = :idUsuario and n.statusNotificacao = :status")
-//    List<Notificacao> buscarNotificacoesPorUsuario(Long idUsuario, StatusNotificacao status);
-//
-//    @Query("SELECT n FROM Notificacao n " +
-//            "INNER JOIN NotificacaoShow ns on ns.show.id = :idShow")
-//    List<Notificacao> buscarNotificacoesShowMembros(Long idShow);
-//
-//    @Query("SELECT n FROM Notificacao n " +
-//            "INNER JOIN NotificacaoEnsaio ne on ne.ensaio.id = :idEnsaio")
-//    List<Notificacao> buscarNotificacoesEnsaioMembros(Long idEnsaio);
+    @Query("SELECT c FROM ConviteParaEvento c WHERE c.idEventoConvite = :idEvento AND c.tipoEventoConvite = :tipoEvento")
+    List<ConviteParaEvento> buscarConvitesParaEvento(@Param("idEvento") Long idEvento,
+                                                     @Param("tipoEvento") TipoEvento tipoEvento);
 }

@@ -2,7 +2,6 @@ package com.baseapplication.core.controller;
 
 import java.util.List;
 
-import com.baseapplication.core.model.dto.EnsaioDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +17,6 @@ import org.springframework.web.multipart.MultipartFile;
 import com.baseapplication.core.dto.ConviteEventoDTO;
 import com.baseapplication.core.dto.EnsaiosFuturosDTO;
 import com.baseapplication.core.dto.InfoMembroBandaDTO;
-import com.baseapplication.core.dto.MusicaDTO;
 import com.baseapplication.core.dto.RepertorioBandaDTO;
 import com.baseapplication.core.dto.ShowsFuturosDTO;
 import com.baseapplication.core.model.dto.BandaDTO;
@@ -146,7 +144,7 @@ public class BandaController {
 
 
     @GetMapping("/buscarRepertorio")
-    public List<MusicaDTO> buscarRepertorio(@RequestParam Long idBanda) {
+    public List<RepertorioBandaDTO> buscarRepertorio(@RequestParam Long idBanda) {
         return bandaService.buscarRepertorio(idBanda);
     }
 
@@ -154,6 +152,18 @@ public class BandaController {
     public void adicionarMusicaAoRepertorio(@RequestBody RepertorioBandaDTO repertorioBandaDTO) {
         bandaService.adicionarMusicaAoRepertorio(repertorioBandaDTO);
     }
+
+    @PostMapping("/atualizarMusicaRepertorio")
+    public ResponseEntity<?> atualizarMusicaRertorio(@RequestBody RepertorioBandaDTO repertorioBandaDTO) {
+        try{
+            bandaService.atualizarMusicaRertorio(repertorioBandaDTO);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+
 
     @PostMapping("/editarBanda")
     public void editarBanda(@RequestParam("banda") String bandaJson, MultipartFile logo) {
@@ -165,6 +175,16 @@ public class BandaController {
             @RequestParam Long idBanda,
             @RequestParam Long idUsuarioConvidado){
         bandaService.enviarConviteParaUsuarioIngressarBanda(idBanda, idUsuarioConvidado);
+    }
+
+    @PostMapping("/alterarPermissaoMembro")
+    public ResponseEntity<?> alterarPermissaoMembro(@RequestBody EditarMembroMusicoBandaDTO permissaoMusicoDTO){
+        try{
+            bandaService.alterarPermissaoMembro(permissaoMusicoDTO);
+            return ResponseEntity.ok("Salvo com sucesso");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
 

@@ -25,4 +25,6 @@ public class Musica {
     private Time duracao;
     @Enumerated(EnumType.STRING)
     private Tonalidade tonalidade;
+    private String urlYoutube;
+    private String urlSpotify;
 }

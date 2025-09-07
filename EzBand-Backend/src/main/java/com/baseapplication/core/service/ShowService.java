@@ -13,7 +13,7 @@ public interface ShowService {
 
     List<Show> buscarPendentesPorUsuarioOrdenadoPorData(Long idUsuario);
 
-    void salvar(Show show);
+    Show salvar(Show show);
 
     List<RepertorioEvento> buscarRepertorio(Long idEvento);
 
@@ -27,4 +27,6 @@ public interface ShowService {
     void alterarStatus(Long idShow, StatusEvento novoStatus);
 
     List<Show> buscarComDataAnteriorAHoje();
+
+    void adicionarMusicoAoShow(Long idEvento, Long idUsuarioConvidado);
 }

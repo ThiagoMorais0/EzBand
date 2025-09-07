@@ -4,4 +4,6 @@ import com.baseapplication.core.model.RepertorioBanda;
 
 public interface RepertorioBandaService {
     void salvar(RepertorioBanda repertorioBanda);
+
+    RepertorioBanda buscarPorId(Long id);
 }

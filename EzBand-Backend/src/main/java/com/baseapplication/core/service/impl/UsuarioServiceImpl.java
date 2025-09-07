@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
+import com.baseapplication.core.dto.*;
 import com.baseapplication.core.event.events.SolicitacaoIngressarBandaEvent;
 import com.baseapplication.core.model.Banda;
 import lombok.RequiredArgsConstructor;
@@ -13,11 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.baseapplication.core.dao.UsuarioDao;
-import com.baseapplication.core.dto.BandaParticipacaoEspecialDTO;
-import com.baseapplication.core.dto.EmailDTO;
-import com.baseapplication.core.dto.EventosSeparadosDTO;
-import com.baseapplication.core.dto.InfoPerfilUsuarioDTO;
-import com.baseapplication.core.dto.InfoUsuarioPainelDTO;
 import com.baseapplication.core.enums.TipoContato;
 import com.baseapplication.core.exception.InternalException;
 import com.baseapplication.core.exception.InvalidParamException;
@@ -68,7 +64,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 		Long idUsuario = Context.getUsuarioLogado().getId();
 		CompletableFuture<List<BandaDTO>> bandasFuture = buscarBandasDoUsuarioAsync(idUsuario);
 //		CompletableFuture<Integer> notificacoesFuture = buscarQuantidadeNotificacoesAsync(idUsuario);
-		CompletableFuture<Integer> participacoesEspeciaisFuture = buscarQuantidadeParticipacoesEspeciaisAsync(
+		CompletableFuture<QuantidadeParticipacoesEspeciaisDTO> participacoesEspeciaisFuture = buscarQuantidadeParticipacoesEspeciaisAsync(
 				idUsuario);
 		CompletableFuture<Integer> proximosEventosFuture = buscarQuantidadeProximosEventosAsync(idUsuario);
 
@@ -91,11 +87,11 @@ public class UsuarioServiceImpl implements UsuarioService {
 		return CompletableFuture.supplyAsync(() -> buscarQuantidadeProximosEventos(idUsuario));
 	}
 
-	private CompletableFuture<Integer> buscarQuantidadeParticipacoesEspeciaisAsync(Long idUsuario) {
+	private CompletableFuture<QuantidadeParticipacoesEspeciaisDTO> buscarQuantidadeParticipacoesEspeciaisAsync(Long idUsuario) {
 		return CompletableFuture.supplyAsync(() -> buscarQuantidadeParticipacoesEspeciais(idUsuario));
 	}
 
-	private Integer buscarQuantidadeParticipacoesEspeciais(Long idUsuario) {
+	private QuantidadeParticipacoesEspeciaisDTO buscarQuantidadeParticipacoesEspeciais(Long idUsuario) {
 		return usuarioDao.buscarQuantidadeParticipacoesEspeciais(idUsuario);
 	}
 
@@ -207,7 +203,20 @@ public class UsuarioServiceImpl implements UsuarioService {
         return ResponseEntity.ok(eventosSeparadosDTO);
     }
 
-    private CompletableFuture<EventosSeparadosDTO> buscarProximosEventosAsync(Long idUsuario) {
+	@Override
+	public InfoPerfilUsuarioDTO buscarPorEmail(String email) {
+		return new InfoPerfilUsuarioDTO(findByEmail(email));
+	}
+
+	@Override
+	public ParticipacoesEspeciaisDTO buscarParticipacoesEspeciais() {
+		return new ParticipacoesEspeciaisDTO(
+				usuarioDao.buscarShowsEspeciais(Context.getUsuarioLogado().getId()),
+				usuarioDao.buscarEnsaiosEspeciais(Context.getUsuarioLogado().getId())
+		);
+	}
+
+	private CompletableFuture<EventosSeparadosDTO> buscarProximosEventosAsync(Long idUsuario) {
 		return CompletableFuture
 				.supplyAsync(() -> eventoHelperService.buscarPendentesPorUsuarioOrdenadoPorData(idUsuario));
 	}

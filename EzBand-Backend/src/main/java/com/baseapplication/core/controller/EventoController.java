@@ -3,7 +3,9 @@ package com.baseapplication.core.controller;
 import java.util.List;
 
 import com.baseapplication.core.dto.*;
+import com.baseapplication.core.model.dto.superClasses.EventoDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,82 +25,122 @@ import com.baseapplication.core.utils.DateUtils;
 @RequestMapping("/evento")
 public class EventoController {
 
-	@Autowired
-	private EventoService eventoService;
+    @Autowired
+    private EventoService eventoService;
 
-	@GetMapping("/buscarPorId")
-	public Evento buscar(@RequestParam Long idEvento, @RequestParam TipoEvento tipoEvento) {
+    @GetMapping("/buscarPorId")
+    public ResponseEntity<?> buscar(@RequestParam Long idEvento, @RequestParam TipoEvento tipoEvento) {
+        try {
+            return ResponseEntity.ok(new EventoDTO(eventoService.buscarPorId(idEvento, tipoEvento)));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 
-		return eventoService.buscarPorId(idEvento, tipoEvento);
+    @GetMapping("/buscarInformacoesEvento")
+    public InformacoesEventoDTO buscarInformacoesEvento(@RequestParam Long idEvento,
+                                                        @RequestParam TipoEvento tipoEvento) {
+        return eventoService.buscarPobuscarInformacoesEventorId(idEvento, tipoEvento);
 
-	}
+    }
 
-	@GetMapping("/buscarInformacoesEvento")
-	public InformacoesEventoDTO buscarInformacoesEvento(@RequestParam Long idEvento,
-			@RequestParam TipoEvento tipoEvento) {
-		return eventoService.buscarPobuscarInformacoesEventorId(idEvento, tipoEvento);
+    @PostMapping("/atualizarInformacoesEvento")
+    public void atualizarInformacoesEvento(@RequestBody InformacoesEventoDTO informacoesEventoDTO) {
+        eventoService.atualizarInformacoesEvento(informacoesEventoDTO);
 
-	}
+    }
 
-	@PostMapping("/atualizarInformacoesEvento")
-	public void atualizarInformacoesEvento(@RequestBody InformacoesEventoDTO informacoesEventoDTO) {
-		eventoService.atualizarInformacoesEvento(informacoesEventoDTO);
+    @GetMapping("/buscarMusicoParaEvento")
+    public MusicoEventoDTO buscarMusicoParaEvento(@RequestParam String contato, @RequestParam TipoContato tipoContato) {
+        return eventoService.buscarMusicoParaEvento(contato, tipoContato);
 
-	}
+    }
 
-	@GetMapping("/buscarMusicoParaEvento")
-	public MusicoEventoDTO buscarMusicoParaEvento(@RequestParam String contato, @RequestParam TipoContato tipoContato) {
-		return eventoService.buscarMusicoParaEvento(contato, tipoContato);
+    @PostMapping("/enviarConviteParaEvento")
+    public void enviarConviteParaEvento(@RequestBody ConviteEventoDTO conviteEvento) {
+        eventoService.enviarConviteParaEvento(conviteEvento);
 
-	}
+    }
 
-	@PostMapping("/enviarConviteParaEvento")
-	public void enviarConviteParaEvento(@RequestBody ConviteEventoDTO conviteEvento) {
-		eventoService.enviarConviteParaEvento(conviteEvento);
+    @GetMapping("/buscarRepertorioEvento")
+    public ResponseEntity<?> buscarRepertorioEvento(@RequestParam Long idEvento,
+                                                    @RequestParam String tipoEvento) {
+        try {
+            return ResponseEntity.ok(eventoService.buscarRepertorioEvento(idEvento, TipoEvento.valueOf(tipoEvento)));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 
-	}
+    @PostMapping("/atualizarRepertorioEvento")
+    public ResponseEntity<?> atualizarRepertorioEvento(@RequestBody AtualizacaoRepertorioEventoDTO atualizacaoRepertorio) {
+        try {
+            eventoService.atualizarRepertorioEvento(atualizacaoRepertorio);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 
-	@GetMapping("/buscarRepertorioEvento")
-	public List<RepertorioEventoDTO> buscarRepertorioEvento(@RequestParam Long idEvento,
-			@RequestParam String tipoEvento) {
-		return eventoService.buscarRepertorioEvento(idEvento, TipoEvento.valueOf(tipoEvento));
+    @PostMapping("/atualizarMusicaRepertorio")
+    public ResponseEntity<?> atualizarMusicaRepertorio(@RequestBody AtualizacaoMusicaRepertorioDTO atualizacaoMusicaRepertorio) {
+        try {
+            eventoService.atualizarMusicaRepertorio(atualizacaoMusicaRepertorio);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 
-	}
+    @GetMapping("/buscarMembrosEDisponibilidadeParaShow")
+    public ResponseEntity<?> buscarMembrosParaShow(@RequestParam Long idBanda,
+                                                   @RequestParam String data) {
+        return eventoService.buscarMembrosEDisponibilidadeParaShow(idBanda, DateUtils.stringToLocalDate(data));
+    }
 
-	@PostMapping("/atualizarRepertorioEvento")
-	public void atualizarRepertorioEvento(@RequestBody AtualizacaoRepertorioEventoDTO atualizacaoRepertorio) {
-		eventoService.atualizarRepertorioEvento(atualizacaoRepertorio);
-	}
+    @PostMapping("/marcarShow")
+    public ResponseEntity<?> marcarShow(@RequestBody NovoShowDTO novoShowDTO) {
+        try {
+            eventoService.marcarShow(novoShowDTO);
+            return ResponseEntity.ok("Show marcado com sucseso");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 
-	@GetMapping("/buscarMembrosEDisponibilidadeParaShow")
-	public ResponseEntity<?> buscarMembrosParaShow(@RequestParam Long idBanda,
-												   @RequestParam String data) {
-		return eventoService.buscarMembrosEDisponibilidadeParaShow(idBanda, DateUtils.stringToLocalDate(data));
-	}
+    @PostMapping("/marcarEnsaio")
+    public ResponseEntity<?> marcarEnsaio(@RequestBody NovoEnsaioDTO novoEnsaioDTO) {
+        try {
+            eventoService.marcarEnsaio(novoEnsaioDTO);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 
-	@PostMapping("/marcarShow")
-	public void marcarShow(@RequestBody NovoShowDTO novoShowDTO) {
-		eventoService.marcarShow(novoShowDTO);
-	}
+    @GetMapping("/isNotificacaoShowAceitaPorTodosMembros")
+    public boolean isNotificacaoShowAceitaPorTodosMembros(Long idShow) {
+        return eventoService.isNotificacaoShowAceitaPorTodosMembros(idShow);
+    }
 
-	@PostMapping("/marcarEnsaio")
-	public void marcarEnsaio(@RequestBody NovoEnsaioDTO novoEnsaioDTO) {
-		eventoService.marcarEnsaio(novoEnsaioDTO);
-	}
+    @PostMapping("/aceitarNotificacao")
+    public void aceitarNotificacao(@RequestParam Long idNotificacao) {
+        eventoService.aceitarNotificacao(idNotificacao);
+    }
 
-	@GetMapping("/isNotificacaoShowAceitaPorTodosMembros")
-	public boolean isNotificacaoShowAceitaPorTodosMembros(Long idShow) {
-		return eventoService.isNotificacaoShowAceitaPorTodosMembros(idShow);
-	}
+    @PostMapping("/recusarNotificacao")
+    public void recusarNotificacao(@RequestParam Long idNotificacao) {
+        eventoService.recusarNotificacao(idNotificacao);
+    }
 
-	@PostMapping("/aceitarNotificacao")
-	public void aceitarNotificacao(@RequestParam Long idNotificacao) {
-		eventoService.aceitarNotificacao(idNotificacao);
-	}
-
-	@PostMapping("/recusarNotificacao")
-	public void recusarNotificacao(@RequestParam Long idNotificacao) {
-		eventoService.recusarNotificacao(idNotificacao);
-	}
+    @PostMapping("/cancelarEvento")
+    public ResponseEntity<?> cancelarEvento(@RequestParam Long idEvento, @RequestParam TipoEvento tipoEvento) {
+        try {
+            eventoService.cancelarEvento(idEvento, tipoEvento);
+            return ResponseEntity.ok("Evento cancelado com sucesso");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 
 }

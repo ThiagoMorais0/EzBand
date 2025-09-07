@@ -24,5 +24,20 @@ public class RepertorioEventoServiceImpl implements RepertorioEventoService {
         repertorioEventoDao.limparRepertorioEvento(idEvento, tipoEvento.toString());
     }
 
+    @Override
+    public List<RepertorioEvento> buscarPorEvento(Long idEvento, TipoEvento tipoEvento) {
+        return repertorioEventoDao.buscarPorEvento(idEvento, tipoEvento);
+    }
+
+    @Override
+    public RepertorioEvento buscarPorIndiceEEvento(Integer indice, Long idEvento, TipoEvento tipoEvento) {
+        return repertorioEventoDao.buscarPorIndiceEEvento(indice, idEvento, tipoEvento);
+    }
+
+    @Override
+    public void salvar(RepertorioEvento repertorioEvento) {
+        repertorioEventoDao.save(repertorioEvento);
+    }
+
 
 }

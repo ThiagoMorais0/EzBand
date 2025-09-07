@@ -5,15 +5,16 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.baseapplication.core.model.Ensaio;
+import com.baseapplication.core.enums.SituacaoMusicoEvento;
+import com.baseapplication.core.enums.TipoEvento;
+import com.baseapplication.core.model.*;
+import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.baseapplication.core.dao.ShowDao;
 import com.baseapplication.core.enums.StatusEvento;
 import com.baseapplication.core.exception.ResourceNotFoundException;
-import com.baseapplication.core.model.RepertorioEvento;
-import com.baseapplication.core.model.Show;
 import com.baseapplication.core.model.superClasses.Evento;
 import com.baseapplication.core.service.ShowService;
 
@@ -22,6 +23,12 @@ public class ShowServiceImpl implements ShowService {
 
 	@Autowired
 	private ShowDao showDao;
+
+	@Autowired
+	private MusicoEventoServiceImpl musicoEventoService;
+
+	@Autowired
+	private EntityManager entityManager;
 
 	@Override
 	public Show buscarPorId(Long idShow) {
@@ -35,8 +42,8 @@ public class ShowServiceImpl implements ShowService {
 	}
 
 	@Override
-	public void salvar(Show show) {
-		showDao.save(show);
+	public Show salvar(Show show) {
+		return showDao.save(show);
 	}
 
 	@Override
@@ -76,6 +83,20 @@ public class ShowServiceImpl implements ShowService {
     @Override
     public List<Show> buscarComDataAnteriorAHoje() {
         return showDao.buscarComDataAnteriorAHoje(LocalDate.now(), StatusEvento.REALIZADO);
+    }
+
+    @Override
+    public void adicionarMusicoAoShow(Long idEvento, Long idUsuarioConvidado) {
+		MusicoEvento musicoEvento = new MusicoEvento();
+		musicoEvento.setUsuario(entityManager.find(Usuario.class, idUsuarioConvidado));
+		musicoEvento.setEvento(entityManager.find(Show.class, idEvento));
+		MusicoEventoId id = new MusicoEventoId();
+		id.setIdEvento(idEvento);
+		id.setIdUsuario(idUsuarioConvidado);
+		id.setTipoEvento(TipoEvento.SHOW);
+		musicoEvento.setId(id);
+		musicoEvento.setSituacao(SituacaoMusicoEvento.ATIVO);
+		musicoEventoService.salvar(musicoEvento);
     }
 
 }

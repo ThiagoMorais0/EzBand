@@ -20,4 +20,6 @@ public interface EnsaioService {
     void alterarStatus(Long idEvento, StatusEvento novoStatus);
 
     List<Ensaio> buscarComDataAnteriorAHoje();
+
+    void adicionarMusicoAoEnsaio(Long idEvento, Long idUsuarioConvidado);
 }

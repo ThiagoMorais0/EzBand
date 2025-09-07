@@ -21,7 +21,7 @@ public class NovoShowDTO {
 	private Long idBanda;
 	private Long idUsuario;
 	private String local;
-	private EnderecoDTO endereco;
+	private EnderecoDTO endereco = new EnderecoDTO();
 	private Long idLocalEvento;
 	private String dataShow;
 	@JsonFormat(pattern = "HH:mm:ss")

@@ -103,5 +103,22 @@ public class UsuarioController {
 		return usuarioService.buscarProximosEventosDoUsuario();
 	}
 
+	@GetMapping("/buscarPorEmail")
+	public ResponseEntity<?> buscarPorEmail(@RequestParam String email){
+		try{
+			return ResponseEntity.ok(usuarioService.buscarPorEmail(email));
+		}catch (Exception e){
+			return ResponseEntity.status(500).body(e.getMessage());
+		}
+	}
+
+	@GetMapping("/buscarParticipacoesEspeciais")
+	public ResponseEntity<?> buscarParticipacoesEspeciais(){
+		try{
+			return ResponseEntity.ok(usuarioService.buscarParticipacoesEspeciais());
+		}catch (Exception e){
+			return ResponseEntity.status(500).body(e.getMessage());
+		}
+	}
 
 }

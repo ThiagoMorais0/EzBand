@@ -15,6 +15,6 @@ import java.util.List;
 public class InfoUsuarioPainelDTO {
     List<BandaDTO> bandas;
     Integer quantidadeNotificacoes;
-    Integer quantidadeParticipacoesEspeciais;
+    QuantidadeParticipacoesEspeciaisDTO participacoesEspeciais;
     Integer quantidadeProximosEventos;
 }

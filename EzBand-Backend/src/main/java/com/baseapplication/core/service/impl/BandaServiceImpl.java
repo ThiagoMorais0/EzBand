@@ -6,8 +6,10 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+import com.baseapplication.core.controller.EditarMembroMusicoBandaDTO;
 import com.baseapplication.core.dto.*;
 import com.baseapplication.core.enums.PermissaoMusico;
+import com.baseapplication.core.enums.StatusEvento;
 import com.baseapplication.core.event.events.ConviteParaUsuarioIngressarBandaEvent;
 import com.baseapplication.core.event.events.UsuarioExpulsoDeBandaEvent;
 import com.baseapplication.core.model.Show;
@@ -160,7 +162,33 @@ public class BandaServiceImpl implements BandaService {
 		return buscarPorId(idBanda).getShows().stream().map(ShowDTO::new).toList();
 	}
 
-	private void setarInformacoesEditadas(Banda banda, EdicaoBandaDTO bandaDTO, String urlLogo) {
+	@Override
+	public void atualizarMusicaRertorio(RepertorioBandaDTO repertorioBandaDTO) {
+		RepertorioBanda musicaRepertorio = repertorioBandaService.buscarPorId(repertorioBandaDTO.getId());
+		musicaRepertorio.getMusica().setTitulo(repertorioBandaDTO.getMusica().getTitulo());
+		musicaRepertorio.getMusica().setArtista(repertorioBandaDTO.getMusica().getArtista());
+		musicaRepertorio.getMusica().setTonalidade(Tonalidade.encontrarPeloNumero(repertorioBandaDTO.getMusica().getTonalidade()));
+		musicaRepertorio.getMusica().setUrlSpotify(repertorioBandaDTO.getMusica().getUrlSpotify());
+		musicaRepertorio.getMusica().setUrlYoutube(repertorioBandaDTO.getMusica().getUrlYoutube());
+		musicaRepertorio.getMusica().setDescricao(repertorioBandaDTO.getMusica().getDescricao());
+		musicaRepertorio.getMusica().setObservacao(repertorioBandaDTO.getMusica().getObservacao());
+		repertorioBandaService.salvar(musicaRepertorio);
+	}
+
+    @Override
+    public void alterarPermissaoMembro(EditarMembroMusicoBandaDTO permissaoMusicoDTO) {
+		MusicoBanda usuario = musicoBandaService.buscarPorIdUsuarioEIdBanda(Context.getUsuarioLogado().getId(), permissaoMusicoDTO.getIdBanda());
+		if(!usuario.getPermissoes().contains(PermissaoMusico.ADMINISTRADOR) || !usuario.getPermissoes().contains(PermissaoMusico.FUNDADOR)){
+			throw new InternalException("Usuário não tem permissão para fazer essa alteração.");
+		}
+
+        MusicoBanda musicoBanda = musicoBandaService.buscarPorIdUsuarioEIdBanda(permissaoMusicoDTO.getIdUsuario(), permissaoMusicoDTO.getIdBanda());
+		musicoBanda.setInstrumentos(permissaoMusicoDTO.getInstrumentos());
+		musicoBanda.setPermissoes(permissaoMusicoDTO.getPermissoes());
+		musicoBandaService.salvar(musicoBanda);
+    }
+
+    private void setarInformacoesEditadas(Banda banda, EdicaoBandaDTO bandaDTO, String urlLogo) {
 		banda.setNome(bandaDTO.getNome());
 		banda.setDescricao(bandaDTO.getDescricao());
 		banda.setCategoria(bandaDTO.getCategoria());
@@ -194,13 +222,13 @@ public class BandaServiceImpl implements BandaService {
 	@Override
 	public Integer buscarQuantidadeDeShows(Long idBanda) {
 		Banda banda = buscarPorId(idBanda);
-		return banda == null ? 0 : banda.getShows().size();
+		return banda == null ? 0 : banda.getShows().stream().filter(show -> show.getStatus().equals(StatusEvento.PENDENTE)).toList().size();
 	}
 
 	@Override
 	public Integer buscarQuantidadeDeEnsaios(Long idBanda) {
 		Banda banda = buscarPorId(idBanda);
-		return banda == null ? 0 : banda.getEnsaios().size();
+		return banda == null ? 0 : banda.getEnsaios().stream().filter(ensaio -> ensaio.getStatus().equals(StatusEvento.PENDENTE)).toList().size();
 	}
 
 	@Override
@@ -268,8 +296,8 @@ public class BandaServiceImpl implements BandaService {
 	}
 
 	@Override
-	public List<MusicaDTO> buscarRepertorio(Long idBanda) {
-		return buscarPorId(idBanda).getRepertorio().stream().map(i -> new MusicaDTO(i.getMusica()))
+	public List<RepertorioBandaDTO> buscarRepertorio(Long idBanda) {
+		return buscarPorId(idBanda).getRepertorio().stream().map(RepertorioBandaDTO::new)
 				.collect(Collectors.toList());
 	}
 

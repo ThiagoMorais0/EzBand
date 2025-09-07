@@ -107,9 +107,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		}
 		cadastroUsuarioDTO.setSenha(criptografar(cadastroUsuarioDTO.getSenha()));
 		Usuario usuario = usuarioService.salvar(new Usuario(cadastroUsuarioDTO));
-		usuario.setUrlFotoPerfil(imagemService.saveImageAndGetUrl(imagem, "profilepictures",
-				usuario.getId() + "." + FileUtils.getSufix(imagem)));
-		usuarioService.salvar(usuario);
+		if(imagem != null){
+			usuario.setUrlFotoPerfil(imagemService.saveImageAndGetUrl(imagem, "profilepictures",
+					usuario.getId() + "." + FileUtils.getSufix(imagem)));
+			usuarioService.salvar(usuario);
+		}
 		return ResponseEntity.ok(null);
 	}
 }

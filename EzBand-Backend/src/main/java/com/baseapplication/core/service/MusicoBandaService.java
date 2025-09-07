@@ -15,4 +15,6 @@ public interface MusicoBandaService {
     void expulsar(Long idBanda, Long idUsuario);
 
     List<MusicoBanda> buscarMembrosPorIdBanda(Long idBanda);
+
+    void salvar(MusicoBanda musicoBanda);
 }

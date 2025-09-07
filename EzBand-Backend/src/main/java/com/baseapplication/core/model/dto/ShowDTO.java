@@ -2,6 +2,7 @@ package com.baseapplication.core.model.dto;
 
 import com.baseapplication.core.model.Show;
 import com.baseapplication.core.model.dto.superClasses.EventoDTO;
+import com.baseapplication.core.model.superClasses.Evento;
 import com.baseapplication.core.utils.DateUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,10 +23,14 @@ public class ShowDTO extends EventoDTO {
     private Boolean isPortaria;
     private Integer porcentagemPortaria;
 
-    public ShowDTO(Show show){
+    public ShowDTO(Evento evento){
+        Show show = (Show) evento;
         BeanUtils.copyProperties(show, this);
-        BeanUtils.copyProperties(show.getEndereco(), this.getEndereco());
+        if(show.getEndereco() != null){
+            BeanUtils.copyProperties(show.getEndereco(), this.getEndereco());
+        }
         this.setBanda(new BandaDTO(show.getBanda()));
+        this.setStatus(show.getStatus().getDescricao());
         this.setData(DateUtils.localDateToString(show.getData()));
     }
 }

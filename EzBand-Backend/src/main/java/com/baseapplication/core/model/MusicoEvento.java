@@ -21,6 +21,14 @@ public class MusicoEvento {
     private String instrumentos;
     private BigDecimal cache;
 
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "id_evento", referencedColumnName = "id", insertable = false, updatable = false),
+            @JoinColumn(name = "tipo_evento", referencedColumnName = "tipoEvento", insertable = false, updatable = false)
+    })
+    private Evento evento;
+
+
     @Enumerated(EnumType.STRING)
     private SituacaoMusicoEvento situacao;
 
@@ -28,5 +36,6 @@ public class MusicoEvento {
     @MapsId("idUsuario")
     @JoinColumn(name = "ID_USUARIO", referencedColumnName = "id")
     private Usuario usuario;
+
 
 }

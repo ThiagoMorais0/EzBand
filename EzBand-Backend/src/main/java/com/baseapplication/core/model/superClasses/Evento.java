@@ -4,6 +4,7 @@ import java.sql.Time;
 import java.time.LocalDate;
 import java.util.List;
 
+import jakarta.persistence.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import com.baseapplication.core.enums.StatusEvento;
@@ -13,24 +14,14 @@ import com.baseapplication.core.model.MusicoEvento;
 import com.baseapplication.core.model.RepertorioEvento;
 import com.baseapplication.core.model.embedded.Endereco;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MappedSuperclass;
-import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@MappedSuperclass
+@Entity
+@Inheritance(strategy = InheritanceType.JOINED) // ou SINGLE_TABLE, dependendo do seu modelo
+@Table(name = "EVENTO")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -51,7 +42,7 @@ public abstract class Evento {
 	private Time duracao;
 	private Time horarioInicio;
 	@Embedded
-	private Endereco endereco;
+	private Endereco endereco = new Endereco();
 	private String local;
 	private String observacoes;
 	@Enumerated(EnumType.STRING)
@@ -63,7 +54,7 @@ public abstract class Evento {
 	@OneToMany(mappedBy = "id.idEvento", fetch = FetchType.LAZY)
 	private List<RepertorioEvento> repertorio;
 
-	@OneToMany(mappedBy = "id.idUsuario", fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "evento", fetch = FetchType.LAZY)
 	private List<MusicoEvento> participantes;
 
 }

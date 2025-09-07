@@ -43,4 +43,9 @@ public class MusicoBandaServiceImpl implements MusicoBandaService {
     public List<MusicoBanda> buscarMembrosPorIdBanda(Long idBanda) {
         return musicoBandaDao.buscarMembrosPorIdBanda(idBanda);
     }
+
+    @Override
+    public void salvar(MusicoBanda musicoBanda) {
+        musicoBandaDao.save(musicoBanda);
+    }
 }

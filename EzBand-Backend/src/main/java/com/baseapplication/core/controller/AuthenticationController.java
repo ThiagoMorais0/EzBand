@@ -46,7 +46,7 @@ public class AuthenticationController {
 
 	@PostMapping("/cadastrarUsuarioComImagem")
 	@CrossOrigin(origins = "*")
-	public ResponseEntity<?> cadastrarUsuarioComImagem(@RequestParam("usuario") String usuarioJson, MultipartFile imagem) {
+	public ResponseEntity<?> cadastrarUsuarioComImagem(@RequestParam("usuario") String usuarioJson, @RequestParam(required = false) MultipartFile imagem) {
 
 		CadastroUsuarioDTO usuario = null;
 		try {

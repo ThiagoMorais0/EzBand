@@ -14,6 +14,8 @@ import com.baseapplication.core.model.RepertorioEventoId;
 
 import jakarta.transaction.Transactional;
 
+import java.util.List;
+
 @Repository
 public interface RepertorioEventoDao extends JpaRepository<RepertorioEvento, RepertorioEventoId> {
 
@@ -21,4 +23,10 @@ public interface RepertorioEventoDao extends JpaRepository<RepertorioEvento, Rep
     @Modifying
     @Query(value = "delete from repertorio_evento where id_evento = :idEvento and tipo_evento = :tipoEvento", nativeQuery = true)
     void limparRepertorioEvento(Long idEvento, String tipoEvento);
+
+    @Query(value = "SELECT r FROM RepertorioEvento r WHERE r.id.idEvento = :idEvento and r.id.tipoEvento = :tipoEvento")
+    List<RepertorioEvento> buscarPorEvento(Long idEvento, TipoEvento tipoEvento);
+
+    @Query(value = "SELECT r FROM RepertorioEvento r WHERE r.id.idEvento = :idEvento and r.id.tipoEvento = :tipoEvento and r.id.indice = :indice")
+    RepertorioEvento buscarPorIndiceEEvento(Integer indice, Long idEvento, TipoEvento tipoEvento);
 }

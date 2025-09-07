@@ -20,9 +20,18 @@ public class MusicaDTO {
     private String descricao;
     private String observacao;
     private Time duracao;
-    private String tonalidade;
+    private Integer tonalidade;
+    private String urlYoutube;
+    private String urlSpotify;
 
     public MusicaDTO(Musica musica){
         BeanUtils.copyProperties(musica, this);
+    }
+
+    public Musica toEntity(){
+        Musica musica = new Musica();
+        musica.setTonalidade(Tonalidade.encontrarPeloNumero(tonalidade));
+        BeanUtils.copyProperties(this, musica);
+        return musica;
     }
 }

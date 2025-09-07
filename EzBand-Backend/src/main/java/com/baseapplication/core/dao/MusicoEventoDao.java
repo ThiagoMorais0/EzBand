@@ -13,4 +13,7 @@ public interface MusicoEventoDao extends JpaRepository<MusicoEvento, MusicoEvent
     @Modifying
     @Query(value = "delete from musico_evento me where me.id_evento = :idEvento and me.tipo_evento = :tipoEvento ", nativeQuery = true)
     void removerTodosParticipantes(Long idEvento, TipoEvento tipoEvento);
+
+    // Spring Data derived query over embedded id fields
+    java.util.List<MusicoEvento> findByIdIdEventoAndIdTipoEvento(Long idEvento, TipoEvento tipoEvento);
 }

@@ -24,5 +24,6 @@ public class MusicoEventoId implements Serializable {
     private Long idUsuario;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "TIPO_EVENTO", insertable = false, updatable = false)
     private TipoEvento tipoEvento;
 }

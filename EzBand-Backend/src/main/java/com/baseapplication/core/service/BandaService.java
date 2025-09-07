@@ -2,6 +2,7 @@ package com.baseapplication.core.service;
 
 import java.util.List;
 
+import com.baseapplication.core.controller.EditarMembroMusicoBandaDTO;
 import com.baseapplication.core.model.dto.EnsaioDTO;
 import com.baseapplication.core.model.dto.ShowDTO;
 import org.springframework.http.ResponseEntity;
@@ -49,7 +50,7 @@ public interface BandaService {
 
     EnsaiosFuturosDTO buscarEnsaiosFuturosBanda(Long idBanda, Long id) ;
 
-    List<MusicaDTO> buscarRepertorio(Long idBanda);
+    List<RepertorioBandaDTO> buscarRepertorio(Long idBanda);
 
     void adicionarMusicaAoRepertorio(RepertorioBandaDTO repertorioBandaDTO);
 
@@ -62,4 +63,8 @@ public interface BandaService {
     List<EnsaioDTO> buscarEnsaios(Long idBanda);
 
     List<ShowDTO> buscarShows(Long idBanda);
+
+    void atualizarMusicaRertorio(RepertorioBandaDTO repertorioBandaDTO);
+
+    void alterarPermissaoMembro(EditarMembroMusicoBandaDTO permissaoMusicoDTO);
 }

@@ -5,6 +5,7 @@ import com.baseapplication.core.dto.*;
 import com.baseapplication.core.dto.superClasses.InformacoesEventoDTO;
 import com.baseapplication.core.enums.TipoContato;
 import com.baseapplication.core.enums.TipoEvento;
+import com.baseapplication.core.model.Usuario;
 import com.baseapplication.core.model.superClasses.Evento;
 import org.springframework.http.ResponseEntity;
 
@@ -44,4 +45,12 @@ public interface EventoService {
     void recusarNotificacao(Long idNotificacao);
 
     List<Evento> buscarComDataAnteriorAHoje();
+
+    void cancelarEvento(Long idEvento, TipoEvento tipoEvento);
+
+    void atualizarMusicaRepertorio(AtualizacaoMusicaRepertorioDTO atualizacaoMusicaRepertorio);
+
+    void incluirUsuarioNoEvento(Usuario usuario, Evento evento);
+
+    void incluirUsuarioNoEvento(Long idEvento, TipoEvento tipoEvento, Long idUsuarioConvidado);
 }

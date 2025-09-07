@@ -6,22 +6,14 @@ import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.baseapplication.core.dto.*;
+import com.baseapplication.core.event.events.ConviteParaMusicoEventoEvent;
 import org.springframework.beans.BeanUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import com.baseapplication.core.dto.AtualizacaoRepertorioEventoDTO;
-import com.baseapplication.core.dto.ConviteEventoDTO;
-import com.baseapplication.core.dto.DisponibilidadeMusicoParaEventoDTO;
-import com.baseapplication.core.dto.EventosSeparadosDTO;
-import com.baseapplication.core.dto.InformacoesEnsaioDTO;
-import com.baseapplication.core.dto.InformacoesShowDTO;
-import com.baseapplication.core.dto.MusicoEventoDTO;
-import com.baseapplication.core.dto.NovoEnsaioDTO;
-import com.baseapplication.core.dto.NovoShowDTO;
-import com.baseapplication.core.dto.RepertorioEventoDTO;
 import com.baseapplication.core.dto.superClasses.InformacoesEventoDTO;
 import com.baseapplication.core.enums.SituacaoMusicoEvento;
 import com.baseapplication.core.enums.StatusEvento;
@@ -149,7 +141,7 @@ public class EventoServiceImpl implements EventoService {
 		if (evento instanceof Show)
 			retorno = new InformacoesShowDTO((Show) evento, musicoEvento);
 		else if (evento instanceof Ensaio)
-			retorno = new InformacoesEnsaioDTO((Ensaio) evento);
+			retorno = new InformacoesEnsaioDTO((Ensaio) evento, musicoEvento);
 
 		if (retorno == null)
 			throw new ResourceNotFoundException("Evento não encontrado");
@@ -197,8 +189,9 @@ public class EventoServiceImpl implements EventoService {
 
 	@Override
 	public List<RepertorioEventoDTO> buscarRepertorioEvento(Long idEvento, TipoEvento tipoEvento) {
+		//Ordernar por indice
 		return buscarEvento(idEvento, tipoEvento).getRepertorio().stream().map(RepertorioEventoDTO::new)
-				.collect(Collectors.toList());
+				.sorted(Comparator.comparing(RepertorioEventoDTO::getIndice)).collect(Collectors.toList());
 	}
 
 	@Override
@@ -259,8 +252,16 @@ public class EventoServiceImpl implements EventoService {
 		}
 
 		setarLocalEvento(novoShowDTO, show);
-		showService.salvar(show);
+		show = showService.salvar(show);
 		incluirMusicosNoEvento(novoShowDTO.getMusicos(), banda, show, TipoEvento.SHOW);
+
+		boolean existeMusicoForaDaBanda = novoShowDTO.getMusicos().stream()
+				.anyMatch(m -> banda.getMusicos().stream().noneMatch(i -> i.getId().getIdUsuario().equals(m.getUsuario().getId())));
+
+		if(existeMusicoForaDaBanda){
+			show.setStatus(StatusEvento.AGUARDANDO_APROVACAO);
+			showService.salvar(show);
+		}
 	}
 
 	private void setarLocalEvento(NovoShowDTO novoShowDTO, Show show) {
@@ -359,7 +360,24 @@ public class EventoServiceImpl implements EventoService {
         return eventos;
     }
 
-    @Override
+	@Override
+	public void cancelarEvento(Long idEvento, TipoEvento tipoEvento) {
+		Evento evento = buscarEvento(idEvento, tipoEvento);
+		evento.setStatus(StatusEvento.CANCELADO);
+		salvar(evento);
+	}
+
+	@Override
+	public void atualizarMusicaRepertorio(AtualizacaoMusicaRepertorioDTO atualizacaoMusicaRepertorio) {
+		RepertorioEvento repertorioEvento = repertorioEventoService.buscarPorIndiceEEvento(
+				atualizacaoMusicaRepertorio.getIndice(),
+				atualizacaoMusicaRepertorio.getIdEvento(),
+				atualizacaoMusicaRepertorio.getTipoEvento());
+		repertorioEvento.setMusica(atualizacaoMusicaRepertorio.getMusica().toEntity());
+		repertorioEventoService.salvar(repertorioEvento);
+	}
+
+	@Override
 	public void aceitarNotificacao(Long idNotificacao) {
 //		Notificacao notificacao = notificacaoService.aceitarNotificacao(idNotificacao);
 //		Evento evento = getEventoFromNotificacao(notificacao);
@@ -395,6 +413,24 @@ public class EventoServiceImpl implements EventoService {
 //		return evento;
 //	}
 
+	@Override
+	public void incluirUsuarioNoEvento(Usuario usuario, Evento evento){
+		MusicoEvento musicoEvento = new MusicoEvento();
+		musicoEvento.setUsuario(usuario);
+		musicoEvento.setEvento(evento);
+		musicoEvento.setSituacao(SituacaoMusicoEvento.ATIVO);
+		musicoEventoService.salvar(musicoEvento);
+	}
+
+	@Override
+	public void incluirUsuarioNoEvento(Long idEvento, TipoEvento tipoEvento, Long idUsuarioConvidado) {
+		MusicoEvento musicoEvento = new MusicoEvento();
+		musicoEvento.setUsuario(usuarioService.buscarPorId(idUsuarioConvidado));
+		musicoEvento.setEvento(buscarEvento(idEvento, tipoEvento));
+		musicoEvento.setSituacao(SituacaoMusicoEvento.ATIVO);
+		musicoEventoService.salvar(musicoEvento);
+	}
+
 	private void incluirMusicosNoEvento(List<MusicoEventoDTO> musicos, Banda banda, Evento evento,
 			TipoEvento tipoEvento) {
 
@@ -411,29 +447,24 @@ public class EventoServiceImpl implements EventoService {
 			musicoEvento.setUsuario(usuario);
 			musicoEvento.setInstrumentos(musico.getInstrumento());
 
-			if (evento.getStatus().equals(StatusEvento.AGUARDANDO_APROVACAO)) {
-				musicoEvento.setSituacao(SituacaoMusicoEvento.CONVITE_PENDENTE);
-				if (isMusicoDiferenteDoUsuarioLogado(musicoEvento)) {
-					// TODO:
-//					enviarNotificacaoAprovacaoEvento(usuario, evento, tipoEvento);
-//					applicationEventPublisher.publishEvent(new SolicitarEntradaBandaEvent(1L, 1L));
-				}
-			} else {
+			boolean membroDaBanda = isUsuarioMembroDaBanda(usuario, banda);
+			if (membroDaBanda) {
 				musicoEvento.setSituacao(SituacaoMusicoEvento.ATIVO);
+			} else {
+				musicoEvento.setSituacao(SituacaoMusicoEvento.CONVITE_PENDENTE);
 			}
 
-			if (isUsuarioMembroDaBanda(usuario, banda)) {
-				musicoEventoService.salvar(musicoEvento);
-			} else {
-				enviarConviteParaEvento(montarConviteEvento(usuario, evento, tipoEvento));
+			// Salva sempre, mesmo para convidados fora da banda
+			musicoEventoService.salvar(musicoEvento);
+
+			// Para não-membros, envia o convite via evento de notificação
+			if (!membroDaBanda) {
+				notificacaoService.enviarNotificacao(new ConviteParaMusicoEventoEvent(
+						usuario.getId(), evento, musico.getCache(), musico.getInstrumento()
+				));
 			}
 		}
-
 	}
-
-//	private void enviarNotificacaoAprovacaoEvento(Usuario usuario, Evento evento, TipoEvento tipoEvento) {
-//		notificacaoService.enviar(criarNotificacaoAprovacaoEvento(usuario, evento, tipoEvento));
-//	}
 
 //	private Notificacao criarNotificacaoAprovacaoEvento(Usuario usuario, Evento evento, TipoEvento tipoEvento) {
 //		switch (tipoEvento) {

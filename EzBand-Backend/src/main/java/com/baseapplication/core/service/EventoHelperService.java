@@ -9,6 +9,7 @@ import com.baseapplication.core.model.Ensaio;
 import com.baseapplication.core.model.Show;
 import com.baseapplication.core.model.dto.ShowDTO;
 import com.baseapplication.core.model.superClasses.Evento;
+import com.baseapplication.core.enums.AcaoResposta;
 
 import java.util.Collection;
 import java.util.List;
@@ -28,4 +29,8 @@ public interface EventoHelperService {
     List<Ensaio> buscarEnsaiosPendentesPorBandaEUsuarioOrdenadoPorData(Long idBanda, Long idUsuario);
 
     void alterarStatus(Long idEvento, TipoEvento tipoEvento, StatusEvento novoStatus);
+
+    void adicionarMusicoAoEventoEVerificarSeTodosConvitesForamAceitos(Long idEvento, TipoEvento tipoEvento, Long idUsuarioConvidado);
+
+    void registrarRespostaConviteEvento(Long idEvento, TipoEvento tipoEvento, Long idUsuarioConvidado, AcaoResposta acao);
 }

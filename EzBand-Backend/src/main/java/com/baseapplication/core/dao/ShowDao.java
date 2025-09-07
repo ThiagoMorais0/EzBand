@@ -32,7 +32,7 @@ public interface ShowDao extends JpaRepository<Show, Long> {
 
     @Query(value = "SELECT s FROM Show s " +
             "INNER JOIN MusicoEvento me ON me.id.idEvento = s.id AND s.tipoEvento = 'SHOW' " +
-            "WHERE s.data = :data AND me.usuario.id = :idUsuario " +
+            "WHERE s.data = :data AND me.usuario.id = :idUsuario and s.status in ('PENDENTE', 'AGUARDANDO_APROVACAO') " +
             "ORDER BY s.data DESC LIMIT 1")
     Evento buscarPrimeiroPorUsuarioEData(Long idUsuario, LocalDate data);
 

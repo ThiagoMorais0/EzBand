@@ -1,11 +1,16 @@
 package com.baseapplication.core.dao;
 
 
+import com.baseapplication.core.dto.QuantidadeParticipacoesEspeciaisDTO;
+import com.baseapplication.core.model.dto.EnsaioDTO;
+import com.baseapplication.core.model.dto.ShowDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.baseapplication.core.model.Usuario;
+
+import java.util.List;
 
 @Repository
 public interface UsuarioDao extends JpaRepository<Usuario, Long> {
@@ -31,20 +36,53 @@ public interface UsuarioDao extends JpaRepository<Usuario, Long> {
             "    (e.id IS NOT NULL AND e.status = 'PENDENTE'))", nativeQuery = true)
     Integer buscarQuantidadeProximosEventos(Long idUsuario);
 
-    @Query(value =
-            "SELECT COUNT(1) " +
-            "FROM musico_evento me " +
-            "LEFT JOIN show s ON me.id_evento = s.id " +
-            "LEFT JOIN ensaio e ON me.id_evento = e.id " +
-            "LEFT JOIN banda b_s ON s.id_banda = b_s.id " +
-            "LEFT JOIN banda b_e ON e.id_banda = b_e.id " +
-            "LEFT JOIN musico_banda mb_s ON mb_s.id_banda = b_s.id AND mb_s.id_usuario = me.id_usuario " +
-            "LEFT JOIN musico_banda mb_e ON mb_e.id_banda = b_e.id AND mb_e.id_usuario = me.id_usuario " +
-            "WHERE me.id_usuario = :idUsuario  " +
-            "  AND ( " +
-            "    (s.id IS NOT NULL AND s.status = 'PENDENTE' AND mb_s.id_usuario IS NULL)  " +
-            "    OR  " +
-            "    (e.id IS NOT NULL AND e.status = 'PENDENTE' AND mb_e.id_usuario IS NULL))", nativeQuery = true)
-    Integer buscarQuantidadeParticipacoesEspeciais(Long idUsuario);
+    @Query("""
+    SELECT new com.baseapplication.core.dto.QuantidadeParticipacoesEspeciaisDTO(
+        COUNT(DISTINCT CASE WHEN ev.tipoEvento = 'SHOW' THEN me.id.idEvento END),
+        COUNT(DISTINCT CASE WHEN ev.tipoEvento = 'ENSAIO' THEN me.id.idEvento END)
+    )
+    FROM MusicoEvento me
+    JOIN me.evento ev
+    WHERE me.id.idUsuario = :idUsuario
+      AND ev.status = 'PENDENTE'
+      AND NOT EXISTS (
+          SELECT 1
+          FROM MusicoBanda mb
+          WHERE mb.banda.id = ev.banda.id
+            AND mb.usuario.id = me.id.idUsuario
+      )
+""")
+    QuantidadeParticipacoesEspeciaisDTO buscarQuantidadeParticipacoesEspeciais(Long idUsuario);
 
+    @Query("""
+    SELECT new com.baseapplication.core.model.dto.ShowDTO(ev)
+    FROM MusicoEvento me
+    JOIN me.evento ev
+    WHERE me.id.idUsuario = :idUsuario
+      AND ev.tipoEvento = 'SHOW'
+      AND ev.status = 'PENDENTE'
+      AND NOT EXISTS (
+          SELECT 1
+          FROM MusicoBanda mb
+          WHERE mb.banda.id = ev.banda.id
+            AND mb.usuario.id = me.id.idUsuario
+      )
+""")
+    List<ShowDTO> buscarShowsEspeciais(Long idUsuario);
+
+    @Query("""
+    SELECT new com.baseapplication.core.model.dto.EnsaioDTO(ev)
+    FROM MusicoEvento me
+    JOIN me.evento ev
+    WHERE me.id.idUsuario = :idUsuario
+      AND ev.tipoEvento = 'ENSAIO'
+      AND ev.status = 'PENDENTE'
+      AND NOT EXISTS (
+          SELECT 1
+          FROM MusicoBanda mb
+          WHERE mb.banda.id = ev.banda.id
+            AND mb.usuario.id = me.id.idUsuario
+      )
+""")
+    List<EnsaioDTO> buscarEnsaiosEspeciais(Long idUsuario);
 }

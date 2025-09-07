@@ -9,6 +9,7 @@ import com.baseapplication.core.model.MusicoEvento;
 import com.baseapplication.core.model.MusicoEventoId;
 import com.baseapplication.core.model.superClasses.Evento;
 import com.baseapplication.core.service.MusicoEventoService;
+import java.util.List;
 
 @Service
 public class MusicoEventoServiceImpl implements MusicoEventoService {
@@ -29,5 +30,10 @@ public class MusicoEventoServiceImpl implements MusicoEventoService {
     @Override
     public MusicoEvento buscar(Long idEvento, TipoEvento tipoEvento, Long idUsuario) {
         return musicoEventoDao.findById(new MusicoEventoId(idEvento, idUsuario, tipoEvento)).orElseThrow();
+    }
+
+    @Override
+    public List<MusicoEvento> listarPorEvento(Long idEvento, TipoEvento tipoEvento) {
+        return musicoEventoDao.findByIdIdEventoAndIdTipoEvento(idEvento, tipoEvento);
     }
 }

@@ -11,11 +11,11 @@ import com.baseapplication.core.event.events.resposta.RespostaSolicitacaoAgendar
 import com.baseapplication.core.factory.RespostaNotificacaoFactory;
 import com.baseapplication.core.model.*;
 import com.baseapplication.core.model.dto.RespostaNotificacaoDTO;
+import com.baseapplication.core.model.notificacao.ConviteParaEvento;
 import com.baseapplication.core.model.notificacao.SolicitacaoAgendarEnsaio;
 import com.baseapplication.core.model.notificacao.SolicitacaoParaIngressarBanda;
 import com.baseapplication.core.model.superClasses.Notificacao;
 import com.baseapplication.core.service.*;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -173,14 +173,6 @@ public class NotificacaoServiceImpl implements NotificacaoService {
         enviarNotificacao(new RespostaSolicitacaoAgendarEnsaioEvent(notificacaoResposta));
     }
 
-/* <<<<<<<<<<<<<<  ✨ Windsurf Command ⭐ >>>>>>>>>>>>>>>> */
-    /**
-     * Executa a ação definida pela resposta da notificação.
-     *
-     * @param notificacao notificação que gerou a resposta
-     * @param acao ação a ser executada
-     */
-/* <<<<<<<<<<  3ff63d7c-6af9-4e73-8126-03051a58a770  >>>>>>>>>>> */
     private void executarAcao(Notificacao notificacao, AcaoResposta acao) {
         switch (notificacao.getTipoNotificacao()){
             case "SOLICITACAO_PARA_AGENDAR_ENSAIO":
@@ -197,6 +189,16 @@ public class NotificacaoServiceImpl implements NotificacaoService {
                             List.of(PermissaoMusico.MEMBRO_REGULAR)
                     );
                 }
+                return;
+            case "CONVITE_PARA_EVENTO":
+                ConviteParaEvento convite = (ConviteParaEvento) notificacao;
+                eventoHelperService.registrarRespostaConviteEvento(
+                        convite.getIdEventoConvite(),
+                        convite.getTipoEventoConvite(),
+                        convite.getIdUsuarioConvidado(),
+                        acao
+                );
+                return;
             default:
                 return;
         }

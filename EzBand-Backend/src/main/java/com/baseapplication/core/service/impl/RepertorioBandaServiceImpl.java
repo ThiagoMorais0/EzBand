@@ -16,4 +16,9 @@ public class RepertorioBandaServiceImpl implements RepertorioBandaService {
     public void salvar(RepertorioBanda repertorioBanda) {
         repertorioBandaDao.save(repertorioBanda);
     }
+
+    @Override
+    public RepertorioBanda buscarPorId(Long id) {
+        return repertorioBandaDao.findById(id).orElseThrow();
+    }
 }

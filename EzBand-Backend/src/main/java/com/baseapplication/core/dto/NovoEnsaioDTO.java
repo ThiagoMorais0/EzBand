@@ -21,7 +21,7 @@ public class NovoEnsaioDTO {
     private Long idUsuario;
     private String local;
     private Long idEstudio;
-    private EnderecoDTO endereco;
+    private EnderecoDTO endereco = new EnderecoDTO();
     private String dataEnsaio;
     @JsonFormat(pattern = "HH:mm:ss")
     private Time horarioInicio;

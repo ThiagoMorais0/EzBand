@@ -27,8 +27,10 @@ public class RepertorioEventoDTO {
     private String descricao;
     private String observacao;
     private String duracao;
-    private Tonalidade tonalidade;
+    private Integer tonalidade;
     private String bloco;
+    private String urlYoutube;
+    private String urlSpotify;
 
     public static RepertorioEvento toEntity(RepertorioEventoDTO repertorioEventoDTO,
                                       Long idEvento,
@@ -48,7 +50,9 @@ public class RepertorioEventoDTO {
                 repertorioEventoDTO.descricao,
                 repertorioEventoDTO.observacao,
                 repertorioEventoDTO.duracao != null ? Time.valueOf(repertorioEventoDTO.duracao) : null,
-                repertorioEventoDTO.tonalidade)
+                Tonalidade.encontrarPeloNumero(repertorioEventoDTO.getTonalidade()),
+                repertorioEventoDTO.urlYoutube,
+                repertorioEventoDTO.urlSpotify)
         );
         return repertorioEvento;
     }
@@ -58,6 +62,8 @@ public class RepertorioEventoDTO {
         if(entity.getMusica().getDuracao() != null){
             this.duracao = entity.getMusica().getDuracao().toString();
         }
+        this.tonalidade = entity.getMusica().getTonalidade().getNumero();
         this.bloco = entity.getBloco();
+        this.indice = entity.getId().getIndice();
     }
 }

@@ -1,9 +1,6 @@
 package com.baseapplication.core.dto.superClasses;
 
-import com.baseapplication.core.dto.InformacoesEnsaioDTO;
-import com.baseapplication.core.dto.InformacoesShowDTO;
-import com.baseapplication.core.dto.MusicoEventoDTO;
-import com.baseapplication.core.dto.RepertorioEventoDTO;
+import com.baseapplication.core.dto.*;
 import com.baseapplication.core.enums.StatusEvento;
 import com.baseapplication.core.enums.TipoEvento;
 import com.baseapplication.core.model.Banda;
@@ -41,10 +38,11 @@ public abstract class InformacoesEventoDTO {
     private LocalDate data;
     private Time duracao;
     private Time horarioInicio;
+    private EnderecoDTO endereco = new EnderecoDTO();
     private String local;
-    private String cidade;
     private String observacoes;
     private String status;
+    private String instrumentos;
 
     private TipoEvento tipoEvento;
     private List<RepertorioEventoDTO> repertorio;

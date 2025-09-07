@@ -2,6 +2,7 @@ package com.baseapplication.core.model.dto;
 
 import com.baseapplication.core.model.Ensaio;
 import com.baseapplication.core.model.dto.superClasses.EventoDTO;
+import com.baseapplication.core.model.superClasses.Evento;
 import com.baseapplication.core.utils.DateUtils;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,7 +17,8 @@ import java.math.BigDecimal;
 public class EnsaioDTO extends EventoDTO {
     private BigDecimal valor;
 
-    public EnsaioDTO(Ensaio ensaio){
+    public EnsaioDTO(Evento evento){
+        Ensaio ensaio = (Ensaio) evento;
         BeanUtils.copyProperties(ensaio, this);
         if(ensaio.getEndereco() != null){
             BeanUtils.copyProperties(ensaio.getEndereco(), this.getEndereco());

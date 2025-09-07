@@ -1,5 +1,6 @@
 package com.baseapplication.core.service;
 
+import com.baseapplication.core.dto.ParticipacoesEspeciaisDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -40,4 +41,8 @@ public interface UsuarioService {
 	void enviarEmail(EmailDTO email);
 
     ResponseEntity<?> buscarProximosEventosDoUsuario();
+
+	InfoPerfilUsuarioDTO buscarPorEmail(String email);
+
+	ParticipacoesEspeciaisDTO buscarParticipacoesEspeciais();
 }

@@ -18,6 +18,7 @@ public class MusicoEventoDTO {
     private InfoPerfilUsuarioDTO usuario;
     private String instrumento = "";
     private BigDecimal cache = BigDecimal.ZERO;
+    private String situacao;
 
     public MusicoEventoDTO(Usuario usuario){
         this.usuario = new InfoPerfilUsuarioDTO(usuario);
@@ -27,6 +28,7 @@ public class MusicoEventoDTO {
         this.usuario = new InfoPerfilUsuarioDTO(musicoEvento.getUsuario());
         this.instrumento = musicoEvento.getInstrumentos();
         this.cache = musicoEvento.getCache();
+        this.situacao = musicoEvento.getSituacao().getDescricao();
     }
 
 }

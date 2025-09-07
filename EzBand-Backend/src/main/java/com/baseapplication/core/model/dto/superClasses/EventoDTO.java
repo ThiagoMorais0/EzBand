@@ -28,7 +28,7 @@ public class EventoDTO {
     private Time duracao;
     private Time horarioInicio;
     private String local;
-    private EnderecoDTO endereco;
+    private EnderecoDTO endereco = new EnderecoDTO();
     private String observacoes;
     private String status;
     private BandaDTO banda;
@@ -36,5 +36,14 @@ public class EventoDTO {
     public EventoDTO(Evento evento){
         BeanUtils.copyProperties(evento, this);
         this.setData(DateUtils.localDateToString(evento.getData()));
+        if(evento.getEndereco() != null){
+            BeanUtils.copyProperties(evento.getEndereco(), this);
+        }
+        if(evento.getBanda() != null){
+            BeanUtils.copyProperties(evento.getBanda(), this);
+        }
+        this.setDataInclusao(DateUtils.localDateToString(evento.getDataInclusao()));
+        this.status = evento.getStatus().getDescricao();
+        this.setIdBanda(evento.getBanda().getId());
     }
 }

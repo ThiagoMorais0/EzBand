@@ -6,6 +6,7 @@ import com.baseapplication.core.model.Show;
 import com.baseapplication.core.model.dto.BandaDTO;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.Hibernate;
 import org.springframework.beans.BeanUtils;
 
 import java.math.BigDecimal;
@@ -20,7 +21,7 @@ public class InformacoesShowDTO extends InformacoesEventoDTO {
     private Boolean isPortaria;
     private Integer porcentagemPortaria;
     private BigDecimal cacheIndividual;
-    private String instrumentos;
+
 
     public InformacoesShowDTO(Show show, MusicoEvento musicoEvento){
         BeanUtils.copyProperties(show, this);
@@ -28,6 +29,8 @@ public class InformacoesShowDTO extends InformacoesEventoDTO {
         this.setStatus(show.getStatus().getDescricao());
         this.setInstrumentos(musicoEvento.getInstrumentos());
         this.setCacheIndividual(musicoEvento.getCache());
+        BeanUtils.copyProperties(show.getEndereco(), this.getEndereco());
+        Hibernate.initialize(show.getParticipantes());
         this.setParticipantes(show.getParticipantes().stream().map(MusicoEventoDTO::new).collect(Collectors.toList()));
     }
 }
