@@ -4,5 +4,5 @@ public enum TipoParticipante {
     USUARIO,
     BANDA,
     ESTUDIO,
-    LOCAL_EVENTOno
+    LOCAL_EVENTO
 }

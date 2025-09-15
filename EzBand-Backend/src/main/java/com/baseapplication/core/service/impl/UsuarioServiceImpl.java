@@ -31,6 +31,10 @@ import com.baseapplication.core.utils.Context;
 import com.baseapplication.core.utils.FileUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.text.similarity.LevenshteinDistance;
+
+import java.util.Comparator;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -234,5 +238,23 @@ public class UsuarioServiceImpl implements UsuarioService {
 	private CompletableFuture<List<BandaDTO>> buscarBandasDoUsuarioAsync(Long idUsuario) {
 		return CompletableFuture
 				.supplyAsync(() -> bandaService.buscarBandasPorUsuario(idUsuario).stream().map(BandaDTO::new).toList());
+	}
+
+	@Override
+	public List<BuscaGlobalDTO> buscarGlobal(String termo) {
+		List<BuscaGlobalDTO> resultados = usuarioDao.buscarGlobal(termo).stream()
+				.map(p -> new BuscaGlobalDTO(
+						p.getId(),
+						p.getNome(),
+						com.baseapplication.core.enums.TipoParticipante.valueOf(p.getTipo()),
+						p.getUrlFoto()
+				)).toList();
+
+		LevenshteinDistance levenshtein = new LevenshteinDistance();
+
+		return resultados.stream()
+				.sorted(Comparator.comparingInt(dto -> levenshtein.apply(termo.toLowerCase(), dto.getNome().toLowerCase())))
+				.limit(20)
+				.collect(Collectors.toList());
 	}
 }

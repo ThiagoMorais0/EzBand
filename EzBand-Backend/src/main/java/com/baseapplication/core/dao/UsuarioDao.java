@@ -1,6 +1,6 @@
 package com.baseapplication.core.dao;
 
-
+import com.baseapplication.core.dto.BuscaGlobalProjection;
 import com.baseapplication.core.dto.QuantidadeParticipacoesEspeciaisDTO;
 import com.baseapplication.core.model.dto.EnsaioDTO;
 import com.baseapplication.core.model.dto.ShowDTO;
@@ -55,7 +55,7 @@ public interface UsuarioDao extends JpaRepository<Usuario, Long> {
     QuantidadeParticipacoesEspeciaisDTO buscarQuantidadeParticipacoesEspeciais(Long idUsuario);
 
     @Query("""
-    SELECT new com.baseapplication.core.model.dto.ShowDTO(ev)
+    SELECT new com.baseapplication.core.model.dto.ShowDTO(ev, me.cache)
     FROM MusicoEvento me
     JOIN me.evento ev
     WHERE me.id.idUsuario = :idUsuario
@@ -85,4 +85,16 @@ public interface UsuarioDao extends JpaRepository<Usuario, Long> {
       )
 """)
     List<EnsaioDTO> buscarEnsaiosEspeciais(Long idUsuario);
+
+    @Query(value = """
+            SELECT id, nome, 'USUARIO' as tipo, url_foto_perfil as urlFoto FROM usuario WHERE nome ILIKE %:termo%
+            UNION ALL
+            SELECT id, nome, 'BANDA' as tipo, url_logo as urlFoto FROM banda WHERE nome ILIKE %:termo%
+            UNION ALL
+            SELECT id, nome, 'ESTUDIO' as tipo, url_foto_perfil as urlFoto FROM estudio WHERE nome ILIKE %:termo%
+            UNION ALL
+            SELECT id, nome, 'LOCAL_EVENTO' as tipo, url_foto_perfil as urlFoto FROM local_evento WHERE nome ILIKE %:termo%
+            LIMIT 50
+            """, nativeQuery = true)
+    List<BuscaGlobalProjection> buscarGlobal(String termo);
 }

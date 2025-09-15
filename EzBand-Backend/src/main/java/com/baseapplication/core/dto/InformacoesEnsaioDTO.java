@@ -18,11 +18,15 @@ import java.util.stream.Collectors;
 public class InformacoesEnsaioDTO extends InformacoesEventoDTO {
     private BigDecimal valor;
 
-    public InformacoesEnsaioDTO(Ensaio ensaio, MusicoEvento musicoEvento){
+    public InformacoesEnsaioDTO(Ensaio ensaio, MusicoEvento musicoEvento) {
         BeanUtils.copyProperties(ensaio, this);
         this.setBanda(new BandaDTO(ensaio.getBanda()));
         this.setStatus(ensaio.getStatus().getDescricao());
-        this.setInstrumentos(musicoEvento.getInstrumentos());
+        if (musicoEvento != null) {
+            this.setInstrumentos(musicoEvento.getInstrumentos());
+        }else{
+            this.setUsuarioPertenceAoEvento(false);
+        }
         this.setValor(ensaio.getValor());
         BeanUtils.copyProperties(ensaio.getEndereco(), this.getEndereco());
         Hibernate.initialize(ensaio.getParticipantes());

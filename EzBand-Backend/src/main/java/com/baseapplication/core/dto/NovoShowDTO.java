@@ -33,6 +33,7 @@ public class NovoShowDTO {
 	private BigDecimal valorContrato;
 	private Integer porcentagemPortaria;
 	private Boolean isPortaria;
+	private BigDecimal consumacaoPorMusico;
 	private List<MusicoEventoDTO> musicos = new ArrayList<>();
 
 	public Show toEntity() {
@@ -41,6 +42,7 @@ public class NovoShowDTO {
 		BeanUtils.copyProperties(this.endereco, show.getEndereco());
 		show.setData(DateUtils.stringToLocalDate(this.dataShow));
 		show.setDataInclusao(LocalDate.now());
+		show.setConsumacaoPorMusico(this.consumacaoPorMusico);
 		return show;
 	}
 }

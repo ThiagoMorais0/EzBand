@@ -10,7 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface EstudioService {
-    void cadastrar(Estudio toEntity);
+    Estudio cadastrar(Estudio toEntity);
 
     List<Estudio> buscarEstudiosDoUsuario();
 

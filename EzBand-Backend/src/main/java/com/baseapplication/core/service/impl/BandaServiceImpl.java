@@ -2,6 +2,7 @@ package com.baseapplication.core.service.impl;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -12,7 +13,7 @@ import com.baseapplication.core.enums.PermissaoMusico;
 import com.baseapplication.core.enums.StatusEvento;
 import com.baseapplication.core.event.events.ConviteParaUsuarioIngressarBandaEvent;
 import com.baseapplication.core.event.events.UsuarioExpulsoDeBandaEvent;
-import com.baseapplication.core.model.Show;
+import com.baseapplication.core.model.*;
 import com.baseapplication.core.model.embedded.ParametrosBanda;
 import com.baseapplication.core.service.*;
 import jakarta.transaction.Transactional;
@@ -36,9 +37,6 @@ import com.baseapplication.core.exception.ConflictException;
 import com.baseapplication.core.exception.InternalException;
 import com.baseapplication.core.exception.ResourceNotFoundException;
 import com.baseapplication.core.exception.RestrictionException;
-import com.baseapplication.core.model.Banda;
-import com.baseapplication.core.model.MusicoBanda;
-import com.baseapplication.core.model.RepertorioBanda;
 import com.baseapplication.core.model.dto.BandaDTO;
 import com.baseapplication.core.model.dto.EnsaioDTO;
 import com.baseapplication.core.model.dto.ShowDTO;
@@ -154,12 +152,22 @@ public class BandaServiceImpl implements BandaService {
 
 	@Override
 	public List<EnsaioDTO> buscarEnsaios(Long idBanda) {
-		return buscarPorId(idBanda).getEnsaios().stream().map(EnsaioDTO::new).toList();
+		return buscarPorId(idBanda).getEnsaios().stream()
+				.sorted(Comparator.comparing(Ensaio::getData)
+						.thenComparing(Ensaio::getHorarioInicio))
+				.map(EnsaioDTO::new).toList();
 	}
 
 	@Override
 	public List<ShowDTO> buscarShows(Long idBanda) {
-		return buscarPorId(idBanda).getShows().stream().map(ShowDTO::new).toList();
+		//Ordenar pela data, do mais recente para o mais longe e depois pelo horário, mesma lógica
+		return buscarPorId(idBanda).getShows().stream()
+				.sorted(
+						Comparator.comparing(Show::getData)
+								.thenComparing(Show::getHorarioInicio)
+				)
+				.map(ShowDTO::new)
+				.toList();
 	}
 
 	@Override

@@ -7,8 +7,11 @@ import org.springframework.web.multipart.MultipartFile;
 import com.baseapplication.core.dto.EmailDTO;
 import com.baseapplication.core.dto.InfoPerfilUsuarioDTO;
 import com.baseapplication.core.dto.InfoUsuarioPainelDTO;
+import com.baseapplication.core.dto.BuscaGlobalDTO;
 import com.baseapplication.core.enums.TipoContato;
 import com.baseapplication.core.model.Usuario;
+
+import java.util.List;
 
 public interface UsuarioService {
 
@@ -45,4 +48,6 @@ public interface UsuarioService {
 	InfoPerfilUsuarioDTO buscarPorEmail(String email);
 
 	ParticipacoesEspeciaisDTO buscarParticipacoesEspeciais();
+
+	List<BuscaGlobalDTO> buscarGlobal(String termo);
 }

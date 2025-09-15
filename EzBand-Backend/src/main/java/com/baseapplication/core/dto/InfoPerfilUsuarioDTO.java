@@ -1,5 +1,6 @@
 package com.baseapplication.core.dto;
 
+import com.baseapplication.core.model.dto.BandaDTO;
 import org.springframework.beans.BeanUtils;
 
 import com.baseapplication.core.model.MusicoBanda;
@@ -10,6 +11,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -26,10 +30,13 @@ public class InfoPerfilUsuarioDTO {
     private String descricao;
     private String urlFotoPerfil;
     private String instrumentos;
+    private List<BandaDTO> bandas = new ArrayList<>();
+    private List<PublicacaoDTO> publicacoes = new ArrayList<>();
     public InfoPerfilUsuarioDTO(Usuario usuario){
         BeanUtils.copyProperties(usuario, this);
         this.nascimento = DateUtils.localDateToString(usuario.getDataNascimento());
         this.dataCriacao = DateUtils.localDateToString(usuario.getDataCriacao());
+        this.setBandas(usuario.getBandas().stream().map(BandaDTO::new).toList());
     }
 
     public InfoPerfilUsuarioDTO(MusicoBanda musico){

@@ -20,6 +20,7 @@ public class EstudioDTO {
     private Long id;
     private String nome;
     private String descricao;
+    private String urlLogo;
     private String horarioInicioFuncionamento;
     private String horarioFinalFuncionamento;
     private List<ServicoEstudioDTO> servicos = new ArrayList<>();
@@ -32,6 +33,7 @@ public class EstudioDTO {
         this.setProprietario(InfoUsuarioDTO.toDTO(entity.getProprietario()));
         this.setServicos(entity.getServicos().stream().map(ServicoEstudioDTO::new).toList());
         this.setEquipamentos(entity.getEquipamentos().stream().map(EquipamentoEstudioDTO::new).toList());
+        this.setUrlLogo(entity.getUrlFotoPerfil());
     }
 
     public void toEntity(Estudio entity) {

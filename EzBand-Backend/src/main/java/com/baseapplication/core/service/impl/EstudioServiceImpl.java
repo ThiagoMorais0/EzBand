@@ -17,6 +17,7 @@ import com.baseapplication.core.utils.Context;
 import com.baseapplication.core.utils.FileUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
@@ -35,8 +36,8 @@ public class EstudioServiceImpl implements EstudioService {
     private final EnsaioService ensaioService;
 
     @Override
-    public void cadastrar(Estudio estudio) {
-        dao.save(estudio);
+    public Estudio cadastrar(Estudio estudio) {
+        return dao.save(estudio);
     }
 
     @Override
@@ -67,9 +68,10 @@ public class EstudioServiceImpl implements EstudioService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<?> cadastrarComImagem(CadastroEstudioDTO estudioDTO, MultipartFile imagem) {
         Estudio estudio =  estudioDTO.toEntity();
-        cadastrar(estudio);
+        estudio = cadastrar(estudio);
         String urlImagem = imagemService.saveImageAndGetUrl(imagem, "studiologo", estudio.getId() + "." + FileUtils.getSufix(imagem));
         estudio.setUrlFotoPerfil(urlImagem);
         cadastrar(estudio);

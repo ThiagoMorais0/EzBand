@@ -1,5 +1,6 @@
 package com.baseapplication.core.controller;
 
+import com.baseapplication.core.dto.BuscaGlobalDTO;
 import com.baseapplication.core.dto.EmailDTO;
 import com.baseapplication.core.dto.InfoPerfilUsuarioDTO;
 import com.baseapplication.core.dto.InfoUsuarioPainelDTO;
@@ -118,6 +119,16 @@ public class UsuarioController {
 			return ResponseEntity.ok(usuarioService.buscarParticipacoesEspeciais());
 		}catch (Exception e){
 			return ResponseEntity.status(500).body(e.getMessage());
+		}
+	}
+
+	@GetMapping("/buscar")
+	public ResponseEntity<List<BuscaGlobalDTO>> buscarGlobal(@RequestParam("termo") String termo) {
+		try {
+			List<BuscaGlobalDTO> resultado = usuarioService.buscarGlobal(termo);
+			return ResponseEntity.ok(resultado);
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 		}
 	}
 

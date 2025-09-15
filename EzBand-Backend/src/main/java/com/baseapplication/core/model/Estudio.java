@@ -24,7 +24,7 @@ public class Estudio {
     private String descricao;
     private LocalDateTime horarioInicioFuncionamento;
     private LocalDateTime horarioFinalFuncionamento;
-    private LocalDateTime DataInclusao;
+    private LocalDateTime DataInclusao = LocalDateTime.now();
     private String urlFotoPerfil;
     @OneToMany(mappedBy = "estudio", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ServicoEstudio> servicos;

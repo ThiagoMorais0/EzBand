@@ -4,11 +4,9 @@ import com.baseapplication.core.enums.TipoEvento;
 import com.baseapplication.core.model.superClasses.Evento;
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.sql.Time;
-import java.util.List;
 
 @Data
 @Entity
@@ -23,6 +21,7 @@ public class Show extends Evento {
     private BigDecimal valorContrato;
     private Boolean isPortaria;
     private Integer porcentagemPortaria;
+    private BigDecimal consumacaoPorMusico;
 
     public Show(){
         this.setTipoEvento(TipoEvento.SHOW);

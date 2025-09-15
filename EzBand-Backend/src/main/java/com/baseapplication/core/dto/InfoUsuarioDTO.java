@@ -20,6 +20,7 @@ public class InfoUsuarioDTO {
     private Boolean ativo;
     private Boolean bloqueado;
     private String permissao;
+    private String urlFotoPerfil;
 
     public static InfoUsuarioDTO toDTO(Usuario usuario){
         InfoUsuarioDTO dto = new InfoUsuarioDTO();
@@ -29,6 +30,7 @@ public class InfoUsuarioDTO {
         dto.setAtivo(usuario.getAtivo());
         dto.setBloqueado(usuario.getBloqueado());
         dto.setPermissao(usuario.getPermissao().getRole());
+        dto.setUrlFotoPerfil(usuario.getUrlFotoPerfil());
         return dto;
     }
 }

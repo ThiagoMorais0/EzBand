@@ -1,6 +1,7 @@
 package com.baseapplication.core.model;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -55,8 +56,8 @@ public class Usuario implements UserDetails {
     @Enumerated(EnumType.STRING)
     private PermissaoUsuario permissao;
     private String urlFotoPerfil;
-    @OneToMany(mappedBy = "id.idUsuario", fetch = FetchType.LAZY)
-    private List<MusicoBanda> musicoBandaList;
+    @OneToMany(mappedBy = "id.idUsuario", fetch = FetchType.EAGER)
+    private List<MusicoBanda> musicoBandaList = new ArrayList<>();
 
     public Usuario(CadastroDTO data) {
         this.nome = data.getNome();

@@ -33,7 +33,7 @@ public class ConviteParaEvento extends Notificacao {
                 evento.getData().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) + " às " +
                 evento.getHorarioInicio());
 
-        if(cache != null){
+        if(evento.getTipoEvento() == TipoEvento.SHOW && cache != null && cache.compareTo(BigDecimal.ZERO) > 0){
             mensagem.append(" com cache de R$ ").append(cache);
         }
 

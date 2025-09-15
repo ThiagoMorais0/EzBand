@@ -276,6 +276,7 @@ public class EventoServiceImpl implements EventoService {
 		}
 	}
 
+	@Transactional
 	@Override
 	public void marcarEnsaio(NovoEnsaioDTO novoEnsaioDTO) {
         validarDataEnsaio(novoEnsaioDTO.getDataEnsaio());
@@ -300,6 +301,14 @@ public class EventoServiceImpl implements EventoService {
 			notificacaoService.enviarNotificacao(new SolicitacaoAgendarEnsaioEvent(ensaio));
 		}
 		incluirMusicosNoEvento(novoEnsaioDTO.getMusicos(), banda, ensaio, TipoEvento.ENSAIO);
+
+		boolean existeMusicoForaDaBanda = novoEnsaioDTO.getMusicos().stream()
+				.anyMatch(m -> banda.getMusicos().stream().noneMatch(i -> i.getId().getIdUsuario().equals(m.getUsuario().getId())));
+
+		if(existeMusicoForaDaBanda){
+			ensaio.setStatus(StatusEvento.AGUARDANDO_APROVACAO);
+			ensaioService.salvar(ensaio);
+		}
 	}
 
     private void validarDataEnsaio(String dataEnsaio) {
@@ -465,52 +474,6 @@ public class EventoServiceImpl implements EventoService {
 			}
 		}
 	}
-
-//	private Notificacao criarNotificacaoAprovacaoEvento(Usuario usuario, Evento evento, TipoEvento tipoEvento) {
-//		switch (tipoEvento) {
-//		case SHOW -> {
-//			return criarNotificacaoAprovacaoShow(usuario, evento);
-//		}
-//		case ENSAIO -> {
-//			return criarNotificacaoAprovacaoEnsaio(usuario, evento);
-//		}
-//		default -> {
-//			throw new InvalidParamException("Tipo inválido");
-//		}
-//		}
-//	}
-
-//	private Notificacao criarNotificacaoAprovacaoEnsaio(Usuario usuario, Evento evento) {
-//		NotificacaoEnsaio notificacaoEnsaio = new NotificacaoEnsaio();
-//		notificacaoEnsaio.setEnsaio((Ensaio) evento);
-//		notificacaoEnsaio.setDataEnsaio(evento.getData());
-//		notificacaoEnsaio.setData(LocalDate.now());
-//		notificacaoEnsaio.setBanda(evento.getBanda());
-//		notificacaoEnsaio.setMensagem(
-//				Context.getUsuarioLogado().getNome() + " está marcando um ensaio em " + evento.getLocal() + " - "
-//						+ evento.getEndereco() + " na data " + DateUtils.localDateToString(evento.getData()) + ".");
-//		notificacaoEnsaio.setTipoNotificacao(TipoNotificacao.APROVACAO_EVENTO);
-//		notificacaoEnsaio.setDestinatario(usuario);
-//		notificacaoEnsaio.setStatusNotificacao(StatusNotificacao.NAO_VISUALIZADO);
-//		notificacaoEnsaio.setRemetente(Context.getUsuarioLogado());
-//		return notificacaoEnsaio;
-//	}
-//
-//	private Notificacao criarNotificacaoAprovacaoShow(Usuario usuario, Evento evento) {
-//		NotificacaoShow notificacaoShow = new NotificacaoShow();
-//		notificacaoShow.setShow((Show) evento);
-//		notificacaoShow.setBanda(evento.getBanda());
-//		notificacaoShow.setData(LocalDate.now());
-//		notificacaoShow.setDataEvento(evento.getData());
-//		notificacaoShow.setMensagem(Context.getUsuarioLogado().getNome() + " está marcando com "
-//				+ evento.getBanda().getNome() + " um show em " + evento.getLocal() + " - " + evento.getEndereco().getCidade()
-//				+ " na data " + DateUtils.localDateToString(evento.getData()) + ".");
-//		notificacaoShow.setTipoNotificacao(TipoNotificacao.APROVACAO_EVENTO);
-//		notificacaoShow.setDestinatario(usuario);
-//		notificacaoShow.setStatusNotificacao(StatusNotificacao.NAO_VISUALIZADO);
-//		notificacaoShow.setRemetente(Context.getUsuarioLogado());
-//		return notificacaoShow;
-//	}
 
 	private boolean isUsuarioMembroDaBanda(Usuario usuario, Banda banda) {
 		for (MusicoBanda musicoBanda : banda.getMusicos()) {

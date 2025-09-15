@@ -21,16 +21,22 @@ public class InformacoesShowDTO extends InformacoesEventoDTO {
     private Boolean isPortaria;
     private Integer porcentagemPortaria;
     private BigDecimal cacheIndividual;
+    private BigDecimal consumacaoPorMusico;
 
 
     public InformacoesShowDTO(Show show, MusicoEvento musicoEvento){
         BeanUtils.copyProperties(show, this);
         this.setBanda(new BandaDTO(show.getBanda()));
         this.setStatus(show.getStatus().getDescricao());
-        this.setInstrumentos(musicoEvento.getInstrumentos());
-        this.setCacheIndividual(musicoEvento.getCache());
+        if(musicoEvento != null){
+            this.setInstrumentos(musicoEvento.getInstrumentos());
+            this.setCacheIndividual(musicoEvento.getCache());
+        }else{
+         this.setUsuarioPertenceAoEvento(false);
+        }
         BeanUtils.copyProperties(show.getEndereco(), this.getEndereco());
         Hibernate.initialize(show.getParticipantes());
         this.setParticipantes(show.getParticipantes().stream().map(MusicoEventoDTO::new).collect(Collectors.toList()));
+        this.setConsumacaoPorMusico(show.getConsumacaoPorMusico());
     }
 }

@@ -43,6 +43,7 @@ public abstract class InformacoesEventoDTO {
     private String observacoes;
     private String status;
     private String instrumentos;
+    private Boolean usuarioPertenceAoEvento = true;
 
     private TipoEvento tipoEvento;
     private List<RepertorioEventoDTO> repertorio;

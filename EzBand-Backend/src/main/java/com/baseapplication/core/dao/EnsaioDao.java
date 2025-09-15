@@ -30,6 +30,6 @@ public interface EnsaioDao extends JpaRepository<Ensaio, Long> {
             "      or me.id_usuario = :idUsuario)", nativeQuery = true)
     List<Ensaio> buscarEnsaiosPorStatusBandaEUsuarioOrdenadoPorData(Long idBanda, Long idUsuario, String status);
 
-    @Query(value = "SELECT e FROM Ensaio e WHERE e.data < :now and e.status <> :status ")
+    @Query(value = "SELECT e FROM Ensaio e WHERE e.data <= :now and e.status <> :status ")
     List<Ensaio> buscarComDataAnteriorAHoje(LocalDate now, StatusEvento status);
 }

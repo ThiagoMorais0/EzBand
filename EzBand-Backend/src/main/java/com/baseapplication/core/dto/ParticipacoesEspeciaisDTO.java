@@ -15,5 +15,5 @@ import java.util.List;
 @AllArgsConstructor
 public class ParticipacoesEspeciaisDTO {
     List<ShowDTO> shows;
-    List<EnsaioDTO> ensaio;
+    List<EnsaioDTO> ensaios;
 }

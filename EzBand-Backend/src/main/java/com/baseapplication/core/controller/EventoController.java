@@ -112,7 +112,7 @@ public class EventoController {
     public ResponseEntity<?> marcarEnsaio(@RequestBody NovoEnsaioDTO novoEnsaioDTO) {
         try {
             eventoService.marcarEnsaio(novoEnsaioDTO);
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok("Ensaio marcado com sucesso");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
