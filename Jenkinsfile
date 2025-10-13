@@ -4,7 +4,9 @@ pipeline {
   stages {
     stage ('Build docker image') {
       steps {
-        sh 'echo "Executando build"'
+        script {
+          dockerapp = docker.build("ezband/ezband-app:${env.BUILD_ID}", '-f ./EzBand-Backend/Dockerfile ./EzBand-Backend')
+        }
       }
     }
 
