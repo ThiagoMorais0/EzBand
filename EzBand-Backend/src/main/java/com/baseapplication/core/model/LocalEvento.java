@@ -2,7 +2,7 @@ package com.baseapplication.core.model;
 
 import com.baseapplication.core.model.embedded.Endereco;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -10,7 +10,11 @@ import java.util.List;
 
 @Entity
 @Table(name = "LOCAL_EVENTO")
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode
 public class LocalEvento {
 
     @Id

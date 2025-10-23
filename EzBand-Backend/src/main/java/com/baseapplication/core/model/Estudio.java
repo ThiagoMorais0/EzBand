@@ -2,13 +2,17 @@ package com.baseapplication.core.model;
 
 import com.baseapplication.core.model.embedded.Endereco;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode
 @Entity
 @Table(name = "ESTUDIO")
 public class Estudio {
@@ -27,13 +31,13 @@ public class Estudio {
     private LocalDateTime DataInclusao = LocalDateTime.now();
     private String urlFotoPerfil;
     @OneToMany(mappedBy = "estudio", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ServicoEstudio> servicos;
+    private List<ServicoEstudio> servicos = new ArrayList<>();
 
     @OneToMany(mappedBy = "estudio", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<EquipamentoEstudio> equipamentos;
+    private List<EquipamentoEstudio> equipamentos = new ArrayList<>();
 
     @OneToMany(mappedBy = "estudio", fetch = FetchType.LAZY)
-    private List<Ensaio> ensaios;
+    private List<Ensaio> ensaios = new ArrayList<>();
 
     @OneToMany(mappedBy = "estudio", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AvaliacaoEstudio> avaliacoes = new ArrayList<>();

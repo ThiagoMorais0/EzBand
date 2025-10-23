@@ -62,8 +62,8 @@ public class EstudioServiceImpl implements EstudioService {
 
     @Override
     public void editar(EstudioDTO estudioDTO) {
-        Estudio estudio = dao.findById(estudioDTO.getId()).orElseThrow();
-        estudioDTO.toEntity(estudio);
+        Estudio estudio = buscarPorId(estudioDTO.getId());
+        BeanUtils.copyProperties(estudioDTO, estudio);
         dao.save(estudio);
     }
 

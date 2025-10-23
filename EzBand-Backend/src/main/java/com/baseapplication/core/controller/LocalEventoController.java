@@ -1,12 +1,17 @@
 package com.baseapplication.core.controller;
 
+import com.baseapplication.core.dto.CadastroEstudioDTO;
 import com.baseapplication.core.dto.CadastroLocalEventoDTO;
 import com.baseapplication.core.dto.LocalEventoDTO;
+import com.baseapplication.core.exception.InternalException;
 import com.baseapplication.core.service.LocalEventoService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -27,6 +32,21 @@ public class LocalEventoController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+    @PostMapping("/cadastrarComImagem")
+    @CrossOrigin(origins = "*")
+    public ResponseEntity<?> cadastrarUsuarioComImagem(@RequestParam("dados") String localEventoJson, MultipartFile imagem) {
+
+        CadastroLocalEventoDTO localEvento = null;
+        try {
+            localEvento = new ObjectMapper().readValue(localEventoJson, CadastroLocalEventoDTO.class);
+        } catch (JsonProcessingException e) {
+            throw new InternalException(e.getMessage());
+        }
+
+        return service.cadastrarComImagem(localEvento, imagem);
+    }
+
 
     @PostMapping("/editar")
     @ResponseBody
