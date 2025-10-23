@@ -333,7 +333,6 @@ public class EventoServiceImpl implements EventoService {
 				throw new InternalException("Estúdio não encontrado");
 			} else {
 				ensaio.setEstudio(estudio);
-				estudio.setEndereco(null);
 			}
 		}
 	}

@@ -2,12 +2,14 @@ package com.baseapplication.core.model;
 
 import com.baseapplication.core.model.embedded.Endereco;
 import com.baseapplication.core.model.embedded.ParametrosBanda;
+import com.baseapplication.core.model.publicacao.PublicacaoBanda;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -52,6 +54,10 @@ public class Banda {
 
     @OneToMany(mappedBy = "banda", fetch = FetchType.EAGER)
     private List<Ensaio> ensaios;
+
+    @OneToMany(mappedBy = "banda", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<PublicacaoBanda> publicacoes = new ArrayList<>();
+
     public List<Usuario> getUsuariosMusicos() {
         return musicos.stream().map(MusicoBanda::getUsuario).collect(Collectors.toList());
     }

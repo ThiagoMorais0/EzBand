@@ -1,6 +1,7 @@
 package com.baseapplication.core.model.dto;
 
 import com.baseapplication.core.dto.InfoPerfilUsuarioDTO;
+import com.baseapplication.core.dto.PublicacaoDTO;
 import com.baseapplication.core.enums.StatusEvento;
 import com.baseapplication.core.enums.StatusNotificacao;
 import com.baseapplication.core.model.Banda;
@@ -12,6 +13,7 @@ import lombok.Setter;
 import org.springframework.beans.BeanUtils;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,6 +36,7 @@ public class BandaDTO {
     private Integer quantidadeNotificacoes;
     private Integer quantidadeMembros;
     private List<InfoPerfilUsuarioDTO> membros;
+    private List<PublicacaoDTO> publicacoes;
 
 
     public BandaDTO(Banda banda){
@@ -55,5 +58,8 @@ public class BandaDTO {
 
         this.quantidadeMembros = banda.getMusicos().size();
         this.membros = banda.getMusicos().stream().map(InfoPerfilUsuarioDTO::new).collect(Collectors.toList());
+        //ORDENAR por data de publicação
+        this.publicacoes = banda.getPublicacoes().stream().map(PublicacaoDTO::new)
+                .sorted(Comparator.comparing(PublicacaoDTO::getDataPublicacao).reversed()).toList();
     }
 }

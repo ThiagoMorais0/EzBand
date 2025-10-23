@@ -4,6 +4,7 @@ import com.baseapplication.core.dto.BuscaGlobalDTO;
 import com.baseapplication.core.dto.EmailDTO;
 import com.baseapplication.core.dto.InfoPerfilUsuarioDTO;
 import com.baseapplication.core.dto.InfoUsuarioPainelDTO;
+import com.baseapplication.core.model.dto.BandaDTO;
 import com.baseapplication.core.service.UsuarioService;
 import com.baseapplication.core.utils.Context;
 import jakarta.validation.constraints.Null;
@@ -131,5 +132,13 @@ public class UsuarioController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 		}
 	}
-
+    
+    @GetMapping("/buscarBandasDoUsuario")
+    public ResponseEntity<?> buscarBandasDoUsuario(){
+        try{
+            return ResponseEntity.ok(Context.getUsuarioLogado().getBandas().stream().map(BandaDTO::new).toList());
+        }catch (Exception e){
+            return ResponseEntity.status(500).body(e.getMessage());
+        }
+    }
 }
