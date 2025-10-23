@@ -1,13 +1,21 @@
 package com.baseapplication.core.service.impl;
 
 import com.baseapplication.core.dao.LocalEventoDao;
+import com.baseapplication.core.dto.CadastroLocalEventoDTO;
 import com.baseapplication.core.dto.LocalEventoDTO;
+import com.baseapplication.core.model.Estudio;
 import com.baseapplication.core.model.LocalEvento;
 import com.baseapplication.core.model.dto.ShowDTO;
+import com.baseapplication.core.service.ImagemService;
 import com.baseapplication.core.service.LocalEventoService;
 import com.baseapplication.core.utils.Context;
+import com.baseapplication.core.utils.FileUtils;
+import com.fasterxml.jackson.databind.util.BeanUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.BeanUtils;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -16,10 +24,11 @@ import java.util.List;
 public class LocalEventoServiceImpl implements LocalEventoService {
 
     private final LocalEventoDao dao;
+    private final ImagemService imagemService;
 
     @Override
-    public void cadastrar(LocalEvento estudio) {
-        dao.save(estudio);
+    public LocalEvento cadastrar(LocalEvento estudio) {
+        return dao.save(estudio);
     }
 
     @Override
@@ -45,12 +54,23 @@ public class LocalEventoServiceImpl implements LocalEventoService {
     @Override
     public void editar(LocalEventoDTO estudioDTO) {
         LocalEvento estudio = dao.findById(estudioDTO.getId()).orElseThrow();
-        estudioDTO.toEntity(estudio);
+        //estudioDTO.toEntity(estudio);
+        BeanUtils.copyProperties(estudioDTO, estudio);
         dao.save(estudio);
     }
 
     @Override
     public List<ShowDTO> buscarShowsPorLocalEvento(Long idLocalEvento) {
         return null;
+    }
+
+    @Override
+    public ResponseEntity<?> cadastrarComImagem(CadastroLocalEventoDTO localEventoDTO, MultipartFile imagem) {
+        LocalEvento localEvento =  localEventoDTO.toEntity();
+        localEvento = cadastrar(localEvento);
+        String urlImagem = imagemService.saveImageAndGetUrl(imagem, "studiologo", localEvento.getId() + "." + FileUtils.getSufix(imagem));
+        localEvento.setUrlFotoPerfil(urlImagem);
+        cadastrar(localEvento);
+        return ResponseEntity.ok(null);
     }
 }
