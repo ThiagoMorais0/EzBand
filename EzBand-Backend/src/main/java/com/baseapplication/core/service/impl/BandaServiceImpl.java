@@ -113,7 +113,7 @@ public class BandaServiceImpl implements BandaService {
 	}
 
 	@Override
-	public void editarBanda(String bandaJson, MultipartFile logo) {
+	public void editarBanda(String bandaJson, MultipartFile logo, Boolean removerLogo) {
 		EdicaoBandaDTO bandaDTO;
 		try {
 			bandaDTO = new ObjectMapper().readValue(bandaJson, EdicaoBandaDTO.class);
@@ -127,6 +127,8 @@ public class BandaServiceImpl implements BandaService {
 		if (logo != null) {
 			urlLogo = imagemService.saveImageAndGetUrl(logo, "bandlogos",
 					banda.getId() + "." + FileUtils.getSufix(logo));
+		} else if (removerLogo) {
+			urlLogo = "default";
 		}
 
 		setarInformacoesEditadas(banda, bandaDTO, urlLogo);

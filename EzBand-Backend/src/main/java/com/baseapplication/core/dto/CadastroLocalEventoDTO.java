@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.BeanUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -17,12 +18,14 @@ public class CadastroLocalEventoDTO {
     private String descricao;
     private String horarioInicioFuncionamento;
     private String horarioFinalFuncionamento;
-    private List<EquipamentoLocalEventoDTO> equipamentos;
+    private List<EquipamentoLocalEventoDTO> equipamentos = new ArrayList<>();
 
     public LocalEvento toEntity() {
         LocalEvento entity = new LocalEvento();
         BeanUtils.copyProperties(this, entity);
-        BeanUtils.copyProperties(this.endereco, entity.getEndereco());
+
+        if(this.endereco != null)
+            BeanUtils.copyProperties(this.endereco, entity.getEndereco());
 
         // Proprietário logado
         entity.setProprietario(Context.getUsuarioLogado());

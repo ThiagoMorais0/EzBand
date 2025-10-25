@@ -3,12 +3,14 @@ package com.baseapplication.core.model.dto;
 import com.baseapplication.core.enums.TipoCalculo;
 import com.baseapplication.core.model.ParametroCusto;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class ParametroCustoDTO {
     private Long id;
     private BandaDTO banda = new BandaDTO();

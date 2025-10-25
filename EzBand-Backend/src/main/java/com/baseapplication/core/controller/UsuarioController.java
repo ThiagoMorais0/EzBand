@@ -141,4 +141,35 @@ public class UsuarioController {
             return ResponseEntity.status(500).body(e.getMessage());
         }
     }
+
+	@PostMapping("/seguir")
+	public ResponseEntity<?> seguirUsuario(@RequestParam Long idUsuario) {
+		try {
+			usuarioService.seguirUsuario(idUsuario);
+			return ResponseEntity.ok("Usuário seguido com sucesso");
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+		}
+	}
+
+	@PostMapping("/deixarDeSeguir")
+	public ResponseEntity<?> deixarDeSeguir(@RequestParam Long idUsuario) {
+		try {
+			usuarioService.deixarDeSeguir(idUsuario);
+			return ResponseEntity.ok("Deixou de seguir o usuário");
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+		}
+	}
+	
+	@GetMapping("/buscarAmigos")
+	public ResponseEntity<?> buscarAmigos(){
+		try{
+			return ResponseEntity.ok(usuarioService.buscarAmigos());
+		}catch (Exception e){
+			return ResponseEntity.status(500).body(e.getMessage());
+		}
+	}
+	
+	
 }

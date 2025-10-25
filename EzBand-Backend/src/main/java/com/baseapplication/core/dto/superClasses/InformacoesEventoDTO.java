@@ -11,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -29,6 +30,7 @@ import java.util.List;
         @JsonSubTypes.Type(value = InformacoesShowDTO.class, name = "show"),
         @JsonSubTypes.Type(value = InformacoesEnsaioDTO.class, name = "ensaio")
 })
+@NoArgsConstructor
 public abstract class InformacoesEventoDTO {
     private Long id;
     private BandaDTO banda;

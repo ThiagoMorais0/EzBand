@@ -1,5 +1,6 @@
 package com.baseapplication.core.dto;
 
+import com.baseapplication.core.enums.TipoRelacionamento;
 import com.baseapplication.core.model.dto.BandaDTO;
 import org.springframework.beans.BeanUtils;
 
@@ -31,12 +32,19 @@ public class InfoPerfilUsuarioDTO {
     private String descricao;
     private String urlFotoPerfil;
     private String instrumentos;
+    private TipoRelacionamento tipoRelacionamento;
     private List<BandaDTO> bandas = new ArrayList<>();
     private List<PublicacaoDTO> publicacoes = new ArrayList<>();
     public InfoPerfilUsuarioDTO(Usuario usuario){
         BeanUtils.copyProperties(usuario, this);
-        this.nascimento = DateUtils.localDateToString(usuario.getDataNascimento());
-        this.dataCriacao = DateUtils.localDateToString(usuario.getDataCriacao());
+
+        if(usuario.getDataNascimento() != null)
+            this.nascimento = DateUtils.localDateToString(usuario.getDataNascimento());
+
+        if(usuario.getDataCriacao() != null)
+            this.dataCriacao = DateUtils.localDateToString(usuario.getDataCriacao());
+
+
         this.setBandas(usuario.getBandas().stream().map(BandaDTO::new).toList());
         this.setPublicacoes(usuario.getPublicacoes().stream().map(PublicacaoDTO::new).sorted(Comparator.comparing(PublicacaoDTO::getDataPublicacao).reversed()).toList());
     }

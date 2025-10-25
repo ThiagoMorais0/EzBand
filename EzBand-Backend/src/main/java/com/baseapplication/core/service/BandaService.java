@@ -54,7 +54,7 @@ public interface BandaService {
 
     void adicionarMusicaAoRepertorio(RepertorioBandaDTO repertorioBandaDTO);
 
-    void editarBanda(String bandaJson, MultipartFile logo);
+    void editarBanda(String bandaJson, MultipartFile logo, Boolean removerLogo);
 
     List<String> getPermissoesMusico(Long idBanda, Long id);
 

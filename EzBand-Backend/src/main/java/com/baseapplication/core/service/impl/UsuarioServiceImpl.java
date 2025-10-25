@@ -25,6 +25,7 @@ import com.baseapplication.core.service.EmailService;
 import com.baseapplication.core.service.EventoHelperService;
 import com.baseapplication.core.service.ImagemService;
 import com.baseapplication.core.service.NotificacaoService;
+import com.baseapplication.core.service.RelacionamentoSeguidorService;
 import com.baseapplication.core.service.ReporteDeErroService;
 import com.baseapplication.core.service.UsuarioService;
 import com.baseapplication.core.utils.Context;
@@ -46,6 +47,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 	private final ImagemService imagemService;
 	private final ReporteDeErroService reporteDeErroService;
 	private final EmailService emailService;
+	private final RelacionamentoSeguidorService relacionamentoSeguidorService;
 
 //    @Override
 //    public Usuario findByLogin(String login) {
@@ -188,7 +190,9 @@ public class UsuarioServiceImpl implements UsuarioService {
 
 	@Override
 	public InfoPerfilUsuarioDTO buscarInformacoesDoPerfilPorId(Long idUsuario) {
-		return new InfoPerfilUsuarioDTO(buscarPorId(idUsuario));
+		InfoPerfilUsuarioDTO dto = new InfoPerfilUsuarioDTO(buscarPorId(idUsuario));
+		dto.setTipoRelacionamento(relacionamentoSeguidorService.buscarTipoRelacionamento(Context.getUsuarioLogado().getId(), idUsuario));
+		return dto;
 	}
 
 	@Override
@@ -257,4 +261,19 @@ public class UsuarioServiceImpl implements UsuarioService {
 				.limit(20)
 				.collect(Collectors.toList());
 	}
+
+	@Override
+	public void seguirUsuario(Long idUsuario) {
+		relacionamentoSeguidorService.seguirUsuario(idUsuario);
+	}
+
+	@Override
+	public void deixarDeSeguir(Long idUsuario) {
+		relacionamentoSeguidorService.deixarDeSeguir(idUsuario);
+	}
+
+    @Override
+    public List<InfoPerfilUsuarioDTO> buscarAmigos() {
+        return relacionamentoSeguidorService.buscarAmigos().stream().map(InfoPerfilUsuarioDTO::new).toList();
+    }
 }

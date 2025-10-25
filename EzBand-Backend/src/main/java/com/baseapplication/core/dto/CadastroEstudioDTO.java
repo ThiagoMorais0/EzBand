@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.BeanUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -18,13 +19,15 @@ public class CadastroEstudioDTO {
     private String descricao;
     private String horarioInicioFuncionamento;
     private String horarioFinalFuncionamento;
-    private List<ServicoEstudioDTO> servicos;
-    private List<EquipamentoEstudioDTO> equipamentos;
+    private List<ServicoEstudioDTO> servicos = new ArrayList<>();
+    private List<EquipamentoEstudioDTO> equipamentos = new ArrayList<>();
 
     public Estudio toEntity() {
         Estudio entity = new Estudio();
         BeanUtils.copyProperties(this, entity);
-        BeanUtils.copyProperties(this.endereco, entity.getEndereco());
+
+        if(this.endereco != null)
+            BeanUtils.copyProperties(this.endereco, entity.getEndereco());
 
         // Proprietário logado
         entity.setProprietario(Context.getUsuarioLogado());

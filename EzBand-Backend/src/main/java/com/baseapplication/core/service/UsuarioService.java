@@ -50,4 +50,10 @@ public interface UsuarioService {
 	ParticipacoesEspeciaisDTO buscarParticipacoesEspeciais();
 
 	List<BuscaGlobalDTO> buscarGlobal(String termo);
+
+	void seguirUsuario(Long idUsuario);
+
+	void deixarDeSeguir(Long idUsuario);
+
+    List<InfoPerfilUsuarioDTO> buscarAmigos();
 }

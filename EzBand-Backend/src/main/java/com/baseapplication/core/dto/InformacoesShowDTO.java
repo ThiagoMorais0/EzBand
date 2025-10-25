@@ -5,6 +5,7 @@ import com.baseapplication.core.model.MusicoEvento;
 import com.baseapplication.core.model.Show;
 import com.baseapplication.core.model.dto.BandaDTO;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.Hibernate;
 import org.springframework.beans.BeanUtils;
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class InformacoesShowDTO extends InformacoesEventoDTO {
     private Time horarioPassagemSom;
     private BigDecimal valorContrato;

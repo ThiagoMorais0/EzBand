@@ -106,8 +106,13 @@ public class BandaController {
     }
 
     @PostMapping("/sairDaBanda")
-    public void sairDaBanda(@RequestParam Long idBanda) {
-        bandaService.sairDaBanda(idBanda, Context.getUsuarioLogado().getId());
+    public ResponseEntity<?> sairDaBanda(@RequestParam Long idBanda) {
+        try{
+            bandaService.sairDaBanda(idBanda, Context.getUsuarioLogado().getId());
+            return ResponseEntity.ok("Saiu da banda com sucesso");
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @GetMapping("/buscarShowsFuturosBanda")
@@ -162,9 +167,12 @@ public class BandaController {
 
 
     @PostMapping("/editarBanda")
-    public ResponseEntity<?> editarBanda(@RequestParam("banda") String bandaJson, MultipartFile logo) {
+    public ResponseEntity<?> editarBanda(
+            @RequestParam("banda") String bandaJson,
+            @RequestParam(required = false) MultipartFile imagem,
+            @RequestParam Boolean removerLogo) {
         try{
-            bandaService.editarBanda(bandaJson, logo);
+            bandaService.editarBanda(bandaJson, imagem, removerLogo);
             return ResponseEntity.ok("Banda editada com sucesso");
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
