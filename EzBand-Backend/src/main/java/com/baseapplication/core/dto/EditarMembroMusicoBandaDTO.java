@@ -1,4 +1,4 @@
-package com.baseapplication.core.controller;
+package com.baseapplication.core.dto;
 
 import com.baseapplication.core.enums.PermissaoMusico;
 import lombok.Getter;

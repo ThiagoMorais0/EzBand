@@ -3,8 +3,10 @@ package com.baseapplication.core.factory;
 import com.baseapplication.core.enums.AcaoResposta;
 import com.baseapplication.core.model.notificacao.ConviteParaEvento;
 import com.baseapplication.core.model.notificacao.SolicitacaoAgendarEnsaio;
+import com.baseapplication.core.model.notificacao.SolicitacaoAgendarShow;
 import com.baseapplication.core.model.notificacao.SolicitacaoParaIngressarBanda;
 import com.baseapplication.core.model.notificacao.resposta.RespostaAgendamentoEnsaioNotificacao;
+import com.baseapplication.core.model.notificacao.resposta.RespostaAgendamentoShowNotificacao;
 import com.baseapplication.core.model.notificacao.resposta.RespostaConviteParaEvento;
 import com.baseapplication.core.model.notificacao.resposta.RespostaSolicitacaoParaIngressarBandaNotificacao;
 import com.baseapplication.core.model.superClasses.Notificacao;
@@ -19,6 +21,9 @@ public class RespostaNotificacaoFactory {
     public static Notificacao criarNotificacaoResposta(Notificacao notificacaoOriginal, String acao) {
         if (notificacaoOriginal instanceof SolicitacaoAgendarEnsaio solicitacao) {
             return new RespostaAgendamentoEnsaioNotificacao(solicitacao, Objects.requireNonNull(AcaoResposta.findByName(acao)));
+        }
+        if (notificacaoOriginal instanceof SolicitacaoAgendarShow solicitacaoShow) {
+            return new RespostaAgendamentoShowNotificacao(solicitacaoShow, Objects.requireNonNull(AcaoResposta.findByName(acao)));
         }
         if (notificacaoOriginal instanceof SolicitacaoParaIngressarBanda solicitacao){
             return new RespostaSolicitacaoParaIngressarBandaNotificacao(solicitacao, Objects.requireNonNull(AcaoResposta.findByName(acao)));

@@ -5,8 +5,10 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import com.baseapplication.core.dto.BuscaBandaDTO;
 import com.baseapplication.core.model.Banda;
 
 @Repository
@@ -65,4 +67,8 @@ public interface BandaDao extends JpaRepository<Banda, Long> {
 
     @Query(value = "select count(distinct rb.id) from repertorio_banda rb where id_banda = :idBanda", nativeQuery = true)
     Integer buscarQuantidadeDeMusicasNoRepertorio(Long idBanda);
+
+    @Query("SELECT b FROM Banda b " +
+            "WHERE (:#{#dto.nome} IS NULL OR :#{#dto.nome} = '' OR LOWER(b.nome) LIKE LOWER(CONCAT('%', :#{#dto.nome}, '%')))")
+    List<Banda> buscarSugestoes(@Param("dto") BuscaBandaDTO dto);
 }

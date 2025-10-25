@@ -3,6 +3,7 @@ package com.baseapplication.core.event.listeners;
 import com.baseapplication.core.controller.NotificacaoController;
 import com.baseapplication.core.event.events.*;
 import com.baseapplication.core.event.events.resposta.RespostaSolicitacaoAgendarEnsaioEvent;
+import com.baseapplication.core.event.events.resposta.RespostaSolicitacaoAgendarShowEvent;
 import com.baseapplication.core.model.notificacao.*;
 import com.baseapplication.core.model.superClasses.Notificacao;
 import com.baseapplication.core.service.NotificacaoService;
@@ -79,6 +80,21 @@ public class NotificacaoListener {
         enviar(notificacao);
     }
 
+    @EventListener
+    @Transactional
+    public void handleSolicitacaoAgendarShow(SolicitacaoAgendarShowEvent event) {
+        SolicitacaoAgendarShow notificacao = new SolicitacaoAgendarShow(event.getShow());
+        notificacao.setIdShow(event.getShow().getId());
+        notificacao.setUrlImagem(event.getShow().getBanda().getUrlLogo());
+        notificacao.setTitulo("Novo agendamento!");
+        enviar(notificacao);
+    }
+
+    @EventListener
+    @Transactional
+    public void handleRespostaSolicitacaoAgendarShow(RespostaSolicitacaoAgendarShowEvent event) {
+        notificacaoService.salvarNotificacao(event.getResposta());
+    }
 
 }
 

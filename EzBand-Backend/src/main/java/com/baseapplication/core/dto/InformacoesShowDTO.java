@@ -34,7 +34,8 @@ public class InformacoesShowDTO extends InformacoesEventoDTO {
         }else{
          this.setUsuarioPertenceAoEvento(false);
         }
-        BeanUtils.copyProperties(show.getEndereco(), this.getEndereco());
+        if(show.getEndereco() != null)
+            BeanUtils.copyProperties(show.getEndereco(), this.getEndereco());
         Hibernate.initialize(show.getParticipantes());
         this.setParticipantes(show.getParticipantes().stream().map(MusicoEventoDTO::new).collect(Collectors.toList()));
         this.setConsumacaoPorMusico(show.getConsumacaoPorMusico());

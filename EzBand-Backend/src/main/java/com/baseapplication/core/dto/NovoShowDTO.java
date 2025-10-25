@@ -39,7 +39,8 @@ public class NovoShowDTO {
 	public Show toEntity() {
 		Show show = new Show();
 		BeanUtils.copyProperties(this, show);
-		BeanUtils.copyProperties(this.endereco, show.getEndereco());
+		if(this.endereco != null)
+			BeanUtils.copyProperties(this.endereco, show.getEndereco());
 		show.setData(DateUtils.stringToLocalDate(this.dataShow));
 		show.setDataInclusao(LocalDate.now());
 		show.setConsumacaoPorMusico(this.consumacaoPorMusico);

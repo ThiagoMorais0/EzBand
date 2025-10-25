@@ -1,9 +1,6 @@
 package com.baseapplication.core.controller;
 
-import com.baseapplication.core.dto.CadastroEstudioDTO;
-import com.baseapplication.core.dto.CadastroUsuarioDTO;
-import com.baseapplication.core.dto.EstudioDTO;
-import com.baseapplication.core.dto.InfoPerfilUsuarioDTO;
+import com.baseapplication.core.dto.*;
 import com.baseapplication.core.exception.InternalException;
 import com.baseapplication.core.service.EstudioService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -107,6 +104,15 @@ public class EstudioController {
     public ResponseEntity<?> buscarEnsaiosPorEstudio(@RequestParam Long idEstudio){
         try{
             return ResponseEntity.ok(service.buscarEnsaiosPorEstudio(idEstudio));
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PostMapping("/buscarSugestoes")
+    public ResponseEntity<?> buscarSugestoes(@RequestBody BuscaEstudioDTO dto ){
+        try{
+            return ResponseEntity.ok(service.buscarSugestoes(dto).stream().map(EstudioDTO::new).toList());
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }

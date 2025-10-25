@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import com.baseapplication.core.dto.*;
 import com.baseapplication.core.event.events.ConviteParaMusicoEventoEvent;
+import com.baseapplication.core.event.events.SolicitacaoAgendarShowEvent;
 import org.springframework.beans.BeanUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
@@ -234,12 +235,12 @@ public class EventoServiceImpl implements EventoService {
 	@Transactional
 	@Override
 	public void marcarShow(@RequestBody NovoShowDTO novoShowDTO) {
-		try {
-			System.out.println(new ObjectMapper().writeValueAsString(novoShowDTO));
-		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		try {
+//			System.out.println(new ObjectMapper().writeValueAsString(novoShowDTO));
+//		} catch (JsonProcessingException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 		Show show = novoShowDTO.toEntity();
 		Banda banda = bandaService.buscarPorId(novoShowDTO.getIdBanda());
 		if (banda == null)
@@ -248,11 +249,20 @@ public class EventoServiceImpl implements EventoService {
 		if (banda.getParametros().getExigirAprovacaoCompromissos()) {
 			show.setStatus(StatusEvento.AGUARDANDO_APROVACAO);
 		} else {
-			show.setStatus(StatusEvento.PENDENTE);
+			if(novoShowDTO.getIdLocalEvento() != null){
+				show.setStatus(StatusEvento.AGUARDANDO_APROVACAO);
+			}else{
+				show.setStatus(StatusEvento.PENDENTE);
+			}
 		}
 
 		setarLocalEvento(novoShowDTO, show);
 		show = showService.salvar(show);
+
+		if (show.getLocalEvento() != null) {
+			System.out.println("Publicando notificação de show");
+			notificacaoService.enviarNotificacao(new SolicitacaoAgendarShowEvent(show));
+		}
 		incluirMusicosNoEvento(novoShowDTO.getMusicos(), banda, show, TipoEvento.SHOW);
 
 		boolean existeMusicoForaDaBanda = novoShowDTO.getMusicos().stream()
@@ -271,7 +281,7 @@ public class EventoServiceImpl implements EventoService {
 				throw new InternalException("Local de evento não encontrado");
 			} else {
 				show.setLocalEvento(localEvento);
-				show.setEndereco(null);
+				show.setEndereco(localEvento.getEndereco());
 			}
 		}
 	}

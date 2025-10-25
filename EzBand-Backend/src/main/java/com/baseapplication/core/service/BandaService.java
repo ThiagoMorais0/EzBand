@@ -2,7 +2,8 @@ package com.baseapplication.core.service;
 
 import java.util.List;
 
-import com.baseapplication.core.controller.EditarMembroMusicoBandaDTO;
+import com.baseapplication.core.dto.BuscaBandaDTO;
+import com.baseapplication.core.dto.EditarMembroMusicoBandaDTO;
 import com.baseapplication.core.model.dto.EnsaioDTO;
 import com.baseapplication.core.model.dto.ShowDTO;
 import org.springframework.http.ResponseEntity;
@@ -10,7 +11,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.baseapplication.core.dto.EnsaiosFuturosDTO;
 import com.baseapplication.core.dto.InfoMembroBandaDTO;
-import com.baseapplication.core.dto.MusicaDTO;
 import com.baseapplication.core.dto.RepertorioBandaDTO;
 import com.baseapplication.core.dto.ShowsFuturosDTO;
 import com.baseapplication.core.model.Banda;
@@ -67,4 +67,6 @@ public interface BandaService {
     void atualizarMusicaRertorio(RepertorioBandaDTO repertorioBandaDTO);
 
     void alterarPermissaoMembro(EditarMembroMusicoBandaDTO permissaoMusicoDTO);
+
+    List<Banda> buscarSugestoes(BuscaBandaDTO dto);
 }

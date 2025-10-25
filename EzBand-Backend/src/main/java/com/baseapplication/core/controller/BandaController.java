@@ -2,6 +2,7 @@ package com.baseapplication.core.controller;
 
 import java.util.List;
 
+import com.baseapplication.core.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,11 +15,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.baseapplication.core.dto.ConviteEventoDTO;
-import com.baseapplication.core.dto.EnsaiosFuturosDTO;
-import com.baseapplication.core.dto.InfoMembroBandaDTO;
-import com.baseapplication.core.dto.RepertorioBandaDTO;
-import com.baseapplication.core.dto.ShowsFuturosDTO;
 import com.baseapplication.core.model.dto.BandaDTO;
 import com.baseapplication.core.service.BandaService;
 import com.baseapplication.core.utils.Context;
@@ -166,15 +162,27 @@ public class BandaController {
 
 
     @PostMapping("/editarBanda")
-    public void editarBanda(@RequestParam("banda") String bandaJson, MultipartFile logo) {
-        bandaService.editarBanda(bandaJson, logo);
+    public ResponseEntity<?> editarBanda(@RequestParam("banda") String bandaJson, MultipartFile logo) {
+        try{
+            bandaService.editarBanda(bandaJson, logo);
+            return ResponseEntity.ok("Banda editada com sucesso");
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+
     }
 
     @PostMapping("/enviarConviteParaUsuarioIngressarBanda")
-    public void enviarConviteParaUsuarioIngressarBanda(
+    public ResponseEntity<?> enviarConviteParaUsuarioIngressarBanda(
             @RequestParam Long idBanda,
             @RequestParam Long idUsuarioConvidado){
-        bandaService.enviarConviteParaUsuarioIngressarBanda(idBanda, idUsuarioConvidado);
+        try{
+            bandaService.enviarConviteParaUsuarioIngressarBanda(idBanda, idUsuarioConvidado);
+            return ResponseEntity.ok("Convite enviado com sucesso");
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+
     }
 
     @PostMapping("/alterarPermissaoMembro")
@@ -183,6 +191,15 @@ public class BandaController {
             bandaService.alterarPermissaoMembro(permissaoMusicoDTO);
             return ResponseEntity.ok("Salvo com sucesso");
         } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PostMapping("/buscarSugestoes")
+    public ResponseEntity<?> buscarSugestoes(@RequestBody BuscaBandaDTO dto){
+        try{
+            return ResponseEntity.ok(bandaService.buscarSugestoes(dto).stream().map(BandaDTO::new).toList());
+        }catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

@@ -1,5 +1,6 @@
 package com.baseapplication.core.controller;
 
+import com.baseapplication.core.dto.BuscaLocalEventoDTO;
 import com.baseapplication.core.dto.CadastroEstudioDTO;
 import com.baseapplication.core.dto.CadastroLocalEventoDTO;
 import com.baseapplication.core.dto.LocalEventoDTO;
@@ -100,5 +101,15 @@ public class LocalEventoController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+    @PostMapping("/buscarSugestoes")
+    public ResponseEntity<?> buscarSugestoes(@RequestBody BuscaLocalEventoDTO dto){
+        try{
+            return ResponseEntity.ok(service.buscarSugestoes(dto).stream().map(LocalEventoDTO::new).toList());
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
 
 }

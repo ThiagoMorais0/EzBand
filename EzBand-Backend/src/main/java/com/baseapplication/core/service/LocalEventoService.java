@@ -1,5 +1,6 @@
 package com.baseapplication.core.service;
 
+import com.baseapplication.core.dto.BuscaLocalEventoDTO;
 import com.baseapplication.core.dto.CadastroLocalEventoDTO;
 import com.baseapplication.core.dto.LocalEventoDTO;
 import com.baseapplication.core.model.LocalEvento;
@@ -25,4 +26,6 @@ public interface LocalEventoService {
     List<ShowDTO> buscarShowsPorLocalEvento(Long idLocalEvento);
 
     ResponseEntity<?> cadastrarComImagem(CadastroLocalEventoDTO localEvento, MultipartFile imagem);
+
+    List<LocalEvento> buscarSugestoes(BuscaLocalEventoDTO dto);
 }

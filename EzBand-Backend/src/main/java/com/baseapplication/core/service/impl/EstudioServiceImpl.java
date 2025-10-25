@@ -1,9 +1,7 @@
 package com.baseapplication.core.service.impl;
 
-import com.baseapplication.core.dto.CadastroEstudioDTO;
-import com.baseapplication.core.dto.EstudioDTO;
+import com.baseapplication.core.dto.*;
 import com.baseapplication.core.dao.EstudioDao;
-import com.baseapplication.core.dto.InfoPerfilUsuarioDTO;
 import com.baseapplication.core.enums.TipoContato;
 import com.baseapplication.core.exception.ConflictException;
 import com.baseapplication.core.exception.InternalException;
@@ -19,13 +17,16 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -100,5 +101,17 @@ public class EstudioServiceImpl implements EstudioService {
             throw new InternalException("Estúdio não encontrado");
         }
         return estudio.getEnsaios().stream().map(EnsaioDTO::new).toList();
+    }
+
+    @Override
+    public List<Estudio> buscarSugestoes(BuscaEstudioDTO dto) {
+        List<Estudio> resultados = dao.buscarSugestoes(dto);
+
+        LevenshteinDistance levenshtein = new LevenshteinDistance();
+
+        return resultados.stream()
+                .sorted(Comparator.comparingInt(estudio -> levenshtein.apply(dto.getNome().toLowerCase(), estudio.getNome().toLowerCase())))
+                .limit(20)
+                .collect(Collectors.toList());
     }
 }

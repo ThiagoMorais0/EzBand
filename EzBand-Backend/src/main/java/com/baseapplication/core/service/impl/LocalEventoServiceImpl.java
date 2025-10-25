@@ -1,6 +1,7 @@
 package com.baseapplication.core.service.impl;
 
 import com.baseapplication.core.dao.LocalEventoDao;
+import com.baseapplication.core.dto.BuscaLocalEventoDTO;
 import com.baseapplication.core.dto.CadastroLocalEventoDTO;
 import com.baseapplication.core.dto.LocalEventoDTO;
 import com.baseapplication.core.model.Estudio;
@@ -12,12 +13,15 @@ import com.baseapplication.core.utils.Context;
 import com.baseapplication.core.utils.FileUtils;
 import com.fasterxml.jackson.databind.util.BeanUtil;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -61,7 +65,8 @@ public class LocalEventoServiceImpl implements LocalEventoService {
 
     @Override
     public List<ShowDTO> buscarShowsPorLocalEvento(Long idLocalEvento) {
-        return null;
+        //ordernar por data
+        return buscarPorId(idLocalEvento).getShows().stream().map(ShowDTO::new).sorted(Comparator.comparing(ShowDTO::getData)).collect(Collectors.toList());
     }
 
     @Override
@@ -72,5 +77,20 @@ public class LocalEventoServiceImpl implements LocalEventoService {
         localEvento.setUrlFotoPerfil(urlImagem);
         cadastrar(localEvento);
         return ResponseEntity.ok(null);
+    }
+
+    @Override
+    public List<LocalEvento> buscarSugestoes(BuscaLocalEventoDTO dto) {
+        List<LocalEvento> resultados = dao.buscarSugestoes(dto);
+
+        LevenshteinDistance levenshtein = new LevenshteinDistance();
+
+        return resultados.stream()
+                .sorted(Comparator.comparingInt(localEvento -> 
+                    dto.getNome() != null && !dto.getNome().isEmpty() 
+                        ? levenshtein.apply(dto.getNome().toLowerCase(), localEvento.getNome().toLowerCase())
+                        : 0))
+                .limit(20)
+                .collect(Collectors.toList());
     }
 }

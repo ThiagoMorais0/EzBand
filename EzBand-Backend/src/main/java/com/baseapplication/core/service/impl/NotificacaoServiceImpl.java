@@ -8,11 +8,13 @@ import com.baseapplication.core.dto.NotificacaoDTO;
 import com.baseapplication.core.enums.*;
 import com.baseapplication.core.event.events.NotificacaoEvent;
 import com.baseapplication.core.event.events.resposta.RespostaSolicitacaoAgendarEnsaioEvent;
+import com.baseapplication.core.event.events.resposta.RespostaSolicitacaoAgendarShowEvent;
 import com.baseapplication.core.factory.RespostaNotificacaoFactory;
 import com.baseapplication.core.model.*;
 import com.baseapplication.core.model.dto.RespostaNotificacaoDTO;
 import com.baseapplication.core.model.notificacao.ConviteParaEvento;
 import com.baseapplication.core.model.notificacao.SolicitacaoAgendarEnsaio;
+import com.baseapplication.core.model.notificacao.SolicitacaoAgendarShow;
 import com.baseapplication.core.model.notificacao.SolicitacaoParaIngressarBanda;
 import com.baseapplication.core.model.superClasses.Notificacao;
 import com.baseapplication.core.service.*;
@@ -178,6 +180,10 @@ public class NotificacaoServiceImpl implements NotificacaoService {
             case "SOLICITACAO_PARA_AGENDAR_ENSAIO":
                 SolicitacaoAgendarEnsaio solicitacao = (SolicitacaoAgendarEnsaio) notificacao;
                 eventoHelperService.alterarStatus(solicitacao.getIdEnsaio(), TipoEvento.ENSAIO, acao.equals(AcaoResposta.ACEITAR) ? StatusEvento.PENDENTE : StatusEvento.CANCELADO);
+                return;
+            case "SOLICITACAO_PARA_AGENDAR_SHOW":
+                SolicitacaoAgendarShow solicitacaoShow = (SolicitacaoAgendarShow) notificacao;
+                eventoHelperService.alterarStatus(solicitacaoShow.getIdShow(), TipoEvento.SHOW, acao.equals(AcaoResposta.ACEITAR) ? StatusEvento.PENDENTE : StatusEvento.CANCELADO);
                 return;
             case "SOLICITACAO_PARA_INGRESSAR_BANDA":
                 SolicitacaoParaIngressarBanda solicitacaoBanda = (SolicitacaoParaIngressarBanda) notificacao;

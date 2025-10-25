@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-import com.baseapplication.core.controller.EditarMembroMusicoBandaDTO;
-import com.baseapplication.core.dto.*;
+import com.baseapplication.core.dto.BuscaBandaDTO;
+import com.baseapplication.core.dto.EditarMembroMusicoBandaDTO;
 import com.baseapplication.core.enums.PermissaoMusico;
 import com.baseapplication.core.enums.StatusEvento;
 import com.baseapplication.core.event.events.ConviteParaUsuarioIngressarBandaEvent;
@@ -18,6 +18,7 @@ import com.baseapplication.core.model.embedded.ParametrosBanda;
 import com.baseapplication.core.service.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -28,10 +29,8 @@ import com.baseapplication.core.dto.CadastroBandaDTO;
 import com.baseapplication.core.dto.EdicaoBandaDTO;
 import com.baseapplication.core.dto.EnsaiosFuturosDTO;
 import com.baseapplication.core.dto.InfoMembroBandaDTO;
-import com.baseapplication.core.dto.MusicaDTO;
 import com.baseapplication.core.dto.RepertorioBandaDTO;
 import com.baseapplication.core.dto.ShowsFuturosDTO;
-import com.baseapplication.core.enums.PermissaoMusico;
 import com.baseapplication.core.enums.Tonalidade;
 import com.baseapplication.core.exception.ConflictException;
 import com.baseapplication.core.exception.InternalException;
@@ -41,7 +40,6 @@ import com.baseapplication.core.model.dto.BandaDTO;
 import com.baseapplication.core.model.dto.EnsaioDTO;
 import com.baseapplication.core.model.dto.ShowDTO;
 import com.baseapplication.core.model.embedded.Musica;
-import com.baseapplication.core.model.embedded.ParametrosBanda;
 import com.baseapplication.core.service.BandaService;
 import com.baseapplication.core.service.EventoHelperService;
 import com.baseapplication.core.service.ImagemService;
@@ -407,6 +405,21 @@ public class BandaServiceImpl implements BandaService {
 		banda.setParametros(parametros);
 
 		return banda;
+	}
+
+	@Override
+	public List<Banda> buscarSugestoes(BuscaBandaDTO dto) {
+		List<Banda> resultados = bandaDao.buscarSugestoes(dto);
+
+		LevenshteinDistance levenshtein = new LevenshteinDistance();
+
+		return resultados.stream()
+				.sorted(Comparator.comparingInt(banda -> 
+					dto.getNome() != null && !dto.getNome().isEmpty() 
+						? levenshtein.apply(dto.getNome().toLowerCase(), banda.getNome().toLowerCase())
+						: 0))
+				.limit(20)
+				.collect(Collectors.toList());
 	}
 
 }
