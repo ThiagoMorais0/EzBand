@@ -1,0 +1,255 @@
+===== ./config/db.js =====
+const mongoose = require('mongoose');
+
+const connectDB = async () => {
+    const uri = `mongodb://${process.env.MONGO_INITDB_ROOT_USERNAME}:${process.env.MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017/${process.env.MONGO_DB_DATABASE}?authSource=admin`;
+    console.log('uri: ' + uri)
+    try {
+        await mongoose.connect(uri);
+        console.log('✅ MongoDB conectado');
+    } catch (err) {
+        console.error('❌ Erro ao conectar MongoDB:', err);
+        process.exit(1);
+    }
+};
+
+module.exports = connectDB;
+===== ./config/jwt.js =====
+const jwt = require('jsonwebtoken');
+const SECRET = process.env.JWT_SECRET;
+
+const verifyToken = (token) => {
+    return jwt.verify(token, SECRET);
+};
+
+module.exports = { verifyToken };
+===== ./ws/wsServer.js =====
+const { WebSocketServer } = require("ws");
+const { verifyToken } = require('../config/jwt');
+const connectDB = require('../config/db');
+const { addClient, removeClient } = require('../services/clientsService');
+const { saveMessage, sendMessage, getUserChats, getChatMessages } = require('../services/messageService');
+
+const wss = new WebSocketServer({ port: 3001 });
+
+wss.on("connection", async (ws, req) => {
+    try {
+        await connectDB();
+
+        const url = new URL(req.url, `http://${req.headers.host}`);
+        const token = url.searchParams.get("token");
+        const tipoIdConectado = url.searchParams.get("tipoId");
+
+        if (!token) {
+            ws.close(4001, "Token ausente");
+            return;
+        }
+
+        verifyToken(token);
+
+        addClient(tipoIdConectado, ws);
+        console.log(`Usuário conectado: ${tipoIdConectado}`);
+
+        const chats = await getUserChats(ws.key);
+        ws.send(JSON.stringify({ type: 'chats', data: chats }));
+
+        ws.on("message", async (msg) => {
+            try {
+                const data = JSON.parse(msg);
+                console.log(data);
+
+                // Solicitação de mais chats
+                if (data.type === "getChats") {
+                    const page = data.page || 1;
+                    const chats = await getUserChats(ws.key, page, 10);
+                    ws.send(JSON.stringify({ type: "chats", data: chats }));
+                    return;
+                }
+
+                if (data.type === "chatOpened") {
+                    setCurrentChat(ws.key, data.userB);
+                    return;
+                }
+
+                // Busca as mensagens do chat
+                if (data.type === "getChatMessages") {
+                    const { userB, page = 1 } = data;
+
+                    const messages = await getChatMessages(ws.key, userB, page)
+
+                    ws.send(JSON.stringify({ type: "chatMessages", data: messages }));
+                    return;
+                }
+
+                await saveMessage(data);
+
+                if (data.type === "message") {
+                    sendMessage(ws, data);
+                }
+            } catch (err) {
+                console.error("Erro na mensagem:", err);
+            }
+        });
+
+        ws.on("close", () => {
+            removeClient(ws.key);
+            console.log(`Usuário desconectado: ${ws.key}`);
+        });
+
+    } catch (err) {
+        console.log("Falha JWT:", err.message);
+        ws.close(4002, "Token inválido");
+    }
+});
+
+console.log("Servidor WebSocket 1x1 rodando na porta 3001");
+===== ./services/clientsService.js =====
+// clientsService.js
+const clients = new Map(); // key -> { ws, currentChat }
+
+const addClient = (key, ws) => {
+    ws.key = key;
+    clients.set(key, { ws, currentChat: null });
+};
+
+const removeClient = (key) => {
+    clients.delete(key);
+};
+
+const getClient = (key) => {
+    const client = clients.get(key);
+    return client ? client.ws : null;
+};
+
+// Retorna todo o objeto { ws, currentChat }
+const getClientData = (key) => clients.get(key);
+
+// Atualiza o chat atualmente aberto para o usuário
+const setCurrentChat = (key, chatUser) => {
+    const client = clients.get(key);
+    if (client) client.currentChat = chatUser;
+};
+
+// Retorna o chat atualmente aberto para o usuário
+const getCurrentChat = (key) => {
+    const client = clients.get(key);
+    return client ? client.currentChat : null;
+};
+
+module.exports = {
+    addClient,
+    removeClient,
+    getClient,
+    getClientData,
+    setCurrentChat,
+    getCurrentChat
+};
+===== ./services/messageService.js =====
+const Message = require('../models/Message');
+const { getClient } = require('./clientsService');
+
+const saveMessage = async (data) => {
+    const newMsg = new Message(data);
+    await newMsg.save();
+};
+
+const sendMessage = (fromWs, data) => {
+    const target = getClient(data.to);
+
+    if (target) {
+        target.send(JSON.stringify({
+            from: fromWs.key,
+            msg: data.msg,
+        }));
+    } else {
+        fromWs.send(JSON.stringify({
+            system: `Usuário ${data.to} não está online`,
+        }));
+    }
+};
+
+const getUserChats = async (userId, page = 1, pageSize = 10) => {
+    console.log("userId: " + userId);
+
+    const skip = (page - 1) * pageSize;
+
+    const chats = await Message.aggregate([
+        { $match: { $or: [{ from: userId }, { to: userId }] } },
+        { $sort: { createdAt: -1 } },
+        {
+            $group: {
+                _id: {
+                    participants: {
+                        $cond: [
+                            { $lt: ["$from", "$to"] },
+                            ["$from", "$to"],
+                            ["$to", "$from"]
+                        ]
+                    }
+                },
+                lastMessage: { $first: "$$ROOT" },
+                updatedAt: { $first: "$createdAt" }
+            }
+        },
+        {
+            $project: {
+                _id: 0,
+                userA: { $arrayElemAt: ["$_id.participants", 0] },
+                userB: { $arrayElemAt: ["$_id.participants", 1] },
+                lastMessage: {
+                    content: "$lastMessage.msg",
+                    sender: "$lastMessage.from",
+                    createdAt: "$lastMessage.createdAt",
+                    read: "$lastMessage.read"
+                },
+                updatedAt: 1
+            }
+        },
+        { $sort: { updatedAt: -1 } },
+        { $skip: skip },
+        { $limit: pageSize }
+    ]);
+    return chats;
+};
+
+const getChatMessages = async (userA, userB, page = 1) => {
+    const pageSize = 25;
+    const skip = (page - 1) * pageSize;
+
+    // Buscar mensagens entre os dois usuários
+    const messages = await Message.find({
+        $or: [
+            { from: userA, to: userB },
+            { from: userB, to: userA }
+        ]
+    })
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(pageSize)
+        .lean();
+
+    // Marcar como lidas as mensagens enviadas para o usuário conectado
+    await Message.updateMany(
+        { to: userA, from: userB, read: false },
+        { $set: { read: true } }
+    );
+
+    return messages;
+}
+
+
+
+module.exports = { saveMessage, sendMessage, getUserChats, getChatMessages };
+===== ./util/logger.js =====
+===== ./models/Message.js =====
+const mongoose = require('mongoose');
+
+const messageSchema = new mongoose.Schema({
+    from: { type: String, required: true },
+    to: { type: String, required: true },
+    msg: { type: String, required: true },
+    createdAt: { type: Date, default: Date.now },
+    read: {type: Boolean, default: false}
+});
+
+module.exports = mongoose.model('Message', messageSchema);

@@ -1,19 +1,16 @@
 {
   "name": "chatservice",
   "version": "1.0.0",
-  "description": "microsserviço de chat para o aplicativo EzBand",
-  "main": "index.js",
+  "description": "",
+  "main": "wsServer.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "SearchFoot Team",
+  "author": "",
   "license": "ISC",
   "dependencies": {
-    "cors": "^2.8.5",
-    "dotenv": "^17.2.1",
-    "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.18.0",
-    "socket.io": "^4.8.1"
+    "ws": "^8.18.3"
   }
 }

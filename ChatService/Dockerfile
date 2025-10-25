@@ -1,5 +1,5 @@
 # Usar Node.js LTS
-FROM node:latest
+FROM node:iron-alpine3.21
 
 # Definir diretório de trabalho
 WORKDIR /app
@@ -17,4 +17,4 @@ COPY . .
 EXPOSE 3001
 
 # Comando para iniciar a aplicação
-CMD ["node", "src/index.js"]
+CMD ["node", "src/ws/wsServer.js"]
