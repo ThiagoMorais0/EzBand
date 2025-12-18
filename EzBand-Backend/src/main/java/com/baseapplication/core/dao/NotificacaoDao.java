@@ -16,11 +16,20 @@ import com.baseapplication.core.model.superClasses.Notificacao;
 @Repository
 public interface NotificacaoDao extends JpaRepository<Notificacao, Long> {
 
-    @Query("SELECT n FROM Notificacao n WHERE n.destinatarioId = :destinatarioId AND n.destinatarioTipo = :destinatarioTipo")
+    @Query("SELECT n FROM Notificacao n WHERE n.destinatarioId = :destinatarioId AND n.destinatarioTipo = :destinatarioTipo AND n.lida = false ORDER BY n.dataCriacao DESC")
     List<Notificacao> buscarNaoLidas(@Param("destinatarioId") Long destinatarioId,
                                      @Param("destinatarioTipo") TipoParticipante destinatarioTipo);
 
     @Query("SELECT c FROM ConviteParaEvento c WHERE c.idEventoConvite = :idEvento AND c.tipoEventoConvite = :tipoEvento")
     List<ConviteParaEvento> buscarConvitesParaEvento(@Param("idEvento") Long idEvento,
                                                      @Param("tipoEvento") TipoEvento tipoEvento);
+
+    @Query("SELECT n FROM Notificacao n WHERE n.destinatarioId = :destinatarioId AND n.destinatarioTipo = :destinatarioTipo AND n.remetenteId = :remetenteId AND n.remetenteTipo = :remetenteTipo AND TYPE(n) = :tipoNotificacao AND n.lida = false")
+    List<Notificacao> buscarNotificacoesSimilaresNaoLidas(
+            @Param("destinatarioId") Long destinatarioId,
+            @Param("destinatarioTipo") TipoParticipante destinatarioTipo,
+            @Param("remetenteId") Long remetenteId,
+            @Param("remetenteTipo") TipoParticipante remetenteTipo,
+            @Param("tipoNotificacao") Class<? extends Notificacao> tipoNotificacao
+    );
 }

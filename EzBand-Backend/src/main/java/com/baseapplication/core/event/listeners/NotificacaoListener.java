@@ -7,7 +7,6 @@ import com.baseapplication.core.event.events.resposta.RespostaSolicitacaoAgendar
 import com.baseapplication.core.model.notificacao.*;
 import com.baseapplication.core.model.superClasses.Notificacao;
 import com.baseapplication.core.service.NotificacaoService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -25,7 +24,6 @@ public class NotificacaoListener {
     }
 
     @EventListener
-    @Transactional
     public void handleSolicitacaoAgendarEnsaio(SolicitacaoAgendarEnsaioEvent event) {
         SolicitacaoAgendarEnsaio notificacao = new SolicitacaoAgendarEnsaio(event.getEnsaio());
         notificacao.setIdEnsaio(event.getEnsaio().getId());
@@ -35,30 +33,26 @@ public class NotificacaoListener {
     }
 
     @EventListener
-    @Transactional
     public void handleRespostaSolicitacaoAgendarEnsaio(RespostaSolicitacaoAgendarEnsaioEvent event) {;
         notificacaoService.salvarNotificacao(event.getResposta());
     }
 
     @EventListener
-    @Transactional
     public void handleUsuarioExpulsoDeBanda(UsuarioExpulsoDeBandaEvent event) {
         UsuarioExpulsoDeBanda notificacao = new UsuarioExpulsoDeBanda(event.getIdBanda(), event.getIdUsuario());
         enviar(notificacao);
     }
 
     @EventListener
-    @Transactional
     public void handleConviteParaUsuarioIngressarBanda(ConviteParaUsuarioIngressarBandaEvent event) {
         ConviteParaUsuarioIngressarBanda notificacao = new ConviteParaUsuarioIngressarBanda(
-                event.getIdBanda(),
-                event.getIdUsuarioConvidado()
+                event.getIdUsuarioConvidado(),
+                event.getBanda()
         );
         enviar(notificacao);
     }
 
     @EventListener
-    @Transactional
     public void handleSolicitacaoIngressarBanda(SolicitacaoIngressarBandaEvent event) {
         SolicitacaoParaIngressarBanda notificacao = new SolicitacaoParaIngressarBanda(
                 event.getUsuario(),
@@ -69,7 +63,6 @@ public class NotificacaoListener {
     }
 
     @EventListener
-    @Transactional
     public void handleEnviarConviteParaMusicoEvento(ConviteParaMusicoEventoEvent event) {
         ConviteParaEvento notificacao = new ConviteParaEvento(
                 event.getEvento(),
@@ -81,7 +74,6 @@ public class NotificacaoListener {
     }
 
     @EventListener
-    @Transactional
     public void handleSolicitacaoAgendarShow(SolicitacaoAgendarShowEvent event) {
         SolicitacaoAgendarShow notificacao = new SolicitacaoAgendarShow(event.getShow());
         notificacao.setIdShow(event.getShow().getId());
@@ -91,9 +83,14 @@ public class NotificacaoListener {
     }
 
     @EventListener
-    @Transactional
     public void handleRespostaSolicitacaoAgendarShow(RespostaSolicitacaoAgendarShowEvent event) {
         notificacaoService.salvarNotificacao(event.getResposta());
+    }
+
+    @EventListener
+    public void handleNovoSeguidor(NovoSeguidorEvent event) {
+        NovoSeguidor notificacao = new NovoSeguidor(event.getRemetente(), event.getIdDestinatario());
+        enviar(notificacao);
     }
 
 }

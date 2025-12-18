@@ -23,6 +23,7 @@ public interface ShowService {
     List<Show> buscarShowsPorStatusBandaEUsuarioOrdenadoPorData(Long idBanda, Long idUsuario, String status);
 
     Evento buscarPrimeiroPorUsuarioEData(Long idUsuario, LocalDate data);
+    List<Evento> buscarPorUsuarioEData(Long idUsuario, LocalDate data);
 
     void alterarStatus(Long idShow, StatusEvento novoStatus);
 

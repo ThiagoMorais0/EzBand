@@ -37,7 +37,9 @@ public class ShowServiceImpl implements ShowService {
 
 	@Override
 	public List<Show> buscarPendentesPorUsuarioOrdenadoPorData(Long idUsuario) {
-		return showDao.buscarPorIdUsuario(idUsuario).stream().filter(i -> i.getStatus().equals(StatusEvento.PENDENTE))
+		return showDao.buscarPorIdUsuario(idUsuario).stream()
+				.filter(i -> i.getStatus().equals(StatusEvento.PENDENTE))
+				.filter(i -> i.getData() != null)
 				.sorted(Comparator.comparing(Show::getData)).collect(Collectors.toList());
 	}
 
@@ -71,6 +73,11 @@ public class ShowServiceImpl implements ShowService {
 	@Override
 	public Evento buscarPrimeiroPorUsuarioEData(Long idUsuario, LocalDate data) {
 		return showDao.buscarPrimeiroPorUsuarioEData(idUsuario, data);
+	}
+
+	@Override
+	public List<Evento> buscarPorUsuarioEData(Long idUsuario, LocalDate data) {
+		return showDao.buscarPorUsuarioEData(idUsuario, data);
 	}
 
     @Override

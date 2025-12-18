@@ -56,4 +56,6 @@ public interface UsuarioService {
 	void deixarDeSeguir(Long idUsuario);
 
     List<InfoPerfilUsuarioDTO> buscarAmigos();
+
+    List<InfoPerfilUsuarioDTO> buscarSugestoes(String termo);
 }

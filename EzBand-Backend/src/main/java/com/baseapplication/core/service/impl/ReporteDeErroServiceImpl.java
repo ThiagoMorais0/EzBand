@@ -21,7 +21,9 @@ public class ReporteDeErroServiceImpl implements ReporteDeErroService {
     @Override
     public void reportarErro(String mensagem, Usuario usuario) {
         reporteDeErroDao.save(new ReporteDeErro(usuario, mensagem));
-        emailService.enviarEmail(criarAssuntoEmail(usuario), criarMensagemEmail(usuario, mensagem), "thiagomface@gmail.com");
+//        try{
+//            emailService.enviarEmail(criarAssuntoEmail(usuario), criarMensagemEmail(usuario, mensagem), "thiagomface@gmail.com");
+//        }catch (Exception ignore){}
     }
 
     private String criarMensagemEmail(Usuario usuario, String mensagem) {

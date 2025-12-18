@@ -29,6 +29,7 @@ public class NovoEnsaioDTO {
     private Time duracao;
     private BigDecimal valor;
     private List<MusicoEventoDTO> musicos;
+    private List<MembroFantasmaEventoDTO> membrosFantasma;
 
     public Ensaio toEntity() {
         Ensaio ensaio = new Ensaio();
@@ -38,6 +39,17 @@ public class NovoEnsaioDTO {
         }
         ensaio.setData(DateUtils.stringToLocalDate(this.dataEnsaio));
         ensaio.setDataInclusao(LocalDate.now());
+        verificarHorariosNulos(ensaio);
         return ensaio;
+    }
+
+    private void verificarHorariosNulos(Ensaio ensaio) {
+        Time zero = Time.valueOf("00:00:00");
+
+        if (this.duracao != null && this.duracao.equals(zero))
+            ensaio.setDuracao(null);
+
+        if (this.horarioInicio != null && this.horarioInicio.equals(zero))
+            ensaio.setHorarioInicio(null);
     }
 }

@@ -66,14 +66,18 @@ public class LocalEventoServiceImpl implements LocalEventoService {
     @Override
     public List<ShowDTO> buscarShowsPorLocalEvento(Long idLocalEvento) {
         //ordernar por data
-        return buscarPorId(idLocalEvento).getShows().stream().map(ShowDTO::new).sorted(Comparator.comparing(ShowDTO::getData)).collect(Collectors.toList());
+        return buscarPorId(idLocalEvento).getShows().stream()
+                .filter(show -> show.getData() != null)
+                .map(ShowDTO::new)
+                .sorted(Comparator.comparing(ShowDTO::getData))
+                .collect(Collectors.toList());
     }
 
     @Override
     public ResponseEntity<?> cadastrarComImagem(CadastroLocalEventoDTO localEventoDTO, MultipartFile imagem) {
         LocalEvento localEvento =  localEventoDTO.toEntity();
         localEvento = cadastrar(localEvento);
-        String urlImagem = imagemService.saveImageAndGetUrl(imagem, "studiologo", localEvento.getId() + "." + FileUtils.getSufix(imagem));
+        String urlImagem = imagemService.saveImageAndGetUrl(imagem, "venuelogo", localEvento.getId() + "." + FileUtils.getSufix(imagem));
         localEvento.setUrlFotoPerfil(urlImagem);
         cadastrar(localEvento);
         return ResponseEntity.ok(null);

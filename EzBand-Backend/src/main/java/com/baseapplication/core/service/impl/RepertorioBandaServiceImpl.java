@@ -6,6 +6,8 @@ import com.baseapplication.core.service.RepertorioBandaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class RepertorioBandaServiceImpl implements RepertorioBandaService {
 
@@ -21,4 +23,16 @@ public class RepertorioBandaServiceImpl implements RepertorioBandaService {
     public RepertorioBanda buscarPorId(Long id) {
         return repertorioBandaDao.findById(id).orElseThrow();
     }
+
+    @Override
+    public void deletar(RepertorioBanda repertorioBanda) {
+        repertorioBandaDao.delete(repertorioBanda);
+    }
+
+    @Override
+    public Integer buscarUltimoIndice(Long idBanda) {
+        Integer indice = repertorioBandaDao.buscarUltimoIndice(idBanda);
+        return indice == null ? 0 : indice;
+    }
+
 }

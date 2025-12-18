@@ -1,0 +1,18 @@
+package com.baseapplication.core.dto.metricas;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.math.BigDecimal;
+
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+public class MetricaBandaMaisRentavelDTO {
+    private Long idBanda;
+    private String nomeBanda;
+    private BigDecimal valorTotal;
+}

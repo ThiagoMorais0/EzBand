@@ -15,8 +15,8 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public Boolean enviarEmail(String assunto, String mensagem, String destinatario) {
         // Configurações do servidor SMTP
-        String usuario = "ezbandapp@gmail.com"; // Substitua pelo seu e-mail
-        String senha = "uzio ylxn shlp krob"; // Substitua pela sua senha ou App Password
+        String usuario = "ezband3@gmail.com"; // Substitua pelo seu e-mail
+        String senha = "hkpt jqqs awxd iipx"; // Substitua pela sua senha ou App Password
 
         // Configuração das propriedades do servidor
         Properties props = new Properties();

@@ -7,13 +7,20 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Repository
 public interface MusicoEventoDao extends JpaRepository<MusicoEvento, MusicoEventoId> {
+    @Transactional
     @Modifying
     @Query(value = "delete from musico_evento me where me.id_evento = :idEvento and me.tipo_evento = :tipoEvento ", nativeQuery = true)
     void removerTodosParticipantes(Long idEvento, TipoEvento tipoEvento);
 
     // Spring Data derived query over embedded id fields
     java.util.List<MusicoEvento> findByIdIdEventoAndIdTipoEvento(Long idEvento, TipoEvento tipoEvento);
+
+    @Query(value = "select * from musico_evento me where me.id_evento = :idEvento and me.tipo_evento = :tipoEvento", nativeQuery = true)
+    List<MusicoEvento> buscarMusicosPorEvento(Long idEvento, String tipoEvento);
 }

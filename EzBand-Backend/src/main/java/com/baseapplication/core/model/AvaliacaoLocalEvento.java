@@ -30,5 +30,8 @@ public class AvaliacaoLocalEvento {
 
     @DateTimeFormat(pattern = "dd/MM/yyyy")
     private LocalDate dataAvaliacao;
+    
+    @Column(columnDefinition = "TEXT")
+    private String comentario;
 
 }

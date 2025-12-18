@@ -39,5 +39,12 @@ public class RepertorioEventoServiceImpl implements RepertorioEventoService {
         repertorioEventoDao.save(repertorioEvento);
     }
 
+    @Override
+    public void removerMusicaDoRepertorio(Long idEvento, TipoEvento tipoEvento, Integer indice) {
+        RepertorioEvento musica = buscarPorIndiceEEvento(indice, idEvento, tipoEvento);
+        if (musica != null) {
+            repertorioEventoDao.delete(musica);
+        }
+    }
 
 }

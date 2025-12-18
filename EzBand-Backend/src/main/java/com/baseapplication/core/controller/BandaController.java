@@ -3,6 +3,9 @@ package com.baseapplication.core.controller;
 import java.util.List;
 
 import com.baseapplication.core.dto.*;
+import com.baseapplication.core.service.MembroFantasmaService;
+import com.baseapplication.core.service.SugestaoRepertorioService;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,10 +25,17 @@ import com.baseapplication.core.utils.Context;
 @RestController
 @CrossOrigin(origins = "http://127.0.0.1:5500")
 @RequestMapping("/banda")
+@Log4j2
 public class BandaController {
 
     @Autowired
     private BandaService bandaService;
+
+    @Autowired
+    private MembroFantasmaService membroFantasmaService;
+
+    @Autowired
+    private SugestaoRepertorioService sugestaoRepertorioService;
 
     @GetMapping("/getInfo")
     public BandaDTO getInfo(@RequestParam Long idBanda) {
@@ -38,8 +48,13 @@ public class BandaController {
     }
 
     @PostMapping("/novaBanda")
-    public void novaBanda(@RequestParam("banda") String bandaJson, MultipartFile logo) {
-        bandaService.novaBanda(bandaJson, logo);
+    public ResponseEntity<?> novaBanda(@RequestParam("banda") String bandaJson, MultipartFile logo) {
+        try{
+            bandaService.novaBanda(bandaJson, logo);
+            return ResponseEntity.ok("Banda criada com sucesso");
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @PostMapping("/cadastrarUsuario")
@@ -49,8 +64,13 @@ public class BandaController {
     }
 
     @PostMapping("/expulsarUsuario")
-    public void expulsarUsuario(@RequestParam Long idBanda, @RequestParam Long idUsuario) {
-        bandaService.expulsarUsuario(idBanda, idUsuario);
+    public ResponseEntity<?> expulsarUsuario(@RequestParam Long idBanda, @RequestParam Long idUsuario) {
+        try{
+            bandaService.expulsarUsuario(idBanda, idUsuario);
+            return ResponseEntity.ok("Usuário expulso");
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @GetMapping("/getMembros")
@@ -139,6 +159,7 @@ public class BandaController {
         try{
             return ResponseEntity.ok(bandaService.buscarShows(idBanda));
         }catch (Exception e){
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -150,8 +171,13 @@ public class BandaController {
     }
 
     @PostMapping("/adicionarMusicaAoRepertorio")
-    public void adicionarMusicaAoRepertorio(@RequestBody RepertorioBandaDTO repertorioBandaDTO) {
-        bandaService.adicionarMusicaAoRepertorio(repertorioBandaDTO);
+    public ResponseEntity<?> adicionarMusicaAoRepertorio(@RequestBody RepertorioBandaDTO repertorioBandaDTO) {
+        try{
+            bandaService.adicionarMusicaAoRepertorio(repertorioBandaDTO);
+            return ResponseEntity.ok("Música adicionada ao repertório com sucesso");
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @PostMapping("/atualizarMusicaRepertorio")
@@ -160,6 +186,16 @@ public class BandaController {
             bandaService.atualizarMusicaRertorio(repertorioBandaDTO);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PostMapping("/removerMusicaDoRepertorio")
+    public ResponseEntity<?> removerMusicaDoRepertorio(@RequestBody RepertorioBandaDTO repertorioBandaDTO) {
+        try{
+            bandaService.removerMusicaDoRepertorio(repertorioBandaDTO.getId(), repertorioBandaDTO.getIdBanda());
+            return ResponseEntity.ok("Música removida do repertório com sucesso");
+        }catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -212,5 +248,71 @@ public class BandaController {
         }
     }
 
+    @PostMapping("/criarMembroFantasma")
+    public ResponseEntity<?> criarMembroFantasma(@RequestParam("membro") String membroJson, @RequestParam(required = false) MultipartFile foto){
+        try{
+            MembroFantasmaDTO membroFantasma = membroFantasmaService.criar(membroJson, foto);
+            return ResponseEntity.ok(membroFantasma);
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PostMapping("/editarMembroFantasma")
+    public ResponseEntity<?> editarMembroFantasma(@RequestBody EdicaoMembroFantasmaDTO dto){
+        try{
+            MembroFantasmaDTO membroFantasma = membroFantasmaService.editar(dto);
+            return ResponseEntity.ok(membroFantasma);
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PostMapping("/deletarMembroFantasma")
+    public ResponseEntity<?> deletarMembroFantasma(@RequestParam Long id){
+        try{
+            membroFantasmaService.deletar(id);
+            return ResponseEntity.ok("Membro fantasma deletado com sucesso");
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/buscarMembrosFantasma")
+    public ResponseEntity<?> buscarMembrosFantasma(@RequestParam Long idBanda){
+        try{
+            return ResponseEntity.ok(membroFantasmaService.buscarPorIdBanda(idBanda));
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/buscarMembroFantasmaPorId")
+    public ResponseEntity<?> buscarMembroFantasmaPorId(@RequestParam Long id){
+        try{
+            return ResponseEntity.ok(membroFantasmaService.buscarPorId(id));
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PostMapping("/sugerirRepertorio")
+    public ResponseEntity<?> sugerirRepertorio(@RequestBody SugestaoRepertorioDTO dto){
+        try{
+            return ResponseEntity.ok(sugestaoRepertorioService.sugerirRepertorio(dto));
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/atualizarOrdemRepertorio")
+    public ResponseEntity<?> atualizarOrdemRepertorio(@RequestParam Long idBanda, @RequestBody List<RepertorioBandaDTO> repertorio) {
+        try{
+            bandaService.atualizarOrdemRepertorio(idBanda, repertorio);
+            return ResponseEntity.ok("Ordem atualizada com sucesso");
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 
 }

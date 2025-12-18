@@ -18,11 +18,12 @@ public class UsuarioExpulsoDeBanda extends Notificacao {
     public UsuarioExpulsoDeBanda(Long idBanda, Long idUsuario){
         super.setMensagem("Você foi expulso");
 
-        super.setDestinatarioId(idBanda);
-        super.setDestinatarioTipo(TipoParticipante.BANDA);
+        super.setDestinatarioId(idUsuario);
+        super.setDestinatarioTipo(TipoParticipante.USUARIO);
 
-        super.setRemetenteId(idUsuario);
-        super.setRemetenteTipo(TipoParticipante.USUARIO);
+        super.setRemetenteId(idBanda);
+        super.setRemetenteTipo(TipoParticipante.BANDA);
+        super.setPermiteResposta(false);
     }
 
     @Override

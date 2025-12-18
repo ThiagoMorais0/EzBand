@@ -174,11 +174,13 @@ class UsuarioControllerTest {
     @Test
     @DisplayName("Deve reportar erro com sucesso")
     void deveReportarErroComSucesso() {
-        String mensagem = "Erro encontrado";
+        ReporteErroDTO dto = new ReporteErroDTO();
+        dto.setMensagem("Erro encontrado");
+        dto.setCategoria("Erro");
         doNothing().when(usuarioService).reportarErro(anyString());
 
-        assertDoesNotThrow(() -> usuarioController.reportarErro(mensagem));
-        verify(usuarioService, times(1)).reportarErro(mensagem);
+        assertDoesNotThrow(() -> usuarioController.reportarErro(dto));
+        verify(usuarioService, times(1)).reportarErro(dto.getCategoria() + ": " + dto.getMensagem());
     }
 
     @Test

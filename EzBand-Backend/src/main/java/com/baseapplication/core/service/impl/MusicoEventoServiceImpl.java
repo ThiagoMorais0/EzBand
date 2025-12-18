@@ -29,11 +29,21 @@ public class MusicoEventoServiceImpl implements MusicoEventoService {
 
     @Override
     public MusicoEvento buscar(Long idEvento, TipoEvento tipoEvento, Long idUsuario) {
-        return musicoEventoDao.findById(new MusicoEventoId(idEvento, idUsuario, tipoEvento)).orElseThrow();
+        return musicoEventoDao.findById(new MusicoEventoId(idEvento, idUsuario, tipoEvento)).orElse(new MusicoEvento());
     }
 
     @Override
     public List<MusicoEvento> listarPorEvento(Long idEvento, TipoEvento tipoEvento) {
         return musicoEventoDao.findByIdIdEventoAndIdTipoEvento(idEvento, tipoEvento);
+    }
+
+    @Override
+    public void remover(MusicoEvento musicoEvento) {
+        musicoEventoDao.delete(musicoEvento);
+    }
+
+    @Override
+    public List<MusicoEvento> buscarMusicosPorEvento(Long idEvento, TipoEvento tipoEvento) {
+        return musicoEventoDao.buscarMusicosPorEvento(idEvento, tipoEvento.toString());
     }
 }

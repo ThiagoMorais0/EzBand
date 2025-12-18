@@ -1,24 +1,35 @@
 package com.baseapplication.core.model.notificacao;
 
 import com.baseapplication.core.enums.TipoParticipante;
+import com.baseapplication.core.model.Banda;
 import com.baseapplication.core.model.superClasses.Notificacao;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @DiscriminatorValue("CONVITE_PARA_USUARIO_INGRESSAR_BANDA")
 @NoArgsConstructor
+@Getter
+@Setter
 public class ConviteParaUsuarioIngressarBanda extends Notificacao {
 
-    public ConviteParaUsuarioIngressarBanda(Long idBanda, Long idUsuario){
-        super.setMensagem("Você está sendo convidado para ingressar a banda!");
+    private String instrumento;
 
-        super.setDestinatarioId(idBanda);
-        super.setDestinatarioTipo(TipoParticipante.BANDA);
+    public ConviteParaUsuarioIngressarBanda(Long idUsuario, Banda banda){
+        super.setTitulo("Convite");
+        super.setMensagem("Você está sendo convidado para ingressar a banda " + banda.getNome() + "!");
+        super.setUrlImagem(banda.getUrlLogo());
 
-        super.setRemetenteId(idUsuario);
-        super.setRemetenteTipo(TipoParticipante.USUARIO);
+        super.setDestinatarioId(idUsuario);
+        super.setDestinatarioTipo(TipoParticipante.USUARIO);
+
+        super.setRemetenteId(banda.getId());
+        super.setRemetenteTipo(TipoParticipante.BANDA);
+        
+        this.instrumento = ""; // Será definido pelo usuário ao aceitar
     }
 
     @Override

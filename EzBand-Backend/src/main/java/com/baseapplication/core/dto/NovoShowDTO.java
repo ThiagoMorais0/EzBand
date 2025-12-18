@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.beans.BeanUtils;
 
 import com.baseapplication.core.model.Show;
@@ -24,6 +25,7 @@ public class NovoShowDTO {
 	private EnderecoDTO endereco = new EnderecoDTO();
 	private Long idLocalEvento;
 	private String dataShow;
+	//Horário pode ser nulo
 	@JsonFormat(pattern = "HH:mm:ss")
 	private Time horarioInicio;
 	@JsonFormat(pattern = "HH:mm:ss")
@@ -35,6 +37,7 @@ public class NovoShowDTO {
 	private Boolean isPortaria;
 	private BigDecimal consumacaoPorMusico;
 	private List<MusicoEventoDTO> musicos = new ArrayList<>();
+	private List<MembroFantasmaEventoDTO> membrosFantasma = new ArrayList<>();
 
 	public Show toEntity() {
 		Show show = new Show();
@@ -44,6 +47,21 @@ public class NovoShowDTO {
 		show.setData(DateUtils.stringToLocalDate(this.dataShow));
 		show.setDataInclusao(LocalDate.now());
 		show.setConsumacaoPorMusico(this.consumacaoPorMusico);
+		verificarHorariosNulos(show);
+
 		return show;
+	}
+
+	private void verificarHorariosNulos(Show show) {
+		Time zero = Time.valueOf("00:00:00");
+
+		if (this.duracao != null && this.duracao.equals(zero))
+			show.setDuracao(null);
+
+		if (this.horarioInicio != null && this.horarioInicio.equals(zero))
+			show.setHorarioInicio(null);
+
+		if (this.horarioPassagemSom != null && this.horarioPassagemSom.equals(zero))
+			show.setHorarioPassagemSom(null);
 	}
 }

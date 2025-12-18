@@ -33,20 +33,20 @@ public class CadastroEstudioDTO {
         entity.setProprietario(Context.getUsuarioLogado());
 
         // Serviços
-        List<ServicoEstudio> servicosEntity = servicos.stream()
+        List<ServicoEstudio> servicosEntity = new ArrayList<>(servicos.stream()
                 .map(dto -> {
                     ServicoEstudio s = dto.toEntity();
                     s.setEstudio(entity); // ESSENCIAL
                     return s;
-                }).toList();
+                }).toList());
 
         // Equipamentos
-        List<EquipamentoEstudio> equipamentosEntity = equipamentos.stream()
+        List<EquipamentoEstudio> equipamentosEntity = new ArrayList<>(equipamentos.stream()
                 .map(dto -> {
                     EquipamentoEstudio e = dto.toEntity();
                     e.setEstudio(entity); // ESSENCIAL
                     return e;
-                }).toList();
+                }).toList());
 
         entity.setServicos(servicosEntity);
         entity.setEquipamentos(equipamentosEntity);

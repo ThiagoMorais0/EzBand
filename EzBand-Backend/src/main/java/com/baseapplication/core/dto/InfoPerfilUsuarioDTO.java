@@ -1,6 +1,7 @@
 package com.baseapplication.core.dto;
 
 import com.baseapplication.core.enums.TipoRelacionamento;
+import com.baseapplication.core.model.MembroFantasma;
 import com.baseapplication.core.model.dto.BandaDTO;
 import org.springframework.beans.BeanUtils;
 
@@ -54,5 +55,11 @@ public class InfoPerfilUsuarioDTO {
         this.nascimento = DateUtils.localDateToString(musico.getUsuario().getDataNascimento());
         this.dataCriacao = DateUtils.localDateToString(musico.getUsuario().getDataCriacao());
         this.instrumentos = musico.getInstrumentos();
+    }
+
+    public InfoPerfilUsuarioDTO(MembroFantasma membroFantasma){
+        BeanUtils.copyProperties(membroFantasma, this);
+        this.urlFotoPerfil = membroFantasma.getUrlFoto();
+        this.instrumentos = membroFantasma.getInstrumento();
     }
 }

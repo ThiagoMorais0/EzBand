@@ -12,10 +12,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class RespostaSolicitacaoParaIngressarBandaNotificacao extends Notificacao {
 
-    public RespostaSolicitacaoParaIngressarBandaNotificacao(SolicitacaoParaIngressarBanda solicitacao, AcaoResposta acao) {
+    public RespostaSolicitacaoParaIngressarBandaNotificacao(SolicitacaoParaIngressarBanda solicitacao, AcaoResposta acao, String mensagem) {
         super.setMensagem(acao.equals(AcaoResposta.ACEITAR) ?
                 "Você ingressou a banda!" :
-                "Sua solicitação para ingressar a banda foi recusada. Resposta:" + solicitacao.getMensagem());
+                "Sua solicitação para ingressar a banda foi recusada. Resposta: " + mensagem);
         super.setPermiteResposta(false);
         // remetente é quem respondeu
         super.setRemetenteId(solicitacao.getDestinatarioId());

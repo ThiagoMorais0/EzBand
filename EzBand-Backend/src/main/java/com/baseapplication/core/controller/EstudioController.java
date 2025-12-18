@@ -77,7 +77,8 @@ public class EstudioController {
 
     @PostMapping("/cadastrarComImagem")
     @CrossOrigin(origins = "*")
-    public ResponseEntity<?> cadastrarUsuarioComImagem(@RequestParam("dados") String estudioJson, MultipartFile imagem) {
+    public ResponseEntity<?> cadastrarUsuarioComImagem(@RequestParam("dados") String estudioJson, 
+                                                        @RequestParam(value = "imagem", required = false) MultipartFile imagem) {
 
         CadastroEstudioDTO estudio = null;
         try {

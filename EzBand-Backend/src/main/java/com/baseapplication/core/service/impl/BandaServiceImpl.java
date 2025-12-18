@@ -59,6 +59,7 @@ public class BandaServiceImpl implements BandaService {
 	private final EventoHelperService eventoHelperService;
 	private final RepertorioBandaService repertorioBandaService;
 	private final NotificacaoService notificacaoService;
+	private final MembroFantasmaService membroFantasmaService;
 
 	@Override
 	public List<Banda> buscarBandasPorUsuario(Long idUsuario) {
@@ -90,8 +91,19 @@ public class BandaServiceImpl implements BandaService {
 
 	@Override
 	public List<InfoMembroBandaDTO> buscarMembros(Long idBanda) {
-		return musicoBandaService.buscarMembrosPorIdBanda(idBanda).stream().map(InfoMembroBandaDTO::new)
-				.collect(Collectors.toList());
+		List<InfoMembroBandaDTO> membros = new ArrayList<>();
+		
+		// Adiciona membros usuários
+		membros.addAll(musicoBandaService.buscarMembrosPorIdBanda(idBanda).stream()
+				.map(InfoMembroBandaDTO::new)
+				.collect(Collectors.toList()));
+		
+		// Adiciona membros fantasma
+		membros.addAll(membroFantasmaService.buscarPorIdBanda(idBanda).stream()
+				.map(mf -> new InfoMembroBandaDTO(mf.toEntity()))
+				.collect(Collectors.toList()));
+		
+		return membros;
 	}
 
 	@Transactional
@@ -104,9 +116,15 @@ public class BandaServiceImpl implements BandaService {
 			throw new InternalException("Erro ao converter json");
 		}
 
-		Banda banda = bandaDao.save(new Banda()); // somente para pegar o id
-		String urlLogo = imagemService.saveImageAndGetUrl(logo, "bandlogos",
-				banda.getId() + "." + FileUtils.getSufix(logo));
+		Banda banda = bandaDao.save(new Banda());
+		String urlLogo;
+		if(logo != null){
+			urlLogo = imagemService.saveImageAndGetUrl(logo, "bandlogos",
+					banda.getId() + "." + FileUtils.getSufix(logo));
+		}else{
+			urlLogo = "default";
+		}
+
 		banda = atualizaBandaFromCadastroDTO(banda, bandaDTO, urlLogo);
 		bandaDao.save(banda);
 		cadastrarUsuarioEmBanda(bandaDTO, banda, PermissaoMusico.getAll());
@@ -147,14 +165,15 @@ public class BandaServiceImpl implements BandaService {
 
 	@Override
 	public void enviarConviteParaUsuarioIngressarBanda(Long idBanda, Long idUsuarioConvidado) {
-		notificacaoService.enviarNotificacao(new ConviteParaUsuarioIngressarBandaEvent(idUsuarioConvidado, idBanda));
+		notificacaoService.enviarNotificacao(new ConviteParaUsuarioIngressarBandaEvent(idUsuarioConvidado, buscarPorId(idBanda)));
 	}
 
 	@Override
 	public List<EnsaioDTO> buscarEnsaios(Long idBanda) {
 		return buscarPorId(idBanda).getEnsaios().stream()
+				.filter(ensaio -> ensaio.getData() != null) // Filtra ensaios sem data
 				.sorted(Comparator.comparing(Ensaio::getData)
-						.thenComparing(Ensaio::getHorarioInicio))
+						.thenComparing(Ensaio::getHorarioInicio, Comparator.nullsLast(Comparator.naturalOrder())))
 				.map(EnsaioDTO::new).toList();
 	}
 
@@ -162,9 +181,10 @@ public class BandaServiceImpl implements BandaService {
 	public List<ShowDTO> buscarShows(Long idBanda) {
 		//Ordenar pela data, do mais recente para o mais longe e depois pelo horário, mesma lógica
 		return buscarPorId(idBanda).getShows().stream()
+				.filter(show -> show.getData() != null) // Filtra shows sem data
 				.sorted(
 						Comparator.comparing(Show::getData)
-								.thenComparing(Show::getHorarioInicio)
+								.thenComparing(Show::getHorarioInicio, Comparator.nullsLast(Comparator.naturalOrder()))
 				)
 				.map(ShowDTO::new)
 				.toList();
@@ -180,6 +200,10 @@ public class BandaServiceImpl implements BandaService {
 		musicaRepertorio.getMusica().setUrlYoutube(repertorioBandaDTO.getMusica().getUrlYoutube());
 		musicaRepertorio.getMusica().setDescricao(repertorioBandaDTO.getMusica().getDescricao());
 		musicaRepertorio.getMusica().setObservacao(repertorioBandaDTO.getMusica().getObservacao());
+		musicaRepertorio.setIndice(repertorioBandaDTO.getIndice());
+		musicaRepertorio.setPosicaoShow(repertorioBandaDTO.getPosicaoShow());
+		musicaRepertorio.setEnergia(repertorioBandaDTO.getEnergia());
+		musicaRepertorio.setRelevancia(repertorioBandaDTO.getRelevancia());
 		repertorioBandaService.salvar(musicaRepertorio);
 	}
 
@@ -247,7 +271,7 @@ public class BandaServiceImpl implements BandaService {
 	@Override
 	public Integer buscarQuantidadeDeMembros(Long idBanda) {
 		Banda banda = buscarPorId(idBanda);
-		return banda == null ? 0 : banda.getMusicos().size();
+		return banda == null ? 0 : banda.getMusicos().size() + banda.getMembrosFantasma().size();
 	}
 
 	@Override
@@ -305,12 +329,15 @@ public class BandaServiceImpl implements BandaService {
 
 	@Override
 	public List<RepertorioBandaDTO> buscarRepertorio(Long idBanda) {
+		//ordernar por índice
 		return buscarPorId(idBanda).getRepertorio().stream().map(RepertorioBandaDTO::new)
+				.sorted(Comparator.comparing(RepertorioBandaDTO::getIndice, Comparator.nullsLast(Comparator.naturalOrder())))
 				.collect(Collectors.toList());
 	}
 
 	@Override
 	public void adicionarMusicaAoRepertorio(RepertorioBandaDTO repertorioBandaDTO) {
+		repertorioBandaDTO.setIndice(repertorioBandaService.buscarUltimoIndice(repertorioBandaDTO.getIdBanda()) + 1);
 		RepertorioBanda repertorioBanda = criarRepertorioBanda(repertorioBandaDTO);
 		salvarRepertorio(repertorioBanda);
 	}
@@ -324,6 +351,11 @@ public class BandaServiceImpl implements BandaService {
 		musica.setTonalidade(Tonalidade.encontrarPeloNumero(repertorioBandaDTO.getMusica().getTonalidade()));
 
 		repertorioBanda.setMusica(musica);
+		repertorioBanda.setIndice(repertorioBandaDTO.getIndice());
+		repertorioBanda.setPosicaoShow(repertorioBandaDTO.getPosicaoShow());
+		repertorioBanda.setEnergia(repertorioBandaDTO.getEnergia());
+		repertorioBanda.setRelevancia(repertorioBandaDTO.getRelevancia());
+		
 		return repertorioBanda;
 	}
 
@@ -422,6 +454,21 @@ public class BandaServiceImpl implements BandaService {
 						: 0))
 				.limit(20)
 				.collect(Collectors.toList());
+	}
+
+	@Override
+	public void removerMusicaDoRepertorio(Long id, Long idBanda) {
+		RepertorioBanda repertorioBanda = repertorioBandaService.buscarPorId(id);
+		repertorioBandaService.deletar(repertorioBanda);
+	}
+
+	@Override
+	public void atualizarOrdemRepertorio(Long idBanda, List<RepertorioBandaDTO> repertorio) {
+		repertorio.forEach(repertorioBandaDTO -> {
+			RepertorioBanda repertorioBanda = repertorioBandaService.buscarPorId(repertorioBandaDTO.getId());
+			repertorioBanda.setIndice(repertorioBandaDTO.getIndice());
+			repertorioBandaService.salvar(repertorioBanda);
+		});
 	}
 
 }

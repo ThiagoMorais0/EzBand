@@ -32,16 +32,10 @@ public class Banda {
     private String urlLogo;
     @Embedded
     private Endereco endereco;
-    @OneToMany(mappedBy = "id.idBanda", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "banda", fetch = FetchType.EAGER)
     private List<MusicoBanda> musicos;
     @Embedded
     private ParametrosBanda parametros = new ParametrosBanda();
-
-//    @OneToMany(mappedBy = "banda", fetch = FetchType.EAGER)
-//    private List<NotificacaoShow> notificacaoShows;
-//
-//    @OneToMany(mappedBy = "banda", fetch = FetchType.EAGER)
-//    private List<NotificacaoEnsaio> notificacaoEnsaios;
 
     @OneToMany(mappedBy = "banda", fetch = FetchType.EAGER)
     private List<Show> shows;
@@ -57,6 +51,9 @@ public class Banda {
 
     @OneToMany(mappedBy = "banda", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<PublicacaoBanda> publicacoes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "banda", fetch = FetchType.EAGER)
+    private List<MembroFantasma> membrosFantasma;
 
     public List<Usuario> getUsuariosMusicos() {
         return musicos.stream().map(MusicoBanda::getUsuario).collect(Collectors.toList());

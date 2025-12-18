@@ -13,4 +13,8 @@ public interface MusicoEventoService {
     MusicoEvento buscar(Long idEvento, TipoEvento tipoEvento, Long idUsuario);
 
     List<MusicoEvento> listarPorEvento(Long idEvento, TipoEvento tipoEvento);
+
+    void remover(MusicoEvento musicoEvento);
+
+    List<MusicoEvento> buscarMusicosPorEvento(Long idEvento, TipoEvento tipoEvento);
 }

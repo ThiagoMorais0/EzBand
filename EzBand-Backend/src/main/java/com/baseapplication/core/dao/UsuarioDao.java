@@ -55,32 +55,32 @@ public interface UsuarioDao extends JpaRepository<Usuario, Long> {
     QuantidadeParticipacoesEspeciaisDTO buscarQuantidadeParticipacoesEspeciais(Long idUsuario);
 
     @Query("""
-    SELECT new com.baseapplication.core.model.dto.ShowDTO(ev, me.cache)
+    SELECT new com.baseapplication.core.model.dto.ShowDTO(s, me.cache)
     FROM MusicoEvento me
-    JOIN me.evento ev
+    JOIN Show s ON s.id = me.id.idEvento
     WHERE me.id.idUsuario = :idUsuario
-      AND ev.tipoEvento = 'SHOW'
-      AND ev.status = 'PENDENTE'
+      AND s.tipoEvento = 'SHOW'
+      AND s.status = 'PENDENTE'
       AND NOT EXISTS (
           SELECT 1
           FROM MusicoBanda mb
-          WHERE mb.banda.id = ev.banda.id
+          WHERE mb.banda.id = s.banda.id
             AND mb.usuario.id = me.id.idUsuario
       )
 """)
     List<ShowDTO> buscarShowsEspeciais(Long idUsuario);
 
     @Query("""
-    SELECT new com.baseapplication.core.model.dto.EnsaioDTO(ev)
+    SELECT new com.baseapplication.core.model.dto.EnsaioDTO(e)
     FROM MusicoEvento me
-    JOIN me.evento ev
+    JOIN Ensaio e ON e.id = me.id.idEvento
     WHERE me.id.idUsuario = :idUsuario
-      AND ev.tipoEvento = 'ENSAIO'
-      AND ev.status = 'PENDENTE'
+      AND e.tipoEvento = 'ENSAIO'
+      AND e.status = 'PENDENTE'
       AND NOT EXISTS (
           SELECT 1
           FROM MusicoBanda mb
-          WHERE mb.banda.id = ev.banda.id
+          WHERE mb.banda.id = e.banda.id
             AND mb.usuario.id = me.id.idUsuario
       )
 """)
@@ -97,4 +97,8 @@ public interface UsuarioDao extends JpaRepository<Usuario, Long> {
             LIMIT 50
             """, nativeQuery = true)
     List<BuscaGlobalProjection> buscarGlobal(String termo);
+
+    @Query("SELECT u FROM Usuario u " +
+            "WHERE (:#{#termo} IS NULL OR :#{#termo} = '' OR LOWER(u.nome) LIKE LOWER(CONCAT('%', :#{#termo}, '%')))")
+    List<Usuario> buscarSugestoes(String termo);
 }

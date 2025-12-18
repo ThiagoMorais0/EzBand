@@ -15,4 +15,6 @@ public interface RepertorioEventoService {
     RepertorioEvento buscarPorIndiceEEvento(Integer indice, Long idEvento, TipoEvento tipoEvento);
 
     void salvar(RepertorioEvento repertorioEvento);
+
+    void removerMusicaDoRepertorio(Long idEvento, TipoEvento tipoEvento, Integer indice);
 }

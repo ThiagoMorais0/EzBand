@@ -1,6 +1,7 @@
 package com.baseapplication.core.dto;
 
 import com.baseapplication.core.dao.MusicoEventoDao;
+import com.baseapplication.core.model.MembroFantasmaEvento;
 import com.baseapplication.core.model.MusicoEvento;
 import com.baseapplication.core.model.Usuario;
 import lombok.AllArgsConstructor;
@@ -19,6 +20,7 @@ public class MusicoEventoDTO {
     private String instrumento = "";
     private BigDecimal cache = BigDecimal.ZERO;
     private String situacao;
+    private boolean isFantasma = false;
 
     public MusicoEventoDTO(Usuario usuario){
         this.usuario = new InfoPerfilUsuarioDTO(usuario);
@@ -29,6 +31,15 @@ public class MusicoEventoDTO {
         this.instrumento = musicoEvento.getInstrumentos();
         this.cache = musicoEvento.getCache();
         this.situacao = musicoEvento.getSituacao().getDescricao();
+        this.isFantasma = false;
+    }
+
+    public MusicoEventoDTO(MembroFantasmaEvento membroFantasmaEvento){
+        this.usuario = new InfoPerfilUsuarioDTO(membroFantasmaEvento.getMembroFantasma());
+        this.instrumento = membroFantasmaEvento.getInstrumentos();
+        this.cache = membroFantasmaEvento.getCache();
+        this.situacao = "Confirmado";
+        this.isFantasma = true;
     }
 
 }

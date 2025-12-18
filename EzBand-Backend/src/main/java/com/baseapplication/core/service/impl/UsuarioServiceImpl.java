@@ -5,6 +5,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 import com.baseapplication.core.dto.*;
+import com.baseapplication.core.event.events.NovoSeguidorEvent;
 import com.baseapplication.core.event.events.SolicitacaoIngressarBandaEvent;
 import com.baseapplication.core.model.Banda;
 import lombok.RequiredArgsConstructor;
@@ -182,6 +183,8 @@ public class UsuarioServiceImpl implements UsuarioService {
 		if(banda == null)
 			throw new InternalException("Banda não encontrada");
 
+		if(banda.getParametros() != null && !banda.getParametros().getPermiteEntradaPorConvite())
+			throw new InternalException("Banda não permite ingresso por convite");
 
 		notificacaoService.enviarNotificacao(new SolicitacaoIngressarBandaEvent(
 				Context.getUsuarioLogado(), banda, instrumento
@@ -264,6 +267,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 
 	@Override
 	public void seguirUsuario(Long idUsuario) {
+		notificacaoService.enviarNotificacao(new NovoSeguidorEvent(Context.getUsuarioLogado(), idUsuario));
 		relacionamentoSeguidorService.seguirUsuario(idUsuario);
 	}
 
@@ -276,4 +280,18 @@ public class UsuarioServiceImpl implements UsuarioService {
     public List<InfoPerfilUsuarioDTO> buscarAmigos() {
         return relacionamentoSeguidorService.buscarAmigos().stream().map(InfoPerfilUsuarioDTO::new).toList();
     }
+
+	@Override
+	public List<InfoPerfilUsuarioDTO> buscarSugestoes(String termo) {
+		List<Usuario> resultados = usuarioDao.buscarSugestoes(termo);
+
+		LevenshteinDistance levenshtein = new LevenshteinDistance();
+
+		resultados = resultados.stream()
+				.sorted(Comparator.comparingInt(usuario -> levenshtein.apply(termo, usuario.getNome().toLowerCase())))
+				.limit(20)
+				.toList();
+
+		return resultados.stream().map(InfoPerfilUsuarioDTO::new).toList();
+	}
 }

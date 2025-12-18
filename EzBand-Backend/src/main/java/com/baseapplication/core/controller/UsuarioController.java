@@ -1,9 +1,6 @@
 package com.baseapplication.core.controller;
 
-import com.baseapplication.core.dto.BuscaGlobalDTO;
-import com.baseapplication.core.dto.EmailDTO;
-import com.baseapplication.core.dto.InfoPerfilUsuarioDTO;
-import com.baseapplication.core.dto.InfoUsuarioPainelDTO;
+import com.baseapplication.core.dto.*;
 import com.baseapplication.core.model.dto.BandaDTO;
 import com.baseapplication.core.service.UsuarioService;
 import com.baseapplication.core.utils.Context;
@@ -91,8 +88,13 @@ public class UsuarioController {
 //	}
 
 	@PostMapping("/reportarErro")
-	public void reportarErro(@RequestBody String mensagem) {
-		usuarioService.reportarErro(mensagem);
+	public ResponseEntity<?> reportarErro(@RequestBody ReporteErroDTO dto) {
+		try{
+			usuarioService.reportarErro(dto.getCategoria() + ": " + dto.getMensagem());
+			return ResponseEntity.ok("Erro reportado com sucesso");
+		}catch (Exception e){
+			return ResponseEntity.status(500).body(e.getMessage());
+		}
 	}
 
 	@PostMapping("/enviarEmail")
@@ -145,6 +147,7 @@ public class UsuarioController {
 	@PostMapping("/seguir")
 	public ResponseEntity<?> seguirUsuario(@RequestParam Long idUsuario) {
 		try {
+
 			usuarioService.seguirUsuario(idUsuario);
 			return ResponseEntity.ok("Usuário seguido com sucesso");
 		} catch (Exception e) {
@@ -166,6 +169,15 @@ public class UsuarioController {
 	public ResponseEntity<?> buscarAmigos(){
 		try{
 			return ResponseEntity.ok(usuarioService.buscarAmigos());
+		}catch (Exception e){
+			return ResponseEntity.status(500).body(e.getMessage());
+		}
+	}
+
+	@GetMapping("/buscarSugestoes")
+	public ResponseEntity<?> buscarSugestoes(@RequestParam String termo){
+		try{
+			return ResponseEntity.ok(usuarioService.buscarSugestoes(termo));
 		}catch (Exception e){
 			return ResponseEntity.status(500).body(e.getMessage());
 		}

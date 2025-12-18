@@ -72,10 +72,16 @@ public class EstudioServiceImpl implements EstudioService {
     @Transactional
     public ResponseEntity<?> cadastrarComImagem(CadastroEstudioDTO estudioDTO, MultipartFile imagem) {
         Estudio estudio =  estudioDTO.toEntity();
+        
+        // Se houver imagem, salva antes de persistir o estúdio
+        if (imagem != null && !imagem.isEmpty()) {
+            estudio = cadastrar(estudio);
+            String urlImagem = imagemService.saveImageAndGetUrl(imagem, "studiologo", estudio.getId() + "." + FileUtils.getSufix(imagem));
+            estudio.setUrlFotoPerfil(urlImagem);
+        }
+        
+        // Salva apenas uma vez
         estudio = cadastrar(estudio);
-        String urlImagem = imagemService.saveImageAndGetUrl(imagem, "studiologo", estudio.getId() + "." + FileUtils.getSufix(imagem));
-        estudio.setUrlFotoPerfil(urlImagem);
-        cadastrar(estudio);
         return ResponseEntity.ok(null);
     }
 

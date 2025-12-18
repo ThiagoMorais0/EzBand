@@ -18,7 +18,7 @@ import java.util.Objects;
 @Component
 public class RespostaNotificacaoFactory {
 
-    public static Notificacao criarNotificacaoResposta(Notificacao notificacaoOriginal, String acao) {
+    public static Notificacao criarNotificacaoResposta(Notificacao notificacaoOriginal, String acao, String mensagem) {
         if (notificacaoOriginal instanceof SolicitacaoAgendarEnsaio solicitacao) {
             return new RespostaAgendamentoEnsaioNotificacao(solicitacao, Objects.requireNonNull(AcaoResposta.findByName(acao)));
         }
@@ -26,7 +26,7 @@ public class RespostaNotificacaoFactory {
             return new RespostaAgendamentoShowNotificacao(solicitacaoShow, Objects.requireNonNull(AcaoResposta.findByName(acao)));
         }
         if (notificacaoOriginal instanceof SolicitacaoParaIngressarBanda solicitacao){
-            return new RespostaSolicitacaoParaIngressarBandaNotificacao(solicitacao, Objects.requireNonNull(AcaoResposta.findByName(acao)));
+            return new RespostaSolicitacaoParaIngressarBandaNotificacao(solicitacao, Objects.requireNonNull(AcaoResposta.findByName(acao)), mensagem);
         }
         if(notificacaoOriginal instanceof ConviteParaEvento convite ){
             return new RespostaConviteParaEvento(convite, Objects.requireNonNull(AcaoResposta.findByName(acao)), Context.getUsuarioLogado());

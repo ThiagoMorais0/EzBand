@@ -92,6 +92,17 @@ public class EventoController {
         }
     }
 
+    @PostMapping("/removerMusicaDoRepertorio")
+    public ResponseEntity<?> removerMusicaDoRepertorio(@RequestBody AtualizacaoMusicaRepertorioDTO atualizacaoMusicaRepertorio) {
+        try {
+            eventoService.removerMusicaDoRepertorio(atualizacaoMusicaRepertorio.getIdEvento(), atualizacaoMusicaRepertorio.getTipoEvento(), atualizacaoMusicaRepertorio.getIndice());
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
     @GetMapping("/buscarMembrosEDisponibilidadeParaShow")
     public ResponseEntity<?> buscarMembrosParaShow(@RequestParam Long idBanda,
                                                    @RequestParam String data) {
@@ -114,6 +125,28 @@ public class EventoController {
             eventoService.marcarEnsaio(novoEnsaioDTO);
             return ResponseEntity.ok("Ensaio marcado com sucesso");
         } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PostMapping("/editarShow")
+    public ResponseEntity<?> editarShow(@RequestBody NovoShowDTO novoShowDTO, @RequestParam Long idShow) {
+        try {
+            eventoService.editarShow(novoShowDTO, idShow);
+            return ResponseEntity.ok("Show editado com sucesso");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PostMapping("/editarEnsaio")
+    public ResponseEntity<?> editarEnsaio(@RequestBody NovoEnsaioDTO novoEnsaioDTO, @RequestParam Long idEnsaio) {
+        try {
+            eventoService.editarEnsaio(novoEnsaioDTO, idEnsaio);
+            return ResponseEntity.ok("Ensaio editado com sucesso");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

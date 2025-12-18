@@ -42,6 +42,8 @@ public class SpotifyServiceImpl implements SpotifyService {
 
     public String adicionarMusicasDaPlaylistAoRepertorioDaBanda(String url, Long idBanda) {
 
+        Integer ultimoIndice = repertorioBandaService.buscarUltimoIndice(idBanda);
+
         // 1 - Extrair o ID
         String playlistId = extractPlaylistId(url);
         if (playlistId == null) {
@@ -72,6 +74,9 @@ public class SpotifyServiceImpl implements SpotifyService {
             Map<String, Object> trackData = (Map<String, Object>) i.get("track");
             List<Map<String, Object>> artists = (List<Map<String, Object>>) trackData.get("artists");
 
+            Map<String, Object> externalUrls = (Map<String, Object>) trackData.get("external_urls");
+            String urlSpotify = externalUrls != null ? (String) externalUrls.get("spotify") : null;
+
             Integer durationMs = (Integer) trackData.get("duration_ms");
 
 // Calcula horas, minutos e segundos da duração
@@ -94,9 +99,8 @@ public class SpotifyServiceImpl implements SpotifyService {
                     duracao,
                     Tonalidade.ORIGINAL,
                     null, //urlYoutube
-                    null //urlSpotify
+                    urlSpotify //urlSpotify
             );
-
             repertorioBanda.setMusica(musica);
             return repertorioBanda;
         }).toList();
@@ -105,6 +109,7 @@ public class SpotifyServiceImpl implements SpotifyService {
             boolean exists = banda.getRepertorio().stream()
                     .anyMatch(r -> r.getMusica().getTitulo().equalsIgnoreCase(musicaNova.getMusica().getTitulo()));
             if (!exists) {
+                musicaNova.setIndice(++ultimoIndice);
                 repertorioBandaService.salvar(musicaNova);
             }
         }

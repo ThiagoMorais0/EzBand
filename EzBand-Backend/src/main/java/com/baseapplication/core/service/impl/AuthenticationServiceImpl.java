@@ -1,6 +1,16 @@
 package com.baseapplication.core.service.impl;
 
+import com.baseapplication.core.config.TokenService;
+import com.baseapplication.core.dto.*;
+import com.baseapplication.core.exception.ConflictException;
+import com.baseapplication.core.model.Usuario;
+import com.baseapplication.core.service.AuthenticationService;
+import com.baseapplication.core.service.EmailService;
+import com.baseapplication.core.service.ImagemService;
+import com.baseapplication.core.service.UsuarioService;
+import com.baseapplication.core.utils.FileUtils;
 import jakarta.transaction.Transactional;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,19 +21,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.baseapplication.core.config.TokenService;
-import com.baseapplication.core.dto.CadastroDTO;
-import com.baseapplication.core.dto.CadastroUsuarioDTO;
-import com.baseapplication.core.dto.InfoUsuarioDTO;
-import com.baseapplication.core.dto.LoginDTO;
-import com.baseapplication.core.dto.LoginResponseDTO;
-import com.baseapplication.core.exception.ConflictException;
-import com.baseapplication.core.model.Usuario;
-import com.baseapplication.core.service.AuthenticationService;
-import com.baseapplication.core.service.ImagemService;
-import com.baseapplication.core.service.UsuarioService;
-import com.baseapplication.core.utils.FileUtils;
+import java.util.HashMap;
+import java.util.Map;
 
+@Log4j2
 @Service
 public class AuthenticationServiceImpl implements AuthenticationService {
 
@@ -38,6 +39,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 	@Autowired
 	private TokenService tokenService;
+
+	@Autowired
+	private EmailService emailService;
 
 	@Override
 	public ResponseEntity<LoginResponseDTO> login(LoginDTO data) {
@@ -61,11 +65,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 	@Override
 	public void registrar(CadastroDTO dados) {
-
 		verificaUsuarioJaCadastrado(dados);
 		dados.setSenha(criptografar(dados.getSenha()));
 		usuarioService.salvar(new Usuario(dados));
-
+		try{
+			emailService.enviarEmail("Novo usuário no EzBand", "O usuário " + dados.getNome() + " acabou de se cadastrar no EzBand.", "thiagomface@gmail.com");
+		}catch(Exception e){
+			log.error("Erro ao enviar email");
+            log.error(e.getMessage());
+		}
 	}
 
 	private String criptografar(String texto) {
@@ -112,6 +120,52 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 					usuario.getId() + "." + FileUtils.getSufix(imagem)));
 			usuarioService.salvar(usuario);
 		}
+//		emailService.enviarEmail("Novo usuário no EzBand", "O usuário " + usuario.getNome() + " acabou de se cadastrar no EzBand.", "ezband3@gmail.com");
 		return ResponseEntity.ok(null);
+	}
+
+	@Override
+	public ResponseEntity<?> validateTokenWithDetails(String token) {
+		try {
+			// Valida o token e extrai o email (subject)
+			String email = tokenService.validarToken(token);
+			
+			// Se o token for inválido, retorna vazio
+			if (email == null || email.isEmpty()) {
+				Map<String, String> errorResponse = new HashMap<>();
+				errorResponse.put("error", "Token inválido ou expirado");
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+			}
+			
+			// Busca o usuário no banco de dados
+			Usuario usuario = usuarioService.findByEmail(email);
+			
+			// Verifica se o usuário ainda existe
+			if (usuario == null) {
+				Map<String, String> errorResponse = new HashMap<>();
+				errorResponse.put("error", "Usuário não encontrado");
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+			}
+			
+			// Verifica se o usuário está ativo e não bloqueado
+			if (!usuario.getAtivo() || usuario.getBloqueado()) {
+				Map<String, String> errorResponse = new HashMap<>();
+				errorResponse.put("error", "Usuário inativo ou bloqueado");
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+			}
+			
+			// Retorna os dados do usuário
+			Map<String, Object> response = new HashMap<>();
+			response.put("valid", true);
+			response.put("userId", usuario.getId());
+			response.put("email", usuario.getEmail());
+			
+			return ResponseEntity.ok(response);
+			
+		} catch (Exception e) {
+			Map<String, String> errorResponse = new HashMap<>();
+			errorResponse.put("error", "Token inválido ou expirado");
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+		}
 	}
 }

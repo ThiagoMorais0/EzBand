@@ -1,0 +1,81 @@
+pipeline {
+    agent any
+
+    environment {
+        IMAGE_NAME = "ezband-backend"
+        IMAGE_TAG = "${BUILD_ID}"
+        LOCAL_REGISTRY = "localhost:5050"
+        FULL_IMAGE = "${LOCAL_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}"
+        HOST_PORT = "8082"
+        CONTAINER_PORT = "8080"
+        ENV_FILE = "/opt/ezband-services/ezband-api/.env"
+    }
+
+    stages {
+        stage('Checkout code') {
+            steps {
+                echo "📥 Fazendo checkout do código..."
+                checkout scm
+            }
+        }
+
+        stage('Build Maven project') {
+            steps {
+                echo "⚙️ Buildando projeto Maven..."
+                sh 'mvn clean package -DskipTests'
+            }
+        }
+
+        stage('Build Docker image') {
+            steps {
+                script {
+                    echo "🚧 Construindo imagem Docker ${FULL_IMAGE}..."
+                    docker.build("${FULL_IMAGE}", ".")
+                }
+            }
+        }
+
+        stage('Push Docker image to local registry') {
+            steps {
+                script {
+                    echo "📤 Enviando imagem para o registry local ${LOCAL_REGISTRY}..."
+                    sh "docker push ${FULL_IMAGE}"
+                    sh "docker tag ${FULL_IMAGE} ${LOCAL_REGISTRY}/${IMAGE_NAME}:latest"
+                    sh "docker push ${LOCAL_REGISTRY}/${IMAGE_NAME}:latest"
+                }
+            }
+        }
+
+        stage('Run container locally') {
+            steps {
+                script {
+                    echo "🚀 Executando container localmente..."
+                    // Para parar e remover container antigo (se existir)
+                    sh "docker rm -f ${IMAGE_NAME} || true"
+                    // Executa o container em background
+                    sh """
+                        docker run -d \
+                        --name ${IMAGE_NAME} \
+                        -p ${HOST_PORT}:${CONTAINER_PORT} \
+                        --env-file ${ENV_FILE} \
+                        --network ezband-nw \
+                        ${FULL_IMAGE}
+                    """
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            echo "🧹 Limpando imagens antigas..."
+            sh 'docker image prune -f || true'
+        }
+        failure {
+            echo "❌ Falha no build/deploy do ${IMAGE_NAME}!"
+        }
+        success {
+            echo "✅ Deploy do ${IMAGE_NAME}:${IMAGE_TAG} concluído com sucesso!"
+        }
+    }
+}

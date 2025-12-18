@@ -24,4 +24,10 @@ public class EnderecoDTO {
             BeanUtils.copyProperties(endereco, this);
         }
     }
+
+    public Endereco toEntity(){
+        Endereco endereco = new Endereco();
+        BeanUtils.copyProperties(this, endereco);
+        return endereco;
+    }
 }

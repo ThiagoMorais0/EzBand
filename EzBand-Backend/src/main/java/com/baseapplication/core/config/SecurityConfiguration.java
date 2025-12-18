@@ -31,9 +31,11 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.POST, "/auth/cadastrarUsuarioComImagem").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/validarToken").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/auth/validate").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/teste").permitAll()
                         .requestMatchers(HttpMethod.GET, "/usuario/verificarEmailJaCadastrado").permitAll()
                         .requestMatchers(HttpMethod.POST, "/usuario/editarUsuarioComImagem").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/banda/criarMembroFantasma").permitAll()
                         // SWAGGER
                         .requestMatchers(HttpMethod.GET, "/swagger-ui.html").permitAll()
                         .requestMatchers(HttpMethod.GET, "/swagger-ui/*").permitAll()

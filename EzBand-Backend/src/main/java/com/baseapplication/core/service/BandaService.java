@@ -69,4 +69,8 @@ public interface BandaService {
     void alterarPermissaoMembro(EditarMembroMusicoBandaDTO permissaoMusicoDTO);
 
     List<Banda> buscarSugestoes(BuscaBandaDTO dto);
+
+    void removerMusicaDoRepertorio(Long id, Long idBanda);
+
+    void atualizarOrdemRepertorio(Long idBanda, List<RepertorioBandaDTO> repertorio);
 }

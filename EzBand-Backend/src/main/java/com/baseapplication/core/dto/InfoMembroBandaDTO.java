@@ -1,6 +1,7 @@
 package com.baseapplication.core.dto;
 
 import com.baseapplication.core.enums.PermissaoMusico;
+import com.baseapplication.core.model.MembroFantasma;
 import com.baseapplication.core.model.MusicoBanda;
 import com.baseapplication.core.model.Usuario;
 import com.baseapplication.core.utils.DateUtils;
@@ -10,6 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.beans.BeanUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -28,11 +30,13 @@ public class InfoMembroBandaDTO {
     private String urlFotoPerfil;
     private String instrumentos;
     private List<String> permissoes;
+    private Boolean isMembroFantasma;
 
     public InfoMembroBandaDTO(Usuario usuario){
         BeanUtils.copyProperties(usuario, this);
         this.nascimento = DateUtils.localDateToString(usuario.getDataNascimento());
         this.dataCriacao = DateUtils.localDateToString(usuario.getDataCriacao());
+        this.isMembroFantasma = false;
     }
 
     public InfoMembroBandaDTO(MusicoBanda musico){
@@ -41,5 +45,16 @@ public class InfoMembroBandaDTO {
         this.dataCriacao = DateUtils.localDateToString(musico.getUsuario().getDataCriacao());
         this.instrumentos = musico.getInstrumentos();
         this.permissoes = musico.getPermissoes().stream().map(Enum::toString).toList();
+        this.isMembroFantasma = false;
+    }
+
+    public InfoMembroBandaDTO(MembroFantasma membroFantasma){
+        this.id = membroFantasma.getId();
+        this.nome = membroFantasma.getNome();
+        this.urlFotoPerfil = membroFantasma.getUrlFoto();
+        this.instrumentos = membroFantasma.getInstrumento();
+        this.descricao = membroFantasma.getObservacoes();
+        this.isMembroFantasma = true;
+        this.permissoes = new ArrayList<>();
     }
 }

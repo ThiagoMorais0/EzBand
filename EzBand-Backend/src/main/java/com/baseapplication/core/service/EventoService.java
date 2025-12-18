@@ -53,4 +53,10 @@ public interface EventoService {
     void incluirUsuarioNoEvento(Usuario usuario, Evento evento);
 
     void incluirUsuarioNoEvento(Long idEvento, TipoEvento tipoEvento, Long idUsuarioConvidado);
+
+    void removerMusicaDoRepertorio(Long idEvento, TipoEvento tipoEvento, Integer indice);
+
+    void editarShow(NovoShowDTO novoShowDTO, Long idShow);
+
+    void editarEnsaio(NovoEnsaioDTO novoEnsaioDTO, Long idEnsaio);
 }

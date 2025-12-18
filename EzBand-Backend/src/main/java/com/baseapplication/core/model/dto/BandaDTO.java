@@ -56,8 +56,10 @@ public class BandaDTO {
 //                                .filter(notificacao -> notificacao.getDestinatario().equals(Context.getUsuarioLogado()))
 //                                .count();
 
-        this.quantidadeMembros = banda.getMusicos().size();
+        this.quantidadeMembros = banda.getMusicos().size() + banda.getMembrosFantasma().size();
+        //Em membros, somar membros normais com membros fantasma
         this.membros = banda.getMusicos().stream().map(InfoPerfilUsuarioDTO::new).collect(Collectors.toList());
+        this.membros.addAll(banda.getMembrosFantasma().stream().map(InfoPerfilUsuarioDTO::new).collect(Collectors.toList()));
         //ORDENAR por data de publicação
         this.publicacoes = banda.getPublicacoes().stream().map(PublicacaoDTO::new)
                 .sorted(Comparator.comparing(PublicacaoDTO::getDataPublicacao).reversed()).toList();

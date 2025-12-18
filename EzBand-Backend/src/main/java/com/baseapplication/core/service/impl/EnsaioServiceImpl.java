@@ -40,6 +40,7 @@ public class EnsaioServiceImpl implements EnsaioService {
         return ensaioDao.buscarPorIdUsuario(idUsuario)
                 .stream()
                 .filter(i -> i.getStatus().equals(StatusEvento.PENDENTE))
+                .filter(i -> i.getData() != null)
                 .sorted(Comparator.comparing(Ensaio::getData))
                 .collect(Collectors.toList());
     }

@@ -19,4 +19,6 @@ public interface AuthenticationService {
 
 	ResponseEntity<?> cadastrarUsuarioComImagem(CadastroUsuarioDTO usuario, MultipartFile imagem);
 
+	ResponseEntity<?> validateTokenWithDetails(String token);
+
 }

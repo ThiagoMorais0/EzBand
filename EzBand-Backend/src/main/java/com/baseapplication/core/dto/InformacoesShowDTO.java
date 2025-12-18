@@ -1,6 +1,7 @@
 package com.baseapplication.core.dto;
 
 import com.baseapplication.core.dto.superClasses.InformacoesEventoDTO;
+import com.baseapplication.core.model.MembroFantasmaEvento;
 import com.baseapplication.core.model.MusicoEvento;
 import com.baseapplication.core.model.Show;
 import com.baseapplication.core.model.dto.BandaDTO;
@@ -12,6 +13,8 @@ import org.springframework.beans.BeanUtils;
 
 import java.math.BigDecimal;
 import java.sql.Time;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Getter
@@ -26,20 +29,33 @@ public class InformacoesShowDTO extends InformacoesEventoDTO {
     private BigDecimal consumacaoPorMusico;
 
 
-    public InformacoesShowDTO(Show show, MusicoEvento musicoEvento){
+    public InformacoesShowDTO(Show show, MusicoEvento musicoEvento) {
         BeanUtils.copyProperties(show, this);
         this.setBanda(new BandaDTO(show.getBanda()));
         this.setStatus(show.getStatus().getDescricao());
-        if(musicoEvento != null){
+        if (musicoEvento != null && musicoEvento.getId() != null) {
             this.setInstrumentos(musicoEvento.getInstrumentos());
             this.setCacheIndividual(musicoEvento.getCache());
-        }else{
-         this.setUsuarioPertenceAoEvento(false);
+        } else {
+            this.setUsuarioPertenceAoEvento(false);
         }
-        if(show.getEndereco() != null)
+        if (show.getLocalEvento() != null) {
+            BeanUtils.copyProperties(show.getLocalEvento().getEndereco(), this.getEndereco());
+        } else if (show.getEndereco() != null)
             BeanUtils.copyProperties(show.getEndereco(), this.getEndereco());
+
         Hibernate.initialize(show.getParticipantes());
         this.setParticipantes(show.getParticipantes().stream().map(MusicoEventoDTO::new).collect(Collectors.toList()));
         this.setConsumacaoPorMusico(show.getConsumacaoPorMusico());
+    }
+
+    public InformacoesShowDTO(Show show, MusicoEvento musicoEvento, List<MembroFantasmaEvento> membrosFantasma) {
+        this(show, musicoEvento);
+        // Adicionar membros fantasma à lista de participantes
+        if (membrosFantasma != null && !membrosFantasma.isEmpty()) {
+            List<MusicoEventoDTO> participantesCompletos = new ArrayList<>(this.getParticipantes());
+            participantesCompletos.addAll(membrosFantasma.stream().map(MusicoEventoDTO::new).collect(Collectors.toList()));
+            this.setParticipantes(participantesCompletos);
+        }
     }
 }
