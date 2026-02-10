@@ -1,0 +1,17 @@
+# ============================================
+# EVOLUTION API - WhatsApp Integration
+# ============================================
+
+# URL do servidor Evolution API (use http://evolution-api:8081 no Docker)
+evolution.api.url=${EVOLUTION_API_URL:http://localhost:8081}
+
+# Chave de API configurada no Evolution API
+evolution.api.key=${EVOLUTION_API_KEY:change-me-to-secure-key}
+
+# Nome da instância WhatsApp (deve ser único por ambiente)
+evolution.instance.name=${EVOLUTION_INSTANCE_NAME:ezband-whatsapp}
+
+# ============================================
+# RETRY CONFIGURATION
+# ============================================
+spring.retry.enabled=true

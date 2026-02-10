@@ -4,7 +4,18 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cea5cf5c-2957-424e-9f71-2d753ba94117" name="Changes" comment="" />
+    <list default="true" id="cea5cf5c-2957-424e-9f71-2d753ba94117" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/DOCUMENTACAO_EVOLUTION.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/EzBand-Backend/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/EzBand-Backend/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/EzBand-Backend/src/main/java/com/baseapplication/BaseApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/EzBand-Backend/src/main/java/com/baseapplication/BaseApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/EzBand-Backend/src/main/java/com/baseapplication/core/dao/UsuarioDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/EzBand-Backend/src/main/java/com/baseapplication/core/dao/UsuarioDao.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/EzBand-Backend/src/main/java/com/baseapplication/core/model/Usuario.java" beforeDir="false" afterPath="$PROJECT_DIR$/EzBand-Backend/src/main/java/com/baseapplication/core/model/Usuario.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/EzBand-Backend/src/main/java/com/baseapplication/core/service/impl/AuthenticationServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/EzBand-Backend/src/main/java/com/baseapplication/core/service/impl/AuthenticationServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/EzBand-Backend/src/main/java/com/baseapplication/core/service/impl/MinioStorageServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/EzBand-Backend/src/main/java/com/baseapplication/core/service/impl/MinioStorageServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/EzBand-Backend/src/main/resources/application-docker.properties" beforeDir="false" afterPath="$PROJECT_DIR$/EzBand-Backend/src/main/resources/application-docker.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/compose.yml.old" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -41,13 +52,9 @@
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
-  <component name="MavenImportPreferences">
-    <option name="generalSettings">
-      <MavenGeneralSettings>
-        <option name="useMavenConfig" value="true" />
-      </MavenGeneralSettings>
-    </option>
-  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 2
+}]]></component>
   <component name="ProjectId" id="2tD8MzWcw35wKtt2lOHQ0LyY6Sf" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -55,17 +62,33 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "WebServerToolWindowFactoryState": "false",
-    "last_opened_file_path": "D:/ezband/EzBand",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "feature",
+    "junie.onboarding.icon.badge.shown": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "D:/dev/EzBand/EzBand",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
+    "to.speed.mode.migration.done": "true",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-30f59d01ecdd-26cb7f24e5b0-intellij.indexing.shared.core-IU-253.29346.138" />
+        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-IU-253.29346.138" />
+      </set>
+    </attachedChunks>
+  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -75,6 +98,7 @@
       <option name="presentableId" value="Default" />
       <updated>1739875242348</updated>
       <workItem from="1739875243326" duration="2576000" />
+      <workItem from="1770741417771" duration="2438000" />
     </task>
     <servers />
   </component>

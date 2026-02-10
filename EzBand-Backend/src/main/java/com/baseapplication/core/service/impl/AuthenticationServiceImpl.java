@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -53,6 +54,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 			if (auth.isAuthenticated()) {
 				Usuario usuario = usuarioService.findByEmail(data.getEmail());
+				salvarDataUltimoLogin(usuario);
 				return ResponseEntity.ok(new LoginResponseDTO(token, usuario));
 			} else {
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -61,6 +63,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 			// Trate diferentes exceções de autenticação aqui, se necessário
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 		}
+	}
+
+	private void salvarDataUltimoLogin(Usuario usuario) {
+		usuario.setDataUltimoLogin(LocalDateTime.now());
+		usuarioService.salvar(usuario);
 	}
 
 	@Override
