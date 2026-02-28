@@ -2,14 +2,17 @@
 # EVOLUTION API - WhatsApp Integration
 # ============================================
 
-# URL do servidor Evolution API (use http://evolution-api:8081 no Docker)
-evolution.api.url=${EVOLUTION_API_URL:http://localhost:8081}
+# URL do servidor Evolution API (use http://evolution-api:8082 no Docker)
+evolution.api.url=${EVOLUTION_API_URL:http://localhost:8082}
 
 # Chave de API configurada no Evolution API
 evolution.api.key=${EVOLUTION_API_KEY:change-me-to-secure-key}
 
 # Nome da instância WhatsApp (deve ser único por ambiente)
 evolution.instance.name=${EVOLUTION_INSTANCE_NAME:ezband-whatsapp}
+
+# Senha de acesso ao painel admin do Evolution
+evolution.admin.password=${EVOLUTION_ADMIN_PASSWORD:admin123}
 
 # ============================================
 # RETRY CONFIGURATION

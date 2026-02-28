@@ -1,12 +1,10 @@
 package com.baseapplication.core.factory;
 
 import com.baseapplication.core.enums.AcaoResposta;
-import com.baseapplication.core.model.notificacao.ConviteParaEvento;
-import com.baseapplication.core.model.notificacao.SolicitacaoAgendarEnsaio;
-import com.baseapplication.core.model.notificacao.SolicitacaoAgendarShow;
-import com.baseapplication.core.model.notificacao.SolicitacaoParaIngressarBanda;
+import com.baseapplication.core.model.notificacao.*;
 import com.baseapplication.core.model.notificacao.resposta.RespostaAgendamentoEnsaioNotificacao;
 import com.baseapplication.core.model.notificacao.resposta.RespostaAgendamentoShowNotificacao;
+import com.baseapplication.core.model.notificacao.resposta.RespostaConviteParaBanda;
 import com.baseapplication.core.model.notificacao.resposta.RespostaConviteParaEvento;
 import com.baseapplication.core.model.notificacao.resposta.RespostaSolicitacaoParaIngressarBandaNotificacao;
 import com.baseapplication.core.model.superClasses.Notificacao;
@@ -30,6 +28,9 @@ public class RespostaNotificacaoFactory {
         }
         if(notificacaoOriginal instanceof ConviteParaEvento convite ){
             return new RespostaConviteParaEvento(convite, Objects.requireNonNull(AcaoResposta.findByName(acao)), Context.getUsuarioLogado());
+        }
+        if(notificacaoOriginal instanceof ConviteParaBanda convite){
+            return new RespostaConviteParaBanda(convite, Objects.requireNonNull(AcaoResposta.findByName(acao)), Context.getUsuarioLogado());
         }
 
         //TODO: outros tipos...

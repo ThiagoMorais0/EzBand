@@ -19,4 +19,8 @@ public interface WhatsappService {
     Map<String, Object> obterStatusConexao();
     
     Map<String, Object> obterQRCode();
+    
+    Map<String, Object> deletarInstancia();
+    
+    Map<String, Object> desconectarInstancia();
 }

@@ -112,11 +112,6 @@ public class EvolutionApiServiceImpl implements WhatsappService {
     }
     
     @Override
-    @Retryable(
-        retryFor = {WebClientResponseException.class},
-        maxAttempts = 3,
-        backoff = @Backoff(delay = 2000, multiplier = 2)
-    )
     public Map<String, Object> criarInstancia() {
         log.info("Criando instância Evolution API: {}", config.getInstanceName());
         
@@ -137,17 +132,18 @@ public class EvolutionApiServiceImpl implements WhatsappService {
             log.info("Instância criada com sucesso: {}", response);
             return response;
         } catch (WebClientResponseException e) {
-            log.error("Erro ao criar instância: {} - {}", e.getStatusCode(), e.getResponseBodyAsString());
+            if (e.getStatusCode().value() == 401) {
+                log.error("❌ ERRO 401: API Key inválida ou não configurada!");
+                log.error("Verifique se a variável EVOLUTION_API_KEY está configurada e corresponde à chave no servidor Evolution API");
+                log.error("API Key atual: {}...", config.getEvolutionApiKey().substring(0, Math.min(8, config.getEvolutionApiKey().length())));
+            } else {
+                log.error("Erro ao criar instância: {} - {}", e.getStatusCode(), e.getResponseBodyAsString());
+            }
             throw e;
         }
     }
     
     @Override
-    @Retryable(
-        retryFor = {WebClientResponseException.class},
-        maxAttempts = 3,
-        backoff = @Backoff(delay = 2000, multiplier = 2)
-    )
     public Map<String, Object> obterStatusConexao() {
         log.info("Verificando status de conexão para instância: {}", config.getInstanceName());
         
@@ -237,6 +233,44 @@ public class EvolutionApiServiceImpl implements WhatsappService {
             messageLogRepository.save(log);
         } catch (Exception e) {
             log.error("Erro ao salvar log de falha: {}", e.getMessage());
+        }
+    }
+    
+    @Override
+    public Map<String, Object> deletarInstancia() {
+        log.info("Deletando instância Evolution API: {}", config.getInstanceName());
+        
+        try {
+            Map<String, Object> response = evolutionWebClient.delete()
+                    .uri("/instance/delete/{instanceName}", config.getInstanceName())
+                    .retrieve()
+                    .bodyToMono(Map.class)
+                    .block();
+            
+            log.info("Instância deletada com sucesso");
+            return response;
+        } catch (WebClientResponseException e) {
+            log.error("Erro ao deletar instância: {} - {}", e.getStatusCode(), e.getResponseBodyAsString());
+            throw e;
+        }
+    }
+    
+    @Override
+    public Map<String, Object> desconectarInstancia() {
+        log.info("Desconectando instância Evolution API: {}", config.getInstanceName());
+        
+        try {
+            Map<String, Object> response = evolutionWebClient.delete()
+                    .uri("/instance/logout/{instanceName}", config.getInstanceName())
+                    .retrieve()
+                    .bodyToMono(Map.class)
+                    .block();
+            
+            log.info("Instância desconectada com sucesso");
+            return response;
+        } catch (WebClientResponseException e) {
+            log.error("Erro ao desconectar instância: {} - {}", e.getStatusCode(), e.getResponseBodyAsString());
+            throw e;
         }
     }
 }

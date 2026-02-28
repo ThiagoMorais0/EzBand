@@ -45,72 +45,6 @@ services:
       MINIO_ROOT_PASSWORD: ${MINIO_ADMIN_PASSWORD}
     command: "server /data --console-address :9090"
 
-  # MENSAGERIA
-  redis:
-    image: redis:7-alpine
-    container_name: redis
-    restart: unless-stopped
-    ports:
-      - "6379:6379"
-    networks:
-      - ezband_app_network
-    volumes:
-      - redis_data:/data
-
-  db_evolution:
-    image: postgres:15-alpine
-    container_name: db_evolution
-    environment:
-      POSTGRES_USER: ${EVO_DB_USER}
-      POSTGRES_PASSWORD: ${EVO_DB_PASSWORD}
-      POSTGRES_DB: evolution_db
-    ports:
-      - "5433:5432" # Porta 5433 no seu Windows, 5432 interna
-    volumes:
-      - db_evolution_data:/var/lib/postgresql/data
-    networks:
-      - ezband_app_network
-
-  evolution-api:
-    image: atendai/evolution-api:v2.1.1
-    container_name: evolution-api
-    restart: unless-stopped
-    ports:
-      - "8082:8080"
-    environment:
-      - SERVER_URL=${EVOLUTION_SERVER_URL:-http://localhost:8082}
-      - AUTHENTICATION_API_KEY=${EVOLUTION_API_KEY}
-      - AUTHENTICATION_TYPE=apikey
-
-      # Configurações críticas para geração de QR Code
-      - CONFIG_SESSION_PHONE_CLIENT=To Fix
-      - CONFIG_SESSION_PHONE_VERSION=
-      - CONFIG_SESSION_PHONE_STRATEGY=latest
-
-      # Argumentos Chrome para Windows/WSL2
-      - CHROME_ARGS=--no-sandbox --disable-setuid-sandbox --disable-gpu --disable-dev-shm-usage
-
-      # Database
-      - DATABASE_ENABLED=true
-      - DATABASE_PROVIDER=postgresql
-      - DATABASE_CONNECTION_URI=postgresql://${EVO_DB_USER}:${EVO_DB_PASSWORD}@db_evolution:5432/evolution_db?schema=public
-      - DATABASE_CONNECTION_CLIENT_NAME=evolution_api
-
-      # Cache - usando local ao invés de Redis para evitar problemas
-      - CACHE_REDIS_ENABLED=false
-      - CACHE_LOCAL_ENABLED=true
-
-      # WebSocket e QR Code
-      - WEBSOCKET_ENABLED=true
-      - QRCODE_LIMIT=30
-    depends_on:
-      - db_evolution
-    networks:
-      - ezband_app_network
-    volumes:
-      - evolution_data:/evolution/instances
-      - evolution_store:/evolution/store
-
   # APLICACOES
   chat-service:
     build: ./ChatService # caminho do seu microservice
@@ -137,18 +71,13 @@ services:
       context: ./EzBand-Backend
       dockerfile: Dockerfile
     container_name: api
-    profiles: ["debug"]
     depends_on:
       - db_postgres
-      - evolution-api
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
       JWT_SECRET: ${JWT_SECRET}
-      EVOLUTION_API_URL: ${EVOLUTION_API_URL:-http://evolution-api:8080}
-      EVOLUTION_API_KEY: ${EVOLUTION_API_KEY}
-      EVOLUTION_INSTANCE_NAME: ${EVOLUTION_INSTANCE_NAME:-ezband-whatsapp}
     ports:
       - "8080:8080"
     networks:
@@ -187,10 +116,6 @@ volumes:
   app_logs:
   db_mongo_data:
   minio_data:
-  redis_data:
-  evolution_data:
-  evolution_store:
-  db_evolution_data:
 
 networks:
   ezband_app_network:

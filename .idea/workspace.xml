@@ -5,16 +5,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="cea5cf5c-2957-424e-9f71-2d753ba94117" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/DOCUMENTACAO_EVOLUTION.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/compose.yml.old" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.env.example" beforeDir="false" afterPath="$PROJECT_DIR$/.env.example" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/EzBand-Backend/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/EzBand-Backend/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/EzBand-Backend/src/main/java/com/baseapplication/BaseApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/EzBand-Backend/src/main/java/com/baseapplication/BaseApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/EzBand-Backend/src/main/java/com/baseapplication/core/config/EvolutionApiConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/EzBand-Backend/src/main/java/com/baseapplication/core/config/EvolutionApiConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/EzBand-Backend/src/main/java/com/baseapplication/core/config/SecurityConfiguration.java" beforeDir="false" afterPath="$PROJECT_DIR$/EzBand-Backend/src/main/java/com/baseapplication/core/config/SecurityConfiguration.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/EzBand-Backend/src/main/java/com/baseapplication/core/dao/UsuarioDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/EzBand-Backend/src/main/java/com/baseapplication/core/dao/UsuarioDao.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/EzBand-Backend/src/main/java/com/baseapplication/core/factory/RespostaNotificacaoFactory.java" beforeDir="false" afterPath="$PROJECT_DIR$/EzBand-Backend/src/main/java/com/baseapplication/core/factory/RespostaNotificacaoFactory.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/EzBand-Backend/src/main/java/com/baseapplication/core/model/Usuario.java" beforeDir="false" afterPath="$PROJECT_DIR$/EzBand-Backend/src/main/java/com/baseapplication/core/model/Usuario.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/EzBand-Backend/src/main/java/com/baseapplication/core/service/WhatsappService.java" beforeDir="false" afterPath="$PROJECT_DIR$/EzBand-Backend/src/main/java/com/baseapplication/core/service/WhatsappService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/EzBand-Backend/src/main/java/com/baseapplication/core/service/impl/AuthenticationServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/EzBand-Backend/src/main/java/com/baseapplication/core/service/impl/AuthenticationServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/EzBand-Backend/src/main/java/com/baseapplication/core/service/impl/MinioStorageServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/EzBand-Backend/src/main/java/com/baseapplication/core/service/impl/MinioStorageServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/EzBand-Backend/src/main/java/com/baseapplication/core/service/impl/EvolutionApiServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/EzBand-Backend/src/main/java/com/baseapplication/core/service/impl/EvolutionApiServiceImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/EzBand-Backend/src/main/resources/application-docker.properties" beforeDir="false" afterPath="$PROJECT_DIR$/EzBand-Backend/src/main/resources/application-docker.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/compose.yml.old" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/EzBand-Backend/src/main/resources/application.properties.example" beforeDir="false" afterPath="$PROJECT_DIR$/EzBand-Backend/src/main/resources/application.properties.example" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/compose.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -52,35 +58,35 @@
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 2
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 2
+}</component>
   <component name="ProjectId" id="2tD8MzWcw35wKtt2lOHQ0LyY6Sf" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "feature",
-    "junie.onboarding.icon.badge.shown": "true",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "D:/dev/EzBand/EzBand",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "to.speed.mode.migration.done": "true",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;feature&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/dev/EzBand/EzBand&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -98,7 +104,9 @@
       <option name="presentableId" value="Default" />
       <updated>1739875242348</updated>
       <workItem from="1739875243326" duration="2576000" />
-      <workItem from="1770741417771" duration="2438000" />
+      <workItem from="1770741417771" duration="4696000" />
+      <workItem from="1770746901948" duration="1021000" />
+      <workItem from="1770755776695" duration="2775000" />
     </task>
     <servers />
   </component>

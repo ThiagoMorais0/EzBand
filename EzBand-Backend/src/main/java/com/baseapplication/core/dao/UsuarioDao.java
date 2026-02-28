@@ -29,11 +29,12 @@ public interface UsuarioDao extends JpaRepository<Usuario, Long> {
             "FROM musico_evento me " +
             "LEFT JOIN show s ON me.id_evento = s.id " +
             "LEFT JOIN ensaio e ON me.id_evento = e.id " +
+            "LEFT JOIN evento ev ON me.id_evento = ev.id " +
             "WHERE me.id_usuario = :idUsuario  " +
             "  AND ( " +
-            "    (s.id IS NOT NULL AND s.status = 'PENDENTE')  " +
+            "    (s.id IS NOT NULL AND ev.status = 'PENDENTE')  " +
             "    OR  " +
-            "    (e.id IS NOT NULL AND e.status = 'PENDENTE'))", nativeQuery = true)
+            "    (e.id IS NOT NULL AND ev.status = 'PENDENTE'))", nativeQuery = true)
     Integer buscarQuantidadeProximosEventos(Long idUsuario);
 
     @Query("""

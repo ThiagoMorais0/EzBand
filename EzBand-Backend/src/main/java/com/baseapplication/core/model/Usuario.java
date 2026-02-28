@@ -1,6 +1,7 @@
 package com.baseapplication.core.model;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -49,6 +50,8 @@ public class Usuario implements UserDetails {
     @Enumerated(EnumType.STRING)
     private PermissaoUsuario permissao;
     private String urlFotoPerfil;
+    private LocalDateTime dataUltimoLogin;
+
     @OneToMany(mappedBy = "id.idUsuario", fetch = FetchType.EAGER)
     private List<MusicoBanda> musicoBandaList = new ArrayList<>();
 
@@ -65,6 +68,7 @@ public class Usuario implements UserDetails {
         this.urlFotoPerfil = "default";
         this.dataCriacao = LocalDate.now();
         this.dataNascimento = data.getDataNascimento();
+        this.dataUltimoLogin = LocalDateTime.now();
     }
 
     public List<Banda> getBandas(){

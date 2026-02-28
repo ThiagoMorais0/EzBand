@@ -90,6 +90,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	private void verificaUsuarioJaCadastrado(CadastroUsuarioDTO dados) {
 		if (usuarioService.findByEmail(dados.getEmail()) != null)
 			throw new ConflictException("Email já cadastrado.");
+		
+		if (dados.getCelular() != null && !dados.getCelular().isEmpty()) {
+			if (usuarioService.findByCelular(dados.getCelular()) != null)
+				throw new ConflictException("Celular já cadastrado.");
+		}
 	}
 
 	private void verificaUsuarioJaCadastrado(CadastroDTO dados) {

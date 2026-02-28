@@ -25,7 +25,9 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
                 .csrf(csrf -> csrf.disable())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                )
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.POST, "/auth/registrar").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/cadastrarUsuarioComImagem").permitAll()
@@ -42,6 +44,8 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.GET, "/v3/api-docs").permitAll()
                         .requestMatchers(HttpMethod.GET, "/v3/api-docs/*").permitAll()
                         .requestMatchers("/notificacoes/**").permitAll()
+                        // PAINEL ADMIN EVOLUTION API
+                        .requestMatchers("/admin/evolution/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
