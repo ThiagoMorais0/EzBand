@@ -47,7 +47,7 @@ public class MinioStorageServiceImpl {
 	public String uploadImage(MultipartFile file, String bucketName, String fileName) throws IOException {
 		try (S3Client s3 = S3Client.builder()
 				.region(Region.US_EAST_1)
-				.endpointOverride(URI.create("http://localhost:9000"))
+				.endpointOverride(URI.create("http://srv1358677.hstgr.cloud:9000"))
 				.credentialsProvider(StaticCredentialsProvider.create(
 						AwsBasicCredentials.create(minioUser, minioPassword)))
 				.serviceConfiguration(S3Configuration.builder().pathStyleAccessEnabled(true).build())
@@ -64,7 +64,7 @@ public class MinioStorageServiceImpl {
 			System.out.println("Upload concluído: " + file.getOriginalFilename());
 
 //			return getPresignedUrl(bucketName, fileName);
-			return String.format("http://localhost:9000/%s/%s", bucketName, fileName);
+			return String.format("http://srv1358677.hstgr.cloud:9000/%s/%s", bucketName, fileName);
 		}
 
 
@@ -73,7 +73,7 @@ public class MinioStorageServiceImpl {
 	public String getPresignedUrl(String bucketName, String fileName) {
 		try (S3Presigner presigner = S3Presigner.builder()
 				.region(Region.US_EAST_1)
-				.endpointOverride(URI.create("http://localhost:9000"))
+				.endpointOverride(URI.create("http://srv1358677.hstgr.cloud:9000"))
 				.credentialsProvider(StaticCredentialsProvider.create(
 						AwsBasicCredentials.create(minioUser, minioPassword)))
 				.serviceConfiguration(S3Configuration.builder().pathStyleAccessEnabled(true).build())
