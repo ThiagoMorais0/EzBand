@@ -18,6 +18,7 @@ import com.baseapplication.core.model.embedded.ParametrosBanda;
 import com.baseapplication.core.service.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.ResponseEntity;
@@ -50,6 +51,7 @@ import com.baseapplication.core.utils.FileUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+@Log4j2
 @Service
 @RequiredArgsConstructor
 public class BandaServiceImpl implements BandaService {
@@ -109,6 +111,7 @@ public class BandaServiceImpl implements BandaService {
 	@Transactional
 	@Override
 	public void novaBanda(String bandaJson, MultipartFile logo) {
+		log.info("Nova banda: " + bandaJson);
 		CadastroBandaDTO bandaDTO;
 		try {
 			bandaDTO = new ObjectMapper().readValue(bandaJson, CadastroBandaDTO.class);
