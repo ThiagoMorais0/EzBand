@@ -28,26 +28,19 @@ public class MinioStorageServiceImpl {
 	@Value("${minio.password}")
 	private String minioPassword;
 
-//	public String uploadImage(MultipartFile file, String bucketName, String fileName) throws IOException {
-//		try (S3Client s3 = S3Client.builder().region(Region.US_EAST_1).endpointOverride(URI.create("http://localhost:9000"))
-//				.credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials
-//						.create(System.getenv("MINIO_ADMIN_USER"), System.getenv("MINIO_ADMIN_PASSWORD"))))
-//				.serviceConfiguration(S3Configuration.builder().pathStyleAccessEnabled(true).build()).build()) {
-//
-//			PutObjectRequest putRequest = PutObjectRequest.builder().bucket(bucketName).key(fileName).build();
-//
-//			s3.putObject(putRequest, RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
-//
-//			System.out.println("Upload concluído: " + file.getOriginalFilename());
-//
-//			return String.format("http://localhost:9000/%s/%s", bucketName, fileName);
-//		}
-//	}
+	// Nova variável para a rede interna do Docker (Upload)
+	@Value("${minio.internal-url}")
+	private String minioInternalUrl;
+
+	// Nova variável para a rede pública (Aplicativo)
+	@Value("${minio.external-url}")
+	private String minioExternalUrl;
 
 	public String uploadImage(MultipartFile file, String bucketName, String fileName) throws IOException {
+		// Usa a URL INTERNA para conectar no S3
 		try (S3Client s3 = S3Client.builder()
 				.region(Region.US_EAST_1)
-				.endpointOverride(URI.create("http://srv1358677.hstgr.cloud:9000"))
+				.endpointOverride(URI.create(minioInternalUrl))
 				.credentialsProvider(StaticCredentialsProvider.create(
 						AwsBasicCredentials.create(minioUser, minioPassword)))
 				.serviceConfiguration(S3Configuration.builder().pathStyleAccessEnabled(true).build())
@@ -63,17 +56,16 @@ public class MinioStorageServiceImpl {
 
 			System.out.println("Upload concluído: " + file.getOriginalFilename());
 
-//			return getPresignedUrl(bucketName, fileName);
-			return String.format("http://srv1358677.hstgr.cloud:9000/%s/%s", bucketName, fileName);
+			// Retorna a URL EXTERNA para ser salva no banco e acessada pelo App
+			return String.format("%s/%s/%s", minioExternalUrl, bucketName, fileName);
 		}
-
-
 	}
 
 	public String getPresignedUrl(String bucketName, String fileName) {
+		// Usa a URL INTERNA para conectar no S3 e gerar a assinatura
 		try (S3Presigner presigner = S3Presigner.builder()
 				.region(Region.US_EAST_1)
-				.endpointOverride(URI.create("http://srv1358677.hstgr.cloud:9000"))
+				.endpointOverride(URI.create(minioInternalUrl))
 				.credentialsProvider(StaticCredentialsProvider.create(
 						AwsBasicCredentials.create(minioUser, minioPassword)))
 				.serviceConfiguration(S3Configuration.builder().pathStyleAccessEnabled(true).build())
@@ -85,11 +77,18 @@ public class MinioStorageServiceImpl {
 					.build();
 
 			GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
-					.signatureDuration(Duration.ofMinutes(100)) // tempo de validade
+					.signatureDuration(Duration.ofMinutes(100))
 					.getObjectRequest(getObjectRequest)
 					.build();
 
-			return presigner.presignGetObject(presignRequest).url().toString();
+			// A AWS SDK vai usar o endpointOverride para montar a URL,
+			// Se presigned URLs forem enviadas ao App, elas precisariam da URL externa.
+			// Como você montou os buckets como públicos e está retornando a string formatada no upload,
+			// a presigned não será um problema crítico agora.
+			String url = presigner.presignGetObject(presignRequest).url().toString();
+
+			// Troca a base interna pela externa no retorno do Presigned (Garantia extra)
+			return url.replace(minioInternalUrl, minioExternalUrl);
 		}
 	}
 }
