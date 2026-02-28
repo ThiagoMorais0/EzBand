@@ -10,6 +10,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.baseapplication.core.dao.UsuarioDao;
+import com.baseapplication.core.dto.UserPrincipal;
+import com.baseapplication.core.model.Usuario;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -31,10 +33,11 @@ public class SecurityFilter extends OncePerRequestFilter {
     	var token = this.recoverToken(request);
         if(token != null){
             var login = tokenService.validarToken(token);
-            UserDetails user = usuarioDao.findByEmail(login);
+            Usuario usuario = usuarioDao.findByEmail(login);
 
-            if(user != null){
-                var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+            if(usuario != null){
+                UserDetails userPrincipal = UserPrincipal.fromUsuario(usuario);
+                var authentication = new UsernamePasswordAuthenticationToken(userPrincipal, null, userPrincipal.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
 

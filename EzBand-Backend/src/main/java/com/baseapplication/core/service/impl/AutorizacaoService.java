@@ -1,6 +1,8 @@
 package com.baseapplication.core.service.impl;
 
 import com.baseapplication.core.dao.UsuarioDao;
+import com.baseapplication.core.dto.UserPrincipal;
+import com.baseapplication.core.model.Usuario;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -15,6 +17,10 @@ public class AutorizacaoService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return usuarioDao.findByEmail(email);
+        Usuario usuario = usuarioDao.findByEmail(email);
+        if (usuario == null) {
+            throw new UsernameNotFoundException("Usuário não encontrado: " + email);
+        }
+        return UserPrincipal.fromUsuario(usuario);
     }
 }
