@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +13,9 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "MUSICO_BANDA")
-public class MusicoBanda {
+public class MusicoBanda implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @EmbeddedId
     private MusicoBandaId id;
