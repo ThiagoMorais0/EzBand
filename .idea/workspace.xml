@@ -6,9 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="cea5cf5c-2957-424e-9f71-2d753ba94117" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/EzBand-Backend/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/EzBand-Backend/Dockerfile" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/EzBand-Backend/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/EzBand-Backend/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/compose.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -76,6 +74,14 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="RunManager">
+    <configuration name="Unnamed" type="Application" factoryName="Application" nameIsGenerated="true">
+      <module name="EzBand" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -96,7 +102,7 @@
       <workItem from="1770741417771" duration="4696000" />
       <workItem from="1770746901948" duration="1021000" />
       <workItem from="1770755776695" duration="2775000" />
-      <workItem from="1778023009479" duration="2116000" />
+      <workItem from="1778023009479" duration="3520000" />
     </task>
     <servers />
   </component>
