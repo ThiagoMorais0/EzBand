@@ -19,7 +19,8 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}          
           passphrase: ${{ secrets.VPS_SSH_PASSPHRASE }}
           port: 5022               # <--- Configurado na porta correta do SSH da VPS
-          timeout: 60s             # <--- Tolerância de rede aumentada para o handshake
+          sync: true            # <--- FORÇA O GITHUB A EXECUTAR EM UMA CONEXÃO SEQUENCIAL ÚNICA
+          timeout: 90s          # <--- Aumenta o tempo de tolerância para o aperto de mão inicial
           command_timeout: 18m
           script: |
             set -e
