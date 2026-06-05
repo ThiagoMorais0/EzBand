@@ -4,6 +4,7 @@ services:
     image: postgres:16
     container_name: db-postgres
     hostname: db-postgres
+    restart: unless-stopped
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -63,6 +64,7 @@ services:
   db_evolution:
     image: postgres:15-alpine
     container_name: db_evolution
+    restart: unless-stopped
     environment:
       POSTGRES_USER: ${EVO_DB_USER}
       POSTGRES_PASSWORD: ${EVO_DB_PASSWORD}
@@ -128,6 +130,7 @@ services:
       context: ./EzBand-Backend
       dockerfile: Dockerfile
     container_name: api
+    restart: unless-stopped
     depends_on:
       - db-postgres
       - evolution-api
@@ -159,6 +162,7 @@ services:
   backup:
     build: ./BackupService
     container_name: backup
+    restart: unless-stopped
     depends_on:
       - db-postgres
       - db-mongo
