@@ -1,56 +1,20 @@
-name: Deploy Backend
+name: Test SSH
 
 on:
-  push:
-    branches: [develop]
+  workflow_dispatch:
 
 jobs:
-  deploy:
-    name: Deploy to VPS
+  test:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
 
     steps:
-      - name: Deploy via SSH
+      - name: SSH Test
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }} 	      
+          key: ${{ secrets.VPS_SSH_KEY }}
           passphrase: ${{ secrets.VPS_SSH_PASSPHRASE }}
-          command_timeout: 18m
           script: |
-            set -e
-
-            cd /root/EzBand
-
-            echo ">> Atualizando código..."
-            git fetch origin develop
-            git reset --hard origin/develop
-
-            echo ">> Reconstruindo containers..."
-            docker compose build api chat-service
-
-            echo ">> Subindo serviços..."
-            docker compose up -d --no-deps api chat-service
-
-            echo ">> Verificando saúde da API (aguardando até 90s)..."
-            for i in $(seq 1 18); do
-              CODE=$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/ 2>/dev/null || echo "000")
-              if [ "$CODE" != "000" ] && [ -n "$CODE" ]; then
-                echo "API respondeu — HTTP $CODE"
-                break
-              fi
-              if [ "$i" -eq 18 ]; then
-                echo "ERRO: API não respondeu após 90s"
-                docker logs api --tail 30
-                exit 1
-              fi
-              echo "  Aguardando... ($i/18)"
-              sleep 5
-            done
-
-            echo ">> Limpando imagens antigas..."
-            docker image prune -f
-
-            echo "Deploy concluído com sucesso."
+            whoami
+            hostname
