@@ -9,11 +9,9 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CriacaoMembroFantasmaDTO {
-    private Long idBanda;
-    private String nome;
-    private String instrumento;
-    private String urlFoto;
-    private String observacoes;
+public class ConfirmacaoTokenDTO {
     private String celular;
+    private String token;
+    private Long idMembroFantasma;
+    private Long idUsuario;
 }

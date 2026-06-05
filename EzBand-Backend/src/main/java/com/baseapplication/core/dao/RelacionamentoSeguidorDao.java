@@ -33,4 +33,13 @@ public interface RelacionamentoSeguidorDao extends JpaRepository<RelacionamentoS
           AND r2.id.idSeguidor = :idUsuario
     """)
     List<Usuario> buscarAmigos(Long idUsuario);
+
+    @Query("SELECT u FROM RelacionamentoSeguidor r JOIN Usuario u ON r.id.idSeguidor = u.id WHERE r.id.idSeguido = :idUsuario AND r.status = :status")
+    List<Usuario> buscarSeguidores(@Param("idUsuario") Long idUsuario, @Param("status") StatusSeguidor status);
+
+    @Query("SELECT COUNT(r) FROM RelacionamentoSeguidor r WHERE r.id.idSeguido = :idUsuario AND r.status = :status")
+    Long contarSeguidores(@Param("idUsuario") Long idUsuario, @Param("status") StatusSeguidor status);
+
+    @Query("SELECT COUNT(r) FROM RelacionamentoSeguidor r WHERE r.id.idSeguidor = :idUsuario AND r.status = :status")
+    Long contarSeguindo(@Param("idUsuario") Long idUsuario, @Param("status") StatusSeguidor status);
 }

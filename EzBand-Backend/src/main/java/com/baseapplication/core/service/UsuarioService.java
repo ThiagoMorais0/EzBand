@@ -1,6 +1,7 @@
 package com.baseapplication.core.service;
 
 import com.baseapplication.core.dto.ParticipacoesEspeciaisDTO;
+import com.baseapplication.core.dto.SeguidorDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -58,4 +59,6 @@ public interface UsuarioService {
     List<InfoPerfilUsuarioDTO> buscarAmigos();
 
     List<InfoPerfilUsuarioDTO> buscarSugestoes(String termo);
+
+    List<SeguidorDTO> buscarSeguidores(Long idUsuario);
 }

@@ -11,4 +11,7 @@ public interface RelacionamentoSeguidorService {
     void seguirUsuario(Long idUsuarioASeguir);
     void deixarDeSeguir(Long idUsuario);
     List<Usuario> buscarAmigos();
+    List<Usuario> buscarSeguidores(Long idUsuario);
+    Long contarSeguidores(Long idUsuario);
+    Long contarSeguindo(Long idUsuario);
 }

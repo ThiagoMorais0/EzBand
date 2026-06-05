@@ -182,6 +182,15 @@ public class UsuarioController {
 			return ResponseEntity.status(500).body(e.getMessage());
 		}
 	}
-	
-	
+
+	@GetMapping("/buscarSeguidores")
+	public ResponseEntity<?> buscarSeguidores(@RequestParam Long idUsuario){
+		try{
+			return ResponseEntity.ok(usuarioService.buscarSeguidores(idUsuario));
+		}catch (Exception e){
+			return ResponseEntity.status(500).body(e.getMessage());
+		}
+	}
+
+
 }

@@ -195,6 +195,8 @@ public class UsuarioServiceImpl implements UsuarioService {
 	public InfoPerfilUsuarioDTO buscarInformacoesDoPerfilPorId(Long idUsuario) {
 		InfoPerfilUsuarioDTO dto = new InfoPerfilUsuarioDTO(buscarPorId(idUsuario));
 		dto.setTipoRelacionamento(relacionamentoSeguidorService.buscarTipoRelacionamento(Context.getUsuarioLogado().getId(), idUsuario));
+		dto.setQuantidadeSeguidores(relacionamentoSeguidorService.contarSeguidores(idUsuario));
+		dto.setQuantidadeSeguindo(relacionamentoSeguidorService.contarSeguindo(idUsuario));
 		return dto;
 	}
 
@@ -280,6 +282,13 @@ public class UsuarioServiceImpl implements UsuarioService {
     public List<InfoPerfilUsuarioDTO> buscarAmigos() {
         return relacionamentoSeguidorService.buscarAmigos().stream().map(InfoPerfilUsuarioDTO::new).toList();
     }
+
+	@Override
+	public List<com.baseapplication.core.dto.SeguidorDTO> buscarSeguidores(Long idUsuario) {
+		return relacionamentoSeguidorService.buscarSeguidores(idUsuario).stream()
+				.map(u -> new com.baseapplication.core.dto.SeguidorDTO(u.getId(), u.getNome(), u.getUrlFotoPerfil()))
+				.toList();
+	}
 
 	@Override
 	public List<InfoPerfilUsuarioDTO> buscarSugestoes(String termo) {

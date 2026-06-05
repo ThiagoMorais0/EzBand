@@ -15,4 +15,5 @@ public class EdicaoMembroFantasmaDTO {
     private String instrumento;
     private String urlFoto;
     private String observacoes;
+    private String celular;
 }

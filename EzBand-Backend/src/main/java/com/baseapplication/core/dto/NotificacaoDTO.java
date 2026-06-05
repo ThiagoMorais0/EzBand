@@ -13,5 +13,6 @@ public record NotificacaoDTO(
         String urlImagem,
         String titulo,
         String tipoNotificacao,
-        Boolean permiteResposta) {
+        Boolean permiteResposta,
+        Long remetenteId) {
 }

@@ -87,8 +87,9 @@ public class BandaServiceImpl implements BandaService {
 
 	@Override
 	public void expulsarUsuario(Long idBanda, Long idUsuario) {
+		Banda banda = buscarPorId(idBanda);
 		musicoBandaService.expulsar(idBanda, idUsuario);
-		notificacaoService.enviarNotificacao(new UsuarioExpulsoDeBandaEvent(idUsuario, idBanda));
+		notificacaoService.enviarNotificacao(new UsuarioExpulsoDeBandaEvent(idUsuario, banda));
 	}
 
 	@Override

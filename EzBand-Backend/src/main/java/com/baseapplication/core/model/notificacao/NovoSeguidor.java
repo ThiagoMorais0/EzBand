@@ -20,6 +20,7 @@ public class NovoSeguidor extends Notificacao {
         super.setPermiteResposta(false);
         super.setTitulo("Novo seguidor");
         super.setMensagem(remetente.getNome() + " começou a seguir você.");
+        super.setUrlImagem(remetente.getUrlFotoPerfil());
     }
 
     @Override

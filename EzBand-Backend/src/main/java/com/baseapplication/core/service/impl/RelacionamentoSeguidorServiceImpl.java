@@ -72,4 +72,19 @@ public class RelacionamentoSeguidorServiceImpl implements RelacionamentoSeguidor
     public List<Usuario> buscarAmigos() {
         return relacionamentoSeguidorDao.buscarAmigos(Context.getUsuarioLogado().getId());
     }
+
+    @Override
+    public List<Usuario> buscarSeguidores(Long idUsuario) {
+        return relacionamentoSeguidorDao.buscarSeguidores(idUsuario, StatusSeguidor.ACEITO);
+    }
+
+    @Override
+    public Long contarSeguidores(Long idUsuario) {
+        return relacionamentoSeguidorDao.contarSeguidores(idUsuario, StatusSeguidor.ACEITO);
+    }
+
+    @Override
+    public Long contarSeguindo(Long idUsuario) {
+        return relacionamentoSeguidorDao.contarSeguindo(idUsuario, StatusSeguidor.ACEITO);
+    }
 }

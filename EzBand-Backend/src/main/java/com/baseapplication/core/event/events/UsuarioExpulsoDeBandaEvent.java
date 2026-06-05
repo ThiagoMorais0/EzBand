@@ -1,6 +1,6 @@
 package com.baseapplication.core.event.events;
 
-import com.baseapplication.core.model.Usuario;
+import com.baseapplication.core.model.Banda;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -8,5 +8,5 @@ import lombok.Getter;
 @AllArgsConstructor
 public class UsuarioExpulsoDeBandaEvent implements NotificacaoEvent {
     private Long idUsuario;
-    private Long idBanda;
+    private Banda banda;
 }

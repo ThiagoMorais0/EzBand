@@ -34,6 +34,8 @@ public class InfoPerfilUsuarioDTO {
     private String urlFotoPerfil;
     private String instrumentos;
     private TipoRelacionamento tipoRelacionamento;
+    private Long quantidadeSeguidores;
+    private Long quantidadeSeguindo;
     private List<BandaDTO> bandas = new ArrayList<>();
     private List<PublicacaoDTO> publicacoes = new ArrayList<>();
     public InfoPerfilUsuarioDTO(Usuario usuario){

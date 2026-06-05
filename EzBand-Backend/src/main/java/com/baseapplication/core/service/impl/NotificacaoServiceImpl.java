@@ -7,8 +7,6 @@ import com.baseapplication.core.dao.UsuarioDao;
 import com.baseapplication.core.dto.NotificacaoDTO;
 import com.baseapplication.core.enums.*;
 import com.baseapplication.core.event.events.NotificacaoEvent;
-import com.baseapplication.core.event.events.resposta.RespostaSolicitacaoAgendarEnsaioEvent;
-import com.baseapplication.core.event.events.resposta.RespostaSolicitacaoAgendarShowEvent;
 import com.baseapplication.core.factory.RespostaNotificacaoFactory;
 import com.baseapplication.core.model.*;
 import com.baseapplication.core.model.dto.RespostaNotificacaoDTO;
@@ -23,9 +21,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Sinks;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -43,7 +44,6 @@ public class NotificacaoServiceImpl implements NotificacaoService {
     private final MusicoBandaService musicoBandaService;
     private final BandaDao bandaDao;
     private final Map<String, Sinks.Many<NotificacaoDTO>> sinks = new ConcurrentHashMap<>();
-    private final Map<String, Boolean> bridgesConfigurados = new ConcurrentHashMap<>();
 
     @Override
     public void salvarNotificacao(Notificacao notificacao) {
@@ -74,13 +74,16 @@ public class NotificacaoServiceImpl implements NotificacaoService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Notificacao> buscarNaoLidas(Long destinatarioId, TipoParticipante destinatarioTipo) {
-        List<Notificacao> notificacoesUsuario = notificacaoDao.buscarNaoLidas(destinatarioId, destinatarioTipo);
-        if(destinatarioTipo.equals(TipoParticipante.USUARIO)) {
-            Usuario usuario = usuarioDao.findById(destinatarioId).get();
-            for(MusicoBanda musicoBanda : usuario.getMusicoBandaList()) {
-                if(musicoBanda.getPermissoes().contains(PermissaoMusico.ADMINISTRADOR)) {
-                    List<Notificacao> notificacoesBanda = buscarNaoLidas(musicoBanda.getBanda().getId(), TipoParticipante.BANDA);
+        List<Notificacao> notificacoesUsuario = new ArrayList<>(notificacaoDao.buscarNaoLidas(destinatarioId, destinatarioTipo));
+        if (destinatarioTipo.equals(TipoParticipante.USUARIO)) {
+            Usuario usuario = usuarioDao.findById(destinatarioId).orElseThrow();
+            for (MusicoBanda musicoBanda : usuario.getMusicoBandaList()) {
+                if (musicoBanda.getPermissoes().contains(PermissaoMusico.ADMINISTRADOR)
+                        || musicoBanda.getPermissoes().contains(PermissaoMusico.FUNDADOR)) {
+                    List<Notificacao> notificacoesBanda = notificacaoDao.buscarNaoLidas(
+                            musicoBanda.getBanda().getId(), TipoParticipante.BANDA);
                     notificacoesUsuario.addAll(notificacoesBanda);
                 }
             }
@@ -109,15 +112,15 @@ public class NotificacaoServiceImpl implements NotificacaoService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Flux<NotificacaoDTO> streamNotificacoes(Long destinatarioId, TipoParticipante destinatarioTipo) {
         String chave = key(destinatarioId, destinatarioTipo);
 
-        Sinks.Many<NotificacaoDTO> sink = sinks.computeIfAbsent(
-                chave,
-                k -> Sinks.many().multicast().onBackpressureBuffer()
-        );
+        // Sempre cria um novo sink para este cliente, substituindo qualquer conexão anterior
+        Sinks.Many<NotificacaoDTO> sink = Sinks.many().multicast().onBackpressureBuffer();
+        sinks.put(chave, sink);
 
-        // Busca notificações não lidas
+        // Busca notificações não lidas do banco para entrega imediata
         Flux<NotificacaoDTO> naoLidas = Flux.fromIterable(
                 buscarNaoLidas(destinatarioId, destinatarioTipo).stream()
                         .map(i -> new NotificacaoDTO(
@@ -128,46 +131,42 @@ public class NotificacaoServiceImpl implements NotificacaoService {
                                 i.getRemetenteTipo().name(),
                                 i.isLida(),
                                 i.getUrlImagem(),
-                                i.getTitulo(), i.getTipoNotificacao(), i.isPermiteResposta()))
+                                i.getTitulo(), i.getTipoNotificacao(), i.isPermiteResposta(),
+                                i.getRemetenteId()))
                         .toList()
         );
 
-        // Se for usuário, cria "bridge" para bandas que ele administra (apenas uma vez)
-        if (destinatarioTipo == TipoParticipante.USUARIO && !bridgesConfigurados.getOrDefault(chave, false)) {
-            Usuario usuario = usuarioDao.findById(destinatarioId).get();
+        // Rastreia subscriptions de bridge para cancelamento correto ao desconectar
+        List<Disposable> bridgeSubscriptions = new ArrayList<>();
 
+        if (destinatarioTipo == TipoParticipante.USUARIO) {
+            Usuario usuario = usuarioDao.findById(destinatarioId).orElseThrow();
             for (MusicoBanda musicoBanda : usuario.getMusicoBandaList()) {
-                if (musicoBanda.getPermissoes().contains(PermissaoMusico.ADMINISTRADOR)) {
+                if (musicoBanda.getPermissoes().contains(PermissaoMusico.ADMINISTRADOR)
+                        || musicoBanda.getPermissoes().contains(PermissaoMusico.FUNDADOR)) {
                     Long bandaId = musicoBanda.getBanda().getId();
                     String chaveBanda = key(bandaId, TipoParticipante.BANDA);
-                    String chaveBridge = chave + "->" + chaveBanda;
 
-                    // Verifica se o bridge já foi configurado para evitar duplicatas
-                    if (!bridgesConfigurados.getOrDefault(chaveBridge, false)) {
-                        // Conecta o flux da banda ao sink do usuário
-                        Sinks.Many<NotificacaoDTO> sinkBanda = sinks.computeIfAbsent(
-                                chaveBanda,
-                                k -> Sinks.many().multicast().onBackpressureBuffer()
-                        );
+                    // Obtém ou cria sink da banda (preservado para outros admins conectados)
+                    Sinks.Many<NotificacaoDTO> sinkBanda = sinks.computeIfAbsent(
+                            chaveBanda, k -> Sinks.many().multicast().onBackpressureBuffer());
 
-                        // Toda notificação que cair no sink da banda é replicada para o sink do usuário
-                        sinkBanda.asFlux().subscribe(sink::tryEmitNext);
-                        bridgesConfigurados.put(chaveBridge, true);
-                        log.info("Bridge configurado: {} -> {}", chave, chaveBanda);
-                    }
+                    // Bridge: notificações da banda chegam ao sink deste usuário
+                    Disposable sub = sinkBanda.asFlux().subscribe(sink::tryEmitNext);
+                    bridgeSubscriptions.add(sub);
+                    log.info("Bridge configurado: {} -> {}", chave, chaveBanda);
                 }
             }
-            bridgesConfigurados.put(chave, true);
         }
 
         log.info("Stream SSE iniciado para {}", chave);
-        // Concatena notificações não lidas primeiro, depois segue em tempo real
         return Flux.merge(
                 naoLidas,
                 sink.asFlux().doFinally(signal -> {
-                    sinks.remove(chave);
-                    // Remove todos os bridges relacionados a esta chave
-                    bridgesConfigurados.keySet().removeIf(key -> key.startsWith(chave));
+                    // Remove apenas se for o mesmo sink (evita remover reconexão mais recente)
+                    sinks.remove(chave, sink);
+                    // Cancela todas as subscriptions de bridge deste cliente
+                    bridgeSubscriptions.forEach(Disposable::dispose);
                     log.info("Conexão SSE encerrada para {}", chave);
                 })
         );
@@ -190,7 +189,8 @@ public class NotificacaoServiceImpl implements NotificacaoService {
                     notificacao.getUrlImagem(),
                     notificacao.getTitulo(),
                     notificacao.getTipoNotificacao(),
-                    notificacao.isPermiteResposta()
+                    notificacao.isPermiteResposta(),
+                    notificacao.getRemetenteId()
             ));
         } else {
             log.debug("Nenhum sink ativo para {}, notificação será entregue quando o cliente conectar", chave);
@@ -214,7 +214,8 @@ public class NotificacaoServiceImpl implements NotificacaoService {
 
         Notificacao notificacaoResposta = RespostaNotificacaoFactory.criarNotificacaoResposta(notificacao, respostaDTO.getAcao(), respostaDTO.getMensagem());
         notificacaoDao.save(notificacaoResposta);
-        enviarNotificacao(new RespostaSolicitacaoAgendarEnsaioEvent(notificacaoResposta));
+        // Envia a notificação de resposta via SSE diretamente para o destinatário
+        enviarNotificacaoSink(notificacaoResposta);
     }
 
     private void executarAcao(Notificacao notificacao, AcaoResposta acao) {

@@ -77,6 +77,14 @@ public class MembroFantasmaServiceImpl implements MembroFantasmaService {
         if (dto.getObservacoes() != null) {
             membroFantasma.setObservacoes(dto.getObservacoes());
         }
+        if (dto.getCelular() != null) {
+            String celularAtual = membroFantasma.getCelular();
+            if (!dto.getCelular().equals(celularAtual)) {
+                membroFantasma.setCelular(dto.getCelular());
+                membroFantasma.setCelularValidado(false);
+                membroFantasma.setDataCelularValidado(null);
+            }
+        }
         
         MembroFantasma saved = membroFantasmaDao.save(membroFantasma);
         return new MembroFantasmaDTO(saved);

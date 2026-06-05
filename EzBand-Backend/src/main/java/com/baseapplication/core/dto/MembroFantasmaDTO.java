@@ -18,6 +18,8 @@ public class MembroFantasmaDTO {
     private String instrumento;
     private String urlFoto;
     private String observacoes;
+    private String celular;
+    private Boolean celularValidado;
 
     public MembroFantasmaDTO(MembroFantasma entity) {
         BeanUtils.copyProperties(entity, this);

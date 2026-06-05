@@ -39,7 +39,7 @@ public class NotificacaoListener {
 
     @EventListener
     public void handleUsuarioExpulsoDeBanda(UsuarioExpulsoDeBandaEvent event) {
-        UsuarioExpulsoDeBanda notificacao = new UsuarioExpulsoDeBanda(event.getIdBanda(), event.getIdUsuario());
+        UsuarioExpulsoDeBanda notificacao = new UsuarioExpulsoDeBanda(event.getBanda(), event.getIdUsuario());
         enviar(notificacao);
     }
 

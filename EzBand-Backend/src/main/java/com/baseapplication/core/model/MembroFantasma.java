@@ -31,6 +31,15 @@ public class MembroFantasma {
     @Column(length = 1000)
     private String observacoes;
 
+    @Column(length = 20)
+    private String celular;
+
+    @Column(name = "CELULAR_VALIDADO")
+    private Boolean celularValidado = false;
+
+    @Column(name = "DATA_CELULAR_VALIDADO")
+    private java.time.LocalDateTime dataCelularValidado;
+
     @ManyToOne
     @JoinColumn(name = "ID_BANDA", insertable = false, updatable = false)
     private Banda banda;
