@@ -18,6 +18,7 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }} 	      
           passphrase: ${{ secrets.VPS_SSH_PASSPHRASE }}
+          port: 5022
           command_timeout: 18m
           script: |
             set -e
