@@ -1,9 +1,9 @@
 services:
-  # --- BANCOS DE DADOS ---
-  db_postgres:
-    image: postgres:15-alpine
-    container_name: db_postgres
-    restart: unless-stopped
+  # BANCOS DE DADOS
+  db-postgres:
+    image: postgres:16
+    container_name: db-postgres
+    hostname: db-postgres
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -11,24 +11,54 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - db_postgres_data:/var/lib/postgresql/data
+      - db-postgres_data:/var/lib/postgresql/data
     networks:
-      - ezband_network
+      - ezband_app_network
 
-  db_mongo:
-    image: mongo:6
-    container_name: db_mongo
+  db-mongo:
+    image: mongo
+    container_name: db-mongo
     restart: unless-stopped
+    ports:
+      - "27017:27017"
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
       MONGO_DB_DATABASE: ${MONGO_DB_DATABASE}
-    ports:
-      - "27017:27017"
     volumes:
-      - db_mongo_data:/data/db
+      - db-mongo_data:/data/db
     networks:
-      - ezband_network
+      - ezband_app_network
+
+  # STORAGE
+  minio:
+    image: minio/minio:RELEASE.2025-07-23T15-54-02Z
+    container_name: minio
+    ports:
+      - "9000:9000"
+      - "9090:9090"
+    volumes:
+      - minio_data:/data
+    networks:
+      ezband_app_network:
+        aliases:
+          - ezband-storage
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ADMIN_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ADMIN_PASSWORD}
+    command: "server /data --console-address :9090"
+
+  # MENSAGERIA
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - ezband_app_network
+    volumes:
+      - redis_data:/data
 
   db_evolution:
     image: postgres:15-alpine
@@ -42,32 +72,8 @@ services:
     volumes:
       - db_evolution_data:/var/lib/postgresql/data
     networks:
-      - ezband_network
+      - ezband_app_network
 
-  # --- INFRA E MENSAGERIA ---
-  minio:
-    image: minio/minio:RELEASE.2025-07-23T15-54-02Z
-    container_name: minio
-    ports:
-      - "9005:9000"   # Alterado para 9005 para evitar conflito
-      - "9090:9090"   # Console Web
-    volumes:
-      - minio_data:/data
-    environment:
-      MINIO_ROOT_USER: ${MINIO_ADMIN_USER}
-      MINIO_ROOT_PASSWORD: ${MINIO_ADMIN_PASSWORD}
-    command: "server /data --console-address :9090"
-    networks:
-      - ezband_network
-
-  redis:
-    image: redis:7-alpine
-    container_name: redis
-    restart: unless-stopped
-    networks:
-      - ezband_network
-
-  # --- SERVIÇOS EXTERNOS ---
   evolution-api:
     image: atendai/evolution-api:v2.1.1
     container_name: evolution-api
@@ -78,77 +84,112 @@ services:
       - SERVER_URL=${EVOLUTION_SERVER_URL:-http://localhost:8082}
       - AUTHENTICATION_API_KEY=${EVOLUTION_API_KEY}
       - AUTHENTICATION_TYPE=apikey
+      - CONFIG_SESSION_PHONE_CLIENT=To Fix
+      - CONFIG_SESSION_PHONE_VERSION=
+      - CONFIG_SESSION_PHONE_STRATEGY=latest
+      - CHROME_ARGS=--no-sandbox --disable-setuid-sandbox --disable-gpu --disable-dev-shm-usage
       - DATABASE_ENABLED=true
       - DATABASE_PROVIDER=postgresql
       - DATABASE_CONNECTION_URI=postgresql://${EVO_DB_USER}:${EVO_DB_PASSWORD}@db_evolution:5432/evolution_db?schema=public
       - DATABASE_CONNECTION_CLIENT_NAME=evolution_api
       - CACHE_REDIS_ENABLED=false
       - CACHE_LOCAL_ENABLED=true
+      - WEBSOCKET_ENABLED=true
+      - QRCODE_LIMIT=30
     depends_on:
       - db_evolution
     networks:
-      - ezband_network
-
-  # --- SUAS APLICAÇÕES ---
-  api:
-    build:
-      context: ./EzBand-Backend
-    container_name: api
-    restart: unless-stopped
-    depends_on:
-      - db_postgres
-      - evolution-api
-    env_file: .env
-    environment:
-      # Uso do nome do serviço 'db_postgres' em vez de localhost
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db_postgres:5432/${POSTGRES_DB}
-      EVOLUTION_API_URL: http://evolution-api:8080
-    ports:
-      - "8080:8080"
+      - ezband_app_network
     volumes:
-      - ./EzBand-Backend:/app # Permite Hot Reload se o seu Dockerfile suportar
-      - app_logs:/app/logs
-    networks:
-      - ezband_network
+      - evolution_data:/evolution/instances
+      - evolution_store:/evolution/store
 
+  # APLICAÇÕES
   chat-service:
     build: ./ChatService
     container_name: chat-service
     restart: unless-stopped
-    depends_on:
-      - db_mongo
-    env_file: .env
-    environment:
-      # Conexão interna via nome do container
-      MONGO_URI: mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@db_mongo:27017/${MONGO_DB_DATABASE}?authSource=admin
     ports:
       - "3001:3001"
-    volumes:
-      - ./ChatService:/app
-      - /app/node_modules
+    environment:
+      PORT: 3001
+      MONGO_URI: mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@db-mongo:27017/chat?authSource=admin
+      JWT_SECRET: ${JWT_SECRET}
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_DB_DATABASE: ${MONGO_DB_DATABASE}
+    depends_on:
+      - db-mongo
     networks:
-      - ezband_network
+      - ezband_app_network
+
+  api:
+    build:
+      context: ./EzBand-Backend
+      dockerfile: Dockerfile
+    container_name: api
+    depends_on:
+      - db-postgres
+      - evolution-api
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"
+    networks:
+      - ezband_app_network
+    volumes:
+      - app_logs:/app/logs
+
+  # FRONT-END (VUE.JS)
+  frontend:
+    build:
+      context: ./EzBand-Web
+      dockerfile: Dockerfile
+    container_name: ezband-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - api
+      - chat-service
+    networks:
+      - ezband_app_network
 
   backup:
     build: ./BackupService
     container_name: backup
-    env_file: .env
     depends_on:
-      - db_postgres
-      - db_mongo
+      - db-postgres
+      - db-mongo
       - minio
+    volumes:
+      - db-postgres_data:/data/postgres:ro
+      - db-mongo_data:/data/mongo:ro
+      - app_logs:/data/logs:ro
+      - ./backup-temp:/backup
+    environment:
+      MINIO_ADMIN_USER: ${MINIO_ADMIN_USER}
+      MINIO_ADMIN_PASSWORD: ${MINIO_ADMIN_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_DB: ${POSTGRES_DB}
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_DB_DATABASE: ${MONGO_DB_DATABASE}
     networks:
-      - ezband_network
+      - ezband_app_network
 
 volumes:
-  db_postgres_data:
-  db_mongo_data:
-  db_evolution_data:
-  minio_data:
+  db-postgres_data:
   app_logs:
+  db-mongo_data:
+  minio_data:
+  redis_data:
   evolution_data:
   evolution_store:
+  db_evolution_data:
 
 networks:
-  ezband_network:
+  ezband_app_network:
     driver: bridge
