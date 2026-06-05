@@ -146,7 +146,7 @@ services:
   # FRONT-END (VUE.JS)
   frontend:
     build:
-      context: ./EzBand-Web
+      context: ../EzBand-Web
       dockerfile: Dockerfile
     container_name: ezband-frontend
     restart: unless-stopped
