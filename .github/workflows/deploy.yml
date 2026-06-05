@@ -16,35 +16,46 @@ jobs:
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }} 	      
+          key: ${{ secrets.VPS_SSH_KEY }}          
           passphrase: ${{ secrets.VPS_SSH_PASSPHRASE }}
-          port: 5022
+          port: 5022               # <--- Configurado na porta correta do SSH da VPS
+          timeout: 60s             # <--- Tolerância de rede aumentada para o handshake
           command_timeout: 18m
           script: |
             set -e
 
+            # 1. Desbloqueia a chave SSH com a passphrase para automatizar o git fetch sem travar
+            eval $(ssh-agent -s)
+            echo "${{ secrets.VPS_SSH_PASSPHRASE }}" | ssh-add ~/.ssh/id_ed25519 2>/dev/null
+
+            # 2. Acessa a pasta do projeto (Back-end)
             cd /root/EzBand
 
             echo ">> Atualizando código..."
             git fetch origin develop
             git reset --hard origin/develop
 
-            echo ">> Reconstruindo containers..."
-            docker compose build api chat-service
+            echo ">> Reconstruindo containers (sem cache para garantir as alterações)..."
+            docker compose build --no-cache api chat-service
 
             echo ">> Subindo serviços..."
+            # Mantivemos o --no-deps aqui porque api e chat-service não dependem de um build dinâmico mútuo no boot
             docker compose up -d --no-deps api chat-service
 
             echo ">> Verificando saúde da API (aguardando até 90s)..."
             for i in $(seq 1 18); do
               CODE=$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/ 2>/dev/null || echo "000")
-              if [ "$CODE" != "000" ] && [ -n "$CODE" ]; then
+              
+              # Aceita respostas de sucesso (2xx) ou redirecionamentos (3xx) caso use alguma rota protegida/HTTPS local
+              if [ "$CODE" != "000" ] && [ -n "$CODE" ] && [ "$CODE" -lt 400 ]; then
                 echo "API respondeu — HTTP $CODE"
                 break
               fi
+              
               if [ "$i" -eq 18 ]; then
-                echo "ERRO: API não respondeu após 90s"
-                docker logs api --tail 30
+                echo "ERRO: API não respondeu com sucesso após 90s (Último status: $CODE)"
+                echo ">> Logs reais do container da API:"
+                docker logs api --tail 40
                 exit 1
               fi
               echo "  Aguardando... ($i/18)"
