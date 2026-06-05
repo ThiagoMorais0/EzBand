@@ -2,3 +2,10 @@
 logs
 EzBand-Backend/src/main/resources/application.properties
 ChatService/node_modules
+
+# IDE
+.idea/
+
+# Arquivos temporários e legados
+compose.yml.old
+ChatService/teste.txt
