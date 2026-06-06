@@ -206,9 +206,11 @@ public class BandaController {
     public ResponseEntity<?> editarBanda(
             @RequestParam("banda") String bandaJson,
             @RequestParam(required = false) MultipartFile imagem,
-            @RequestParam Boolean removerLogo) {
+            @RequestParam Boolean removerLogo,
+            @RequestParam(required = false) MultipartFile banner,
+            @RequestParam(required = false, defaultValue = "false") Boolean removerBanner) {
         try{
-            bandaService.editarBanda(bandaJson, imagem, removerLogo);
+            bandaService.editarBanda(bandaJson, imagem, removerLogo, banner, removerBanner);
             return ResponseEntity.ok("Banda editada com sucesso");
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

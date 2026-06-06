@@ -78,7 +78,8 @@ public class NotificacaoServiceImpl implements NotificacaoService {
     public List<Notificacao> buscarNaoLidas(Long destinatarioId, TipoParticipante destinatarioTipo) {
         List<Notificacao> notificacoesUsuario = new ArrayList<>(notificacaoDao.buscarNaoLidas(destinatarioId, destinatarioTipo));
         if (destinatarioTipo.equals(TipoParticipante.USUARIO)) {
-            Usuario usuario = usuarioDao.findById(destinatarioId).orElseThrow();
+            Usuario usuario = usuarioDao.findById(destinatarioId).orElse(null);
+            if (usuario == null) return notificacoesUsuario;
             for (MusicoBanda musicoBanda : usuario.getMusicoBandaList()) {
                 if (musicoBanda.getPermissoes().contains(PermissaoMusico.ADMINISTRADOR)
                         || musicoBanda.getPermissoes().contains(PermissaoMusico.FUNDADOR)) {
@@ -140,23 +141,24 @@ public class NotificacaoServiceImpl implements NotificacaoService {
         List<Disposable> bridgeSubscriptions = new ArrayList<>();
 
         if (destinatarioTipo == TipoParticipante.USUARIO) {
-            Usuario usuario = usuarioDao.findById(destinatarioId).orElseThrow();
-            for (MusicoBanda musicoBanda : usuario.getMusicoBandaList()) {
-                if (musicoBanda.getPermissoes().contains(PermissaoMusico.ADMINISTRADOR)
-                        || musicoBanda.getPermissoes().contains(PermissaoMusico.FUNDADOR)) {
-                    Long bandaId = musicoBanda.getBanda().getId();
-                    String chaveBanda = key(bandaId, TipoParticipante.BANDA);
+            usuarioDao.findById(destinatarioId).ifPresent(usuario -> {
+                for (MusicoBanda musicoBanda : usuario.getMusicoBandaList()) {
+                    if (musicoBanda.getPermissoes().contains(PermissaoMusico.ADMINISTRADOR)
+                            || musicoBanda.getPermissoes().contains(PermissaoMusico.FUNDADOR)) {
+                        Long bandaId = musicoBanda.getBanda().getId();
+                        String chaveBanda = key(bandaId, TipoParticipante.BANDA);
 
-                    // Obtém ou cria sink da banda (preservado para outros admins conectados)
-                    Sinks.Many<NotificacaoDTO> sinkBanda = sinks.computeIfAbsent(
-                            chaveBanda, k -> Sinks.many().multicast().onBackpressureBuffer());
+                        // Obtém ou cria sink da banda (preservado para outros admins conectados)
+                        Sinks.Many<NotificacaoDTO> sinkBanda = sinks.computeIfAbsent(
+                                chaveBanda, k -> Sinks.many().multicast().onBackpressureBuffer());
 
-                    // Bridge: notificações da banda chegam ao sink deste usuário
-                    Disposable sub = sinkBanda.asFlux().subscribe(sink::tryEmitNext);
-                    bridgeSubscriptions.add(sub);
-                    log.info("Bridge configurado: {} -> {}", chave, chaveBanda);
+                        // Bridge: notificações da banda chegam ao sink deste usuário
+                        Disposable sub = sinkBanda.asFlux().subscribe(sink::tryEmitNext);
+                        bridgeSubscriptions.add(sub);
+                        log.info("Bridge configurado: {} -> {}", chave, chaveBanda);
+                    }
                 }
-            }
+            });
         }
 
         log.info("Stream SSE iniciado para {}", chave);

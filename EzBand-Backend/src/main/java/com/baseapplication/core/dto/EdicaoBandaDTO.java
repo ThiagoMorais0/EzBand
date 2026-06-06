@@ -12,4 +12,7 @@ public class EdicaoBandaDTO {
     private String categoria;
     private Boolean permiteEntradaPorConvite;
     private Boolean exigirAprovacaoCompromissos;
+    private String instagramUrl;
+    private String facebookUrl;
+    private String youtubeUrl;
 }

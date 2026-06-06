@@ -132,9 +132,11 @@ public class EvolutionApiServiceImpl implements WhatsappService {
             log.info("Instância criada com sucesso: {}", response);
             return response;
         } catch (WebClientResponseException e) {
-            if (e.getStatusCode().value() == 401) {
+            if (e.getStatusCode().value() == 403 && e.getResponseBodyAsString().contains("already in use")) {
+                log.info("Instância '{}' já existe, obtendo QR code...", config.getInstanceName());
+                return obterQRCode();
+            } else if (e.getStatusCode().value() == 401) {
                 log.error("❌ ERRO 401: API Key inválida ou não configurada!");
-                log.error("Verifique se a variável EVOLUTION_API_KEY está configurada e corresponde à chave no servidor Evolution API");
                 log.error("API Key atual: {}...", config.getEvolutionApiKey().substring(0, Math.min(8, config.getEvolutionApiKey().length())));
             } else {
                 log.error("Erro ao criar instância: {} - {}", e.getStatusCode(), e.getResponseBodyAsString());
@@ -175,7 +177,6 @@ public class EvolutionApiServiceImpl implements WhatsappService {
             if (response != null && response.containsKey("instance")) {
                 Map<String, Object> instanceData = (Map<String, Object>) response.get("instance");
                 String state = (String) instanceData.getOrDefault("state", "");
-                
                 if ("open".equals(state)) {
                     return Map.of(
                         "message", "Instância já conectada",
@@ -185,7 +186,13 @@ public class EvolutionApiServiceImpl implements WhatsappService {
                     );
                 }
             }
-            
+
+            // v2.2+ retorna base64 na raiz — normaliza para { qrcode: { base64, code } }
+            if (response != null && response.containsKey("base64")) {
+                log.info("QR Code obtido com sucesso");
+                return Map.of("qrcode", response);
+            }
+
             log.info("QR Code obtido com sucesso");
             return response;
         } catch (WebClientResponseException e) {

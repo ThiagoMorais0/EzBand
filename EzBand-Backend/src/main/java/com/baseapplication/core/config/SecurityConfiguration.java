@@ -38,6 +38,8 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.GET, "/usuario/verificarEmailJaCadastrado").permitAll()
                         .requestMatchers(HttpMethod.POST, "/usuario/editarUsuarioComImagem").permitAll()
                         .requestMatchers(HttpMethod.POST, "/banda/criarMembroFantasma").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/validacao-celular/validar-token").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/validacao-celular/status").permitAll()
                         // SWAGGER
                         .requestMatchers(HttpMethod.GET, "/swagger-ui.html").permitAll()
                         .requestMatchers(HttpMethod.GET, "/swagger-ui/*").permitAll()

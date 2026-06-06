@@ -28,6 +28,10 @@ public class BandaDTO {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy", locale = "pt-BR", timezone = "Brazil/East")
     private LocalDate dataInclusao;
     private String urlLogo;
+    private String urlBanner;
+    private String instagramUrl;
+    private String facebookUrl;
+    private String youtubeUrl;
     private Boolean permiteEntradaPorConvite;
     private Boolean exigirAprovacaoCompromissos;
     private Boolean listarObservacaoRepertorio;

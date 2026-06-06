@@ -135,7 +135,7 @@ public class BandaServiceImpl implements BandaService {
 	}
 
 	@Override
-	public void editarBanda(String bandaJson, MultipartFile logo, Boolean removerLogo) {
+	public void editarBanda(String bandaJson, MultipartFile logo, Boolean removerLogo, MultipartFile banner, Boolean removerBanner) {
 		EdicaoBandaDTO bandaDTO;
 		try {
 			bandaDTO = new ObjectMapper().readValue(bandaJson, EdicaoBandaDTO.class);
@@ -149,11 +149,19 @@ public class BandaServiceImpl implements BandaService {
 		if (logo != null) {
 			urlLogo = imagemService.saveImageAndGetUrl(logo, "bandlogos",
 					banda.getId() + "." + FileUtils.getSufix(logo));
-		} else if (removerLogo) {
+		} else if (Boolean.TRUE.equals(removerLogo)) {
 			urlLogo = "default";
 		}
 
-		setarInformacoesEditadas(banda, bandaDTO, urlLogo);
+		String urlBanner = banda.getUrlBanner();
+		if (banner != null) {
+			urlBanner = imagemService.saveImageAndGetUrl(banner, "bandbanners",
+					banda.getId() + "." + FileUtils.getSufix(banner));
+		} else if (Boolean.TRUE.equals(removerBanner)) {
+			urlBanner = null;
+		}
+
+		setarInformacoesEditadas(banda, bandaDTO, urlLogo, urlBanner);
 		bandaDao.save(banda);
 
 	}
@@ -224,11 +232,15 @@ public class BandaServiceImpl implements BandaService {
 		musicoBandaService.salvar(musicoBanda);
     }
 
-    private void setarInformacoesEditadas(Banda banda, EdicaoBandaDTO bandaDTO, String urlLogo) {
+    private void setarInformacoesEditadas(Banda banda, EdicaoBandaDTO bandaDTO, String urlLogo, String urlBanner) {
 		banda.setNome(bandaDTO.getNome());
 		banda.setDescricao(bandaDTO.getDescricao());
 		banda.setCategoria(bandaDTO.getCategoria());
 		banda.setUrlLogo(urlLogo);
+		banda.setUrlBanner(urlBanner);
+		banda.setInstagramUrl(bandaDTO.getInstagramUrl());
+		banda.setFacebookUrl(bandaDTO.getFacebookUrl());
+		banda.setYoutubeUrl(bandaDTO.getYoutubeUrl());
 		banda.getParametros().setPermiteEntradaPorConvite(bandaDTO.getPermiteEntradaPorConvite());
 		banda.getParametros().setExigirAprovacaoCompromissos(bandaDTO.getExigirAprovacaoCompromissos());
 	}

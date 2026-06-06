@@ -51,6 +51,22 @@ public class Usuario implements UserDetails {
     private PermissaoUsuario permissao;
     private String urlFotoPerfil;
     private LocalDateTime dataUltimoLogin;
+    private Boolean celularValidado = false;
+
+    @Column(name = "end_pais")
+    private String endPais;
+    @Column(name = "end_estado")
+    private String endEstado;
+    @Column(name = "end_bairro")
+    private String endBairro;
+    @Column(name = "end_rua")
+    private String endRua;
+    @Column(name = "end_numero")
+    private String endNumero;
+    @Column(name = "end_cep")
+    private String endCep;
+    @Column(name = "end_complemento")
+    private String endComplemento;
 
     @OneToMany(mappedBy = "id.idUsuario", fetch = FetchType.EAGER)
     private List<MusicoBanda> musicoBandaList = new ArrayList<>();
@@ -83,6 +99,14 @@ public class Usuario implements UserDetails {
         this.cidade = usuarioDTO.getCidade();
         this.celular = usuarioDTO.getCelular();
         this.dataNascimento = DateUtils.stringToLocalDate(usuarioDTO.getNascimento());
+        this.descricao = usuarioDTO.getBio() != null ? usuarioDTO.getBio() : "";
+        this.endPais = usuarioDTO.getPais();
+        this.endEstado = usuarioDTO.getEstado();
+        this.endBairro = usuarioDTO.getBairro();
+        this.endRua = usuarioDTO.getRua();
+        this.endNumero = usuarioDTO.getNumero();
+        this.endCep = usuarioDTO.getCep();
+        this.endComplemento = usuarioDTO.getComplemento();
         this.ativo = true;
         this.bloqueado = false;
         this.dataCriacao = LocalDate.now();

@@ -197,6 +197,14 @@ public class UsuarioServiceImpl implements UsuarioService {
 		dto.setTipoRelacionamento(relacionamentoSeguidorService.buscarTipoRelacionamento(Context.getUsuarioLogado().getId(), idUsuario));
 		dto.setQuantidadeSeguidores(relacionamentoSeguidorService.contarSeguidores(idUsuario));
 		dto.setQuantidadeSeguindo(relacionamentoSeguidorService.contarSeguindo(idUsuario));
+		// Address is private — strip before returning public profile
+		dto.setEndPais(null);
+		dto.setEndEstado(null);
+		dto.setEndBairro(null);
+		dto.setEndRua(null);
+		dto.setEndNumero(null);
+		dto.setEndCep(null);
+		dto.setEndComplemento(null);
 		return dto;
 	}
 

@@ -24,6 +24,14 @@ public class CadastroUsuarioDTO {
     private String celular;
     private String cidade;
     private String nascimento;
+    private String bio;
+    private String pais;
+    private String estado;
+    private String bairro;
+    private String rua;
+    private String numero;
+    private String cep;
+    private String complemento;
 
     public Usuario toEntity(String url){
         Usuario usuario = new Usuario();
@@ -34,8 +42,14 @@ public class CadastroUsuarioDTO {
         usuario.setCelular(celular);
         usuario.setDataNascimento(DateUtils.stringToLocalDate(nascimento));
         usuario.setUrlFotoPerfil(url);
-        usuario.setDescricao("");
-//        usuario.setInstrumentos("");
+        usuario.setDescricao(bio != null ? bio : "");
+        usuario.setEndPais(pais);
+        usuario.setEndEstado(estado);
+        usuario.setEndBairro(bairro);
+        usuario.setEndRua(rua);
+        usuario.setEndNumero(numero);
+        usuario.setEndCep(cep);
+        usuario.setEndComplemento(complemento);
         return usuario;
     }
 

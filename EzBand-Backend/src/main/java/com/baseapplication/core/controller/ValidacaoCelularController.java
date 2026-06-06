@@ -38,7 +38,7 @@ public class ValidacaoCelularController {
     }
 
     @PostMapping("/validar-token")
-    @Operation(summary = "Validar token", 
+    @Operation(summary = "Validar token",
                description = "Valida o token enviado via WhatsApp e marca o celular como validado")
     public ResponseEntity<Map<String, Object>> validarToken(@RequestBody ConfirmacaoTokenDTO request) {
         try {
@@ -51,5 +51,12 @@ public class ValidacaoCelularController {
                 "erro", e.getMessage()
             ));
         }
+    }
+
+    @GetMapping("/status")
+    @Operation(summary = "Verificar disponibilidade do WhatsApp",
+               description = "Verifica se a conexão com o WhatsApp está ativa e mensagens podem ser entregues")
+    public ResponseEntity<Map<String, Object>> verificarStatus() {
+        return ResponseEntity.ok(validacaoCelularService.verificarDisponibilidade());
     }
 }

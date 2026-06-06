@@ -38,6 +38,13 @@ public class InfoPerfilUsuarioDTO {
     private Long quantidadeSeguindo;
     private List<BandaDTO> bandas = new ArrayList<>();
     private List<PublicacaoDTO> publicacoes = new ArrayList<>();
+    private String endPais;
+    private String endEstado;
+    private String endBairro;
+    private String endRua;
+    private String endNumero;
+    private String endCep;
+    private String endComplemento;
     public InfoPerfilUsuarioDTO(Usuario usuario){
         BeanUtils.copyProperties(usuario, this);
 

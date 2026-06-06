@@ -37,11 +37,11 @@ jobs:
             git reset --hard origin/develop
 
             echo ">> Reconstruindo containers (sem cache para garantir as alterações)..."
-            docker compose build --no-cache api chat-service
+            docker compose --profile deploy build --no-cache api chat-service
 
             echo ">> Subindo serviços..."
             # Mantivemos o --no-deps aqui porque api e chat-service não dependem de um build dinâmico mútuo no boot
-            docker compose up -d --no-deps api chat-service
+            docker compose --profile deploy up -d --no-deps api chat-service
 
             echo ">> Verificando saúde da API (aguardando até 90s)..."
             for i in $(seq 1 18); do

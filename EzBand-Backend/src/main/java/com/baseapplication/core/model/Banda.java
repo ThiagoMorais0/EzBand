@@ -33,6 +33,14 @@ public class Banda implements Serializable {
     private LocalDate dataInclusao;
     @Column(length = 1000)
     private String urlLogo;
+    @Column(length = 1000)
+    private String urlBanner;
+    @Column(length = 500)
+    private String instagramUrl;
+    @Column(length = 500)
+    private String facebookUrl;
+    @Column(length = 500)
+    private String youtubeUrl;
     @Embedded
     private Endereco endereco;
     @OneToMany(mappedBy = "banda", fetch = FetchType.EAGER)

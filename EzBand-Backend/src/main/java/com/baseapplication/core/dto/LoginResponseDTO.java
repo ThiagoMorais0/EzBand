@@ -13,11 +13,15 @@ public class LoginResponseDTO {
     private String nome;
     private Long idUsuario;
     private String urlFotoPerfil;
+    private String celular;
+    private Boolean celularValidado;
 
     public LoginResponseDTO(String token, Usuario usuario){
         this.token = token;
         this.nome = usuario.getNome();
         this.idUsuario = usuario.getId();
         this.urlFotoPerfil = usuario.getUrlFotoPerfil();
+        this.celular = usuario.getCelular();
+        this.celularValidado = Boolean.TRUE.equals(usuario.getCelularValidado());
     }
 }
