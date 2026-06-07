@@ -34,7 +34,7 @@ public class ValidacaoCelularServiceImpl implements ValidacaoCelularService {
     private final WhatsappService whatsappService;
     private final PhoneNumberUtil phoneNumberUtil;
 
-    @Value("${app.frontend.url:http://localhost:5173}")
+    @Value("${app.frontend.url:https://ezband.cloud}")
     private String frontendUrl;
 
     @Override
