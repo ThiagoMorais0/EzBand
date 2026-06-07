@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "http://127.0.0.1:5500")
 @RequestMapping("/checklist/banda")
 @RequiredArgsConstructor
 public class ItemChecklistBandaController {

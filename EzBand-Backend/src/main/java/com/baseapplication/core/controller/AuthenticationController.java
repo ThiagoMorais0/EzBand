@@ -31,7 +31,6 @@ public class AuthenticationController {
 		return authenticationService.login(credenciais);
 	}
 
-	@CrossOrigin(origins = "*")
 	@PostMapping("/registrar")
 	public void registrar(@RequestBody CadastroDTO cadastroDTO) {
 		System.out.println(cadastroDTO.getDataNascimento());
@@ -39,7 +38,6 @@ public class AuthenticationController {
 	}
 
 	@PostMapping("/cadastrarUsuarioComImagem")
-	@CrossOrigin(origins = "*")
 	public ResponseEntity<?> cadastrarUsuarioComImagem(@RequestParam("usuario") String usuarioJson, @RequestParam(required = false) MultipartFile imagem) {
 
 		CadastroUsuarioDTO usuario = null;

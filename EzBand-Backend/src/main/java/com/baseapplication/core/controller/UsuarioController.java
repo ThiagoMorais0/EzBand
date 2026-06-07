@@ -55,7 +55,6 @@ public class UsuarioController {
 
 
 	@GetMapping("/verificarEmailJaCadastrado")
-	@CrossOrigin(origins = "*")
 	public boolean verificarEmailJaCadastrado(@RequestParam String email) {
 
 		return usuarioService.verificarEmailJaCadastrado(email);

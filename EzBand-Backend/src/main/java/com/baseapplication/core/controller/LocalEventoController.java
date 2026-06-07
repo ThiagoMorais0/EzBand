@@ -35,7 +35,6 @@ public class LocalEventoController {
     }
 
     @PostMapping("/cadastrarComImagem")
-    @CrossOrigin(origins = "*")
     public ResponseEntity<?> cadastrarUsuarioComImagem(@RequestParam("dados") String localEventoJson, MultipartFile imagem) {
 
         CadastroLocalEventoDTO localEvento = null;
