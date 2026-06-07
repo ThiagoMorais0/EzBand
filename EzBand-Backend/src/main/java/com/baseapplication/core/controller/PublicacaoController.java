@@ -21,17 +21,22 @@ public class PublicacaoController {
     private final PublicacaoService publicacaoService;
 
     @PostMapping("/publicar")
-    public ResponseEntity<String> publicarPublicacao(@RequestParam String publicacaoJson, List<MultipartFile> imagens) {
-
-        NovaPublicacaoDTO publicacao = null;
+    public ResponseEntity<String> publicarPublicacao(@RequestParam String publicacaoJson,
+                                                     @RequestParam(value = "imagens", required = false) List<MultipartFile> imagens) {
+        NovaPublicacaoDTO publicacao;
         try {
             publicacao = new ObjectMapper().readValue(publicacaoJson, NovaPublicacaoDTO.class);
         } catch (JsonProcessingException e) {
-            throw new InternalException(e.getMessage());
+            return ResponseEntity.badRequest().body("Dados da publicação inválidos.");
         }
 
-        publicacaoService.publicar(publicacao, imagens);
-        return ResponseEntity.ok("Publicacao publicada com sucesso");
+        try {
+            publicacaoService.publicar(publicacao, imagens != null ? imagens : List.of());
+            return ResponseEntity.ok("Publicacao publicada com sucesso");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Erro ao publicar. Verifique as imagens e tente novamente.");
+        }
     }
 
     @PostMapping("/editarTexto")

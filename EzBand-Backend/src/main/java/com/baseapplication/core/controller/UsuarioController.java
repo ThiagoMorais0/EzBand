@@ -46,10 +46,11 @@ public class UsuarioController {
 		try {
 			Object dto = usuarioService.editarUsuarioComImagem(usuarioJson, imagem, removerImagemDePerfil);
 			return ResponseEntity.ok()
-					.contentType(MediaType.APPLICATION_JSON) // força JSON
+					.contentType(MediaType.APPLICATION_JSON)
 					.body(dto);
 		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body("Erro ao salvar as alterações do perfil. Tente novamente.");
 		}
 	}
 

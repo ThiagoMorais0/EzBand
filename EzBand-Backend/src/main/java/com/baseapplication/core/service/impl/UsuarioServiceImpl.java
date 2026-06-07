@@ -153,6 +153,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 	}
 
 	@Override
+	@jakarta.transaction.Transactional
 	public InfoPerfilUsuarioDTO editarUsuarioComImagem(String usuarioJson, MultipartFile imagem, Boolean removerImagemDePerfil) {
 		InfoPerfilUsuarioDTO usuarioDTO = null;
 		try {
@@ -163,10 +164,12 @@ public class UsuarioServiceImpl implements UsuarioService {
 		}
 		Usuario usuario = buscarPorContato(usuarioDTO.getEmail(), TipoContato.EMAIL);
 		String urlImagem = usuario.getUrlFotoPerfil();
-		if(imagem != null){
-			imagemService.deletarImagemPorUrl(urlImagem);
-			urlImagem = imagemService.saveImageAndGetUrl(imagem, "profilepictures", usuario.getId() + "." + FileUtils.getSufix(imagem));
-		}else if(removerImagemDePerfil){
+		if (imagem != null) {
+			String urlImagemAntiga = urlImagem;
+			urlImagem = imagemService.saveImageAndGetUrl(imagem, "profilepictures",
+					usuario.getId() + "_" + System.currentTimeMillis() + "." + FileUtils.getSufix(imagem));
+			imagemService.deletarImagemPorUrl(urlImagemAntiga);
+		} else if (removerImagemDePerfil) {
 			imagemService.deletarImagemPorUrl(urlImagem);
 			urlImagem = "default";
 		}

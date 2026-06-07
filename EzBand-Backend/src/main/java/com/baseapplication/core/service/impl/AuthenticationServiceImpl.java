@@ -128,9 +128,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		}
 		cadastroUsuarioDTO.setSenha(criptografar(cadastroUsuarioDTO.getSenha()));
 		Usuario usuario = usuarioService.salvar(new Usuario(cadastroUsuarioDTO));
-		if(imagem != null){
+		if (imagem != null) {
 			usuario.setUrlFotoPerfil(imagemService.saveImageAndGetUrl(imagem, "profilepictures",
-					usuario.getId() + "." + FileUtils.getSufix(imagem)));
+					usuario.getId() + "_" + System.currentTimeMillis() + "." + FileUtils.getSufix(imagem)));
 			usuarioService.salvar(usuario);
 		}
 //		emailService.enviarEmail("Novo usuário no EzBand", "O usuário " + usuario.getNome() + " acabou de se cadastrar no EzBand.", "ezband3@gmail.com");

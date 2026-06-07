@@ -122,17 +122,17 @@ public class BandaServiceImpl implements BandaService {
 
 		Banda banda = bandaDao.save(new Banda());
 		String urlLogo;
-		if(logo != null){
+		if (logo != null) {
 			urlLogo = imagemService.saveImageAndGetUrl(logo, "bandlogos",
-					banda.getId() + "." + FileUtils.getSufix(logo));
-		}else{
+					banda.getId() + "_" + System.currentTimeMillis() + "." + FileUtils.getSufix(logo));
+		} else {
 			urlLogo = "default";
 		}
 
 		String urlBanner = null;
-		if(banner != null){
+		if (banner != null) {
 			urlBanner = imagemService.saveImageAndGetUrl(banner, "bandbanners",
-					banda.getId() + "." + FileUtils.getSufix(banner));
+					banda.getId() + "_" + System.currentTimeMillis() + "." + FileUtils.getSufix(banner));
 		}
 
 		banda = atualizaBandaFromCadastroDTO(banda, bandaDTO, urlLogo, urlBanner);
@@ -141,6 +141,7 @@ public class BandaServiceImpl implements BandaService {
 		return banda.getId();
 	}
 
+	@Transactional
 	@Override
 	public void editarBanda(String bandaJson, MultipartFile logo, Boolean removerLogo, MultipartFile banner, Boolean removerBanner) {
 		EdicaoBandaDTO bandaDTO;
@@ -154,9 +155,10 @@ public class BandaServiceImpl implements BandaService {
 
 		String urlLogo = banda.getUrlLogo();
 		if (logo != null) {
-			imagemService.deletarImagemPorUrl(urlLogo);
+			String urlLogoAntigo = urlLogo;
 			urlLogo = imagemService.saveImageAndGetUrl(logo, "bandlogos",
-					banda.getId() + "." + FileUtils.getSufix(logo));
+					banda.getId() + "_" + System.currentTimeMillis() + "." + FileUtils.getSufix(logo));
+			imagemService.deletarImagemPorUrl(urlLogoAntigo);
 		} else if (Boolean.TRUE.equals(removerLogo)) {
 			imagemService.deletarImagemPorUrl(urlLogo);
 			urlLogo = "default";
@@ -164,9 +166,10 @@ public class BandaServiceImpl implements BandaService {
 
 		String urlBanner = banda.getUrlBanner();
 		if (banner != null) {
-			imagemService.deletarImagemPorUrl(urlBanner);
+			String urlBannerAntigo = urlBanner;
 			urlBanner = imagemService.saveImageAndGetUrl(banner, "bandbanners",
-					banda.getId() + "." + FileUtils.getSufix(banner));
+					banda.getId() + "_" + System.currentTimeMillis() + "." + FileUtils.getSufix(banner));
+			imagemService.deletarImagemPorUrl(urlBannerAntigo);
 		} else if (Boolean.TRUE.equals(removerBanner)) {
 			imagemService.deletarImagemPorUrl(urlBanner);
 			urlBanner = null;
@@ -174,7 +177,6 @@ public class BandaServiceImpl implements BandaService {
 
 		setarInformacoesEditadas(banda, bandaDTO, urlLogo, urlBanner);
 		bandaDao.save(banda);
-
 	}
 
 	@Override

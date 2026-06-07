@@ -48,7 +48,7 @@ public class MembroFantasmaServiceImpl implements MembroFantasmaService {
         String urlFoto;
         if (foto != null) {
             urlFoto = imagemService.saveImageAndGetUrl(foto, "profilepictures",
-                    "membro_fantasma_" + saved.getId() + "." + FileUtils.getSufix(foto));
+                    "membro_fantasma_" + saved.getId() + "_" + System.currentTimeMillis() + "." + FileUtils.getSufix(foto));
         } else {
             urlFoto = "default";
         }

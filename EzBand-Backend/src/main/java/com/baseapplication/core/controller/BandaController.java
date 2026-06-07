@@ -50,11 +50,13 @@ public class BandaController {
             @RequestParam("banda") String bandaJson,
             @RequestParam(required = false) MultipartFile logo,
             @RequestParam(required = false) MultipartFile banner) {
-        try{
+        try {
             Long idBanda = bandaService.novaBanda(bandaJson, logo, banner);
             return ResponseEntity.ok(idBanda);
-        }catch (Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        } catch (Exception e) {
+            log.error("Erro ao criar banda", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Erro ao criar a banda. Verifique os dados e tente novamente.");
         }
     }
 
@@ -210,13 +212,14 @@ public class BandaController {
             @RequestParam Boolean removerLogo,
             @RequestParam(required = false) MultipartFile banner,
             @RequestParam(required = false, defaultValue = "false") Boolean removerBanner) {
-        try{
+        try {
             bandaService.editarBanda(bandaJson, imagem, removerLogo, banner, removerBanner);
             return ResponseEntity.ok("Banda editada com sucesso");
-        }catch (Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        } catch (Exception e) {
+            log.error("Erro ao editar banda", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Erro ao salvar as alterações da banda. Tente novamente.");
         }
-
     }
 
     @PostMapping("/enviarConviteParaUsuarioIngressarBanda")
