@@ -70,6 +70,8 @@ public class PublicacaoServiceImpl implements PublicacaoService {
 
     @Override
     public void excluirPublicacao(Long idPublicacao) {
+        imagemPublicacaoDao.findByIdPublicacao(idPublicacao)
+                .forEach(img -> imagemService.deletarImagemPorUrl(img.getUrl()));
         imagemPublicacaoDao.deletarPorIdPublicacao(idPublicacao);
         publicacaoDao.deletarPeloId(idPublicacao);
     }

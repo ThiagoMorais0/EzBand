@@ -10,6 +10,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 public interface ImagemPublicacaoDao extends JpaRepository<ImagemPublicacao, Long> {
 
+    @Query(value = "select * from imagem_publicacao where id_publicacao = :idPublicacao", nativeQuery = true)
+    java.util.List<ImagemPublicacao> findByIdPublicacao(Long idPublicacao);
+
     @Transactional
     @Modifying
     @Query(value = "delete from imagem_publicacao where id_publicacao = :idPublicacao", nativeQuery = true)

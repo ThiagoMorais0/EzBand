@@ -64,7 +64,7 @@ public class MembroFantasmaServiceImpl implements MembroFantasmaService {
     public MembroFantasmaDTO editar(EdicaoMembroFantasmaDTO dto) {
         MembroFantasma membroFantasma = membroFantasmaDao.findById(dto.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Membro fantasma não encontrado"));
-        
+
         if (dto.getNome() != null) {
             membroFantasma.setNome(dto.getNome());
         }
@@ -72,6 +72,7 @@ public class MembroFantasmaServiceImpl implements MembroFantasmaService {
             membroFantasma.setInstrumento(dto.getInstrumento());
         }
         if (dto.getUrlFoto() != null) {
+            imagemService.deletarImagemPorUrl(membroFantasma.getUrlFoto());
             membroFantasma.setUrlFoto(dto.getUrlFoto());
         }
         if (dto.getObservacoes() != null) {
@@ -93,9 +94,9 @@ public class MembroFantasmaServiceImpl implements MembroFantasmaService {
     @Override
     @Transactional
     public void deletar(Long id) {
-        if (!membroFantasmaDao.existsById(id)) {
-            throw new ResourceNotFoundException("Membro fantasma não encontrado");
-        }
+        MembroFantasma membroFantasma = membroFantasmaDao.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Membro fantasma não encontrado"));
+        imagemService.deletarImagemPorUrl(membroFantasma.getUrlFoto());
         membroFantasmaDao.deleteById(id);
     }
 

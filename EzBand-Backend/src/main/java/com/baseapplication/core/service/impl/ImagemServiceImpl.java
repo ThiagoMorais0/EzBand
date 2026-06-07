@@ -29,4 +29,9 @@ public class ImagemServiceImpl implements ImagemService {
 		System.out.println("imagem: " + image);
 		return image != null ? salvarImagemNoBucket(image, bucketName, fileName) : "default";
 	}
+
+	@Override
+	public void deletarImagemPorUrl(String url) {
+		minioStorageServiceImpl.deleteImageByUrl(url);
+	}
 }

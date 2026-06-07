@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface EstadoNotificacaoDao extends JpaRepository<EstadoNotificacao, Long> {
 
+    void deleteByNotificacao_Id(Long notificacaoId);
 }

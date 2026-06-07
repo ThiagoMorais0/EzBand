@@ -154,17 +154,21 @@ public class BandaServiceImpl implements BandaService {
 
 		String urlLogo = banda.getUrlLogo();
 		if (logo != null) {
+			imagemService.deletarImagemPorUrl(urlLogo);
 			urlLogo = imagemService.saveImageAndGetUrl(logo, "bandlogos",
 					banda.getId() + "." + FileUtils.getSufix(logo));
 		} else if (Boolean.TRUE.equals(removerLogo)) {
+			imagemService.deletarImagemPorUrl(urlLogo);
 			urlLogo = "default";
 		}
 
 		String urlBanner = banda.getUrlBanner();
 		if (banner != null) {
+			imagemService.deletarImagemPorUrl(urlBanner);
 			urlBanner = imagemService.saveImageAndGetUrl(banner, "bandbanners",
 					banda.getId() + "." + FileUtils.getSufix(banner));
 		} else if (Boolean.TRUE.equals(removerBanner)) {
+			imagemService.deletarImagemPorUrl(urlBanner);
 			urlBanner = null;
 		}
 

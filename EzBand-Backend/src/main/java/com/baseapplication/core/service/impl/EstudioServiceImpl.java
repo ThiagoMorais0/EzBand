@@ -94,6 +94,7 @@ public class EstudioServiceImpl implements EstudioService {
             throw new InternalException(e.getMessage());
         }
         Estudio estudio = buscarPorId(estudioDTO.getId());
+        imagemService.deletarImagemPorUrl(estudio.getUrlFotoPerfil());
         String urlImagem = imagemService.saveImageAndGetUrl(imagem, "studiologo", estudioDTO.getId() + "." + FileUtils.getSufix(imagem));
         BeanUtils.copyProperties(estudioDTO, estudio);
         estudio.setUrlFotoPerfil(urlImagem);

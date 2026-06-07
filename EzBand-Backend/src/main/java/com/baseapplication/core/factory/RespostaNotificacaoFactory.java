@@ -6,6 +6,7 @@ import com.baseapplication.core.model.notificacao.resposta.RespostaAgendamentoEn
 import com.baseapplication.core.model.notificacao.resposta.RespostaAgendamentoShowNotificacao;
 import com.baseapplication.core.model.notificacao.resposta.RespostaConviteParaBanda;
 import com.baseapplication.core.model.notificacao.resposta.RespostaConviteParaEvento;
+import com.baseapplication.core.model.notificacao.resposta.RespostaConviteParaUsuarioIngressarBanda;
 import com.baseapplication.core.model.notificacao.resposta.RespostaSolicitacaoParaIngressarBandaNotificacao;
 import com.baseapplication.core.model.superClasses.Notificacao;
 import com.baseapplication.core.utils.Context;
@@ -32,8 +33,10 @@ public class RespostaNotificacaoFactory {
         if(notificacaoOriginal instanceof ConviteParaBanda convite){
             return new RespostaConviteParaBanda(convite, Objects.requireNonNull(AcaoResposta.findByName(acao)), Context.getUsuarioLogado());
         }
+        if(notificacaoOriginal instanceof ConviteParaUsuarioIngressarBanda convite){
+            return new RespostaConviteParaUsuarioIngressarBanda(convite, Objects.requireNonNull(AcaoResposta.findByName(acao)), Context.getUsuarioLogado());
+        }
 
-        //TODO: outros tipos...
         throw new UnsupportedOperationException("Tipo de notificação não suportado para resposta");
     }
 }

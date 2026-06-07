@@ -1,6 +1,7 @@
 package com.baseapplication.core.service.impl;
 
 import com.baseapplication.core.dao.BandaDao;
+import com.baseapplication.core.dao.EstadoNotificacaoDao;
 import com.baseapplication.core.dao.NotificacaoDao;
 import com.baseapplication.core.dao.RespostaNotificacaoDao;
 import com.baseapplication.core.dao.UsuarioDao;
@@ -39,6 +40,7 @@ public class NotificacaoServiceImpl implements NotificacaoService {
 
     private final NotificacaoDao notificacaoDao;
     private final RespostaNotificacaoDao respostaNotificacaoDao;
+    private final EstadoNotificacaoDao estadoNotificacaoDao;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final UsuarioDao usuarioDao;
     private final EventoHelperService eventoHelperService;
@@ -96,6 +98,7 @@ public class NotificacaoServiceImpl implements NotificacaoService {
     }
 
     @Override
+    @Transactional
     public void responderNotificacao(Long idNotificacao, RespostaNotificacaoDTO respostaDTO) {
         respostaNotificacaoDao.save(respostaDTO.toEntity(idNotificacao));
         criarEEnviarNotificacaoResposta(idNotificacao, respostaDTO);
@@ -200,10 +203,12 @@ public class NotificacaoServiceImpl implements NotificacaoService {
     }
 
     @Override
+    @Transactional
     public void deletarPorId(Long id) {
         if (!notificacaoDao.existsById(id)) {
             throw new ResourceNotFoundException("Notificação não encontrada.");
         }
+        estadoNotificacaoDao.deleteByNotificacao_Id(id);
         notificacaoDao.deleteById(id);
     }
 

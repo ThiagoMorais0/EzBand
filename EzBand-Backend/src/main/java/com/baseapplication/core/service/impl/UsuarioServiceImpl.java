@@ -164,8 +164,10 @@ public class UsuarioServiceImpl implements UsuarioService {
 		Usuario usuario = buscarPorContato(usuarioDTO.getEmail(), TipoContato.EMAIL);
 		String urlImagem = usuario.getUrlFotoPerfil();
 		if(imagem != null){
-			 urlImagem = imagemService.saveImageAndGetUrl(imagem, "profilepictures", usuario.getId() + "." + FileUtils.getSufix(imagem));
+			imagemService.deletarImagemPorUrl(urlImagem);
+			urlImagem = imagemService.saveImageAndGetUrl(imagem, "profilepictures", usuario.getId() + "." + FileUtils.getSufix(imagem));
 		}else if(removerImagemDePerfil){
+			imagemService.deletarImagemPorUrl(urlImagem);
 			urlImagem = "default";
 		}
 		BeanUtils.copyProperties(usuarioDTO, usuario);
