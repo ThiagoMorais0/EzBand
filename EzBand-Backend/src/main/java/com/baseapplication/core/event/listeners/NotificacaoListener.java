@@ -19,8 +19,10 @@ public class NotificacaoListener {
     private final NotificacaoService notificacaoService;
 
     private void enviar(Notificacao notificacao) {
-        notificacaoService.salvarNotificacao(notificacao);
-        notificacaoController.enviarNotificacao(notificacao);
+        boolean salva = notificacaoService.salvarNotificacao(notificacao);
+        if (salva) {
+            notificacaoController.enviarNotificacao(notificacao);
+        }
     }
 
     @EventListener

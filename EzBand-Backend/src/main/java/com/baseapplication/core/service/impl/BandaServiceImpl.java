@@ -111,7 +111,7 @@ public class BandaServiceImpl implements BandaService {
 
 	@Transactional
 	@Override
-	public void novaBanda(String bandaJson, MultipartFile logo) {
+	public Long novaBanda(String bandaJson, MultipartFile logo, MultipartFile banner) {
 		log.info("Nova banda: " + bandaJson);
 		CadastroBandaDTO bandaDTO;
 		try {
@@ -129,9 +129,16 @@ public class BandaServiceImpl implements BandaService {
 			urlLogo = "default";
 		}
 
-		banda = atualizaBandaFromCadastroDTO(banda, bandaDTO, urlLogo);
+		String urlBanner = null;
+		if(banner != null){
+			urlBanner = imagemService.saveImageAndGetUrl(banner, "bandbanners",
+					banda.getId() + "." + FileUtils.getSufix(banner));
+		}
+
+		banda = atualizaBandaFromCadastroDTO(banda, bandaDTO, urlLogo, urlBanner);
 		bandaDao.save(banda);
 		cadastrarUsuarioEmBanda(bandaDTO, banda, PermissaoMusico.getAll());
+		return banda.getId();
 	}
 
 	@Override
@@ -441,16 +448,20 @@ public class BandaServiceImpl implements BandaService {
 		}
 	}
 
-	private Banda atualizaBandaFromCadastroDTO(Banda banda, CadastroBandaDTO bandaDTO, String urlLogo) {
+	private Banda atualizaBandaFromCadastroDTO(Banda banda, CadastroBandaDTO bandaDTO, String urlLogo, String urlBanner) {
 		banda.setCategoria(bandaDTO.getCategoria());
 		banda.setNome(bandaDTO.getNome());
 		banda.setDescricao(bandaDTO.getDescricao());
 		banda.setUrlLogo(urlLogo);
+		banda.setUrlBanner(urlBanner);
+		banda.setInstagramUrl(bandaDTO.getInstagramUrl());
+		banda.setFacebookUrl(bandaDTO.getFacebookUrl());
+		banda.setYoutubeUrl(bandaDTO.getYoutubeUrl());
 		banda.setDataInclusao(LocalDate.now());
 
 		ParametrosBanda parametros = new ParametrosBanda();
-		parametros.setExigirAprovacaoCompromissos(false);
-		parametros.setPermiteEntradaPorConvite(true);
+		parametros.setExigirAprovacaoCompromissos(Boolean.TRUE.equals(bandaDTO.getExigirAprovacaoCompromissos()));
+		parametros.setPermiteEntradaPorConvite(bandaDTO.getPermiteEntradaPorConvite() == null || bandaDTO.getPermiteEntradaPorConvite());
 		parametros.setListarObservacaoRepertorio(false);
 		banda.setParametros(parametros);
 

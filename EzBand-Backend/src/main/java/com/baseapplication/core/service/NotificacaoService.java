@@ -16,7 +16,7 @@ import com.baseapplication.core.model.superClasses.Notificacao;
 import reactor.core.publisher.Flux;
 
 public interface NotificacaoService {
-    void salvarNotificacao(Notificacao notificacao);
+    boolean salvarNotificacao(Notificacao notificacao);
 
     List<Notificacao> buscarNaoLidas(Long destinatarioId, TipoParticipante destinatarioTipo);
 
@@ -31,6 +31,8 @@ public interface NotificacaoService {
     void enviarNotificacaoSink(Notificacao notificacao);
 
     void lerNotificacao(Long id);
+
+    void deletarPorId(Long id);
 //    List<Notificacao> buscarNotificacoesPorUsuario(Long idUsuario);
 //    void enviarConviteParaEvento(String contato,
 //                                 TipoContato tipoContato,

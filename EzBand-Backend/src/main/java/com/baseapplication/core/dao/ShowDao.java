@@ -16,9 +16,7 @@ import java.util.List;
 
 @Repository
 public interface ShowDao extends JpaRepository<Show, Long> {
-    @Query(value = "select s.* from musico_evento me " +
-            "inner join show s on me.id_evento = s.id " +
-            "where me.tipo_evento = 'SHOW' and me.id_usuario = :idUsuario", nativeQuery = true )
+    @Query("SELECT DISTINCT s FROM Show s JOIN s.participantes me WHERE me.id.idUsuario = :idUsuario")
     List<Show> buscarPorIdUsuario(Long idUsuario);
 
     @Query(value = "select distinct s.* " +

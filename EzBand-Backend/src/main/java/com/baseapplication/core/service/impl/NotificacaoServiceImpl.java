@@ -16,6 +16,7 @@ import com.baseapplication.core.model.notificacao.SolicitacaoAgendarEnsaio;
 import com.baseapplication.core.model.notificacao.SolicitacaoAgendarShow;
 import com.baseapplication.core.model.notificacao.SolicitacaoParaIngressarBanda;
 import com.baseapplication.core.model.superClasses.Notificacao;
+import com.baseapplication.core.exception.ResourceNotFoundException;
 import com.baseapplication.core.service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -46,31 +47,23 @@ public class NotificacaoServiceImpl implements NotificacaoService {
     private final Map<String, Sinks.Many<NotificacaoDTO>> sinks = new ConcurrentHashMap<>();
 
     @Override
-    public void salvarNotificacao(Notificacao notificacao) {
-        // Remove notificações duplicadas não lidas antes de salvar a nova
-        removerNotificacoesDuplicadas(notificacao);
-        notificacaoDao.save(notificacao);
-    }
-
-    private void removerNotificacoesDuplicadas(Notificacao novaNotificacao) {
-        // Busca notificações similares não lidas (mesmo tipo, remetente e destinatário)
-        List<Notificacao> notificacoesSimilares = notificacaoDao.buscarNotificacoesSimilaresNaoLidas(
-                novaNotificacao.getDestinatarioId(),
-                novaNotificacao.getDestinatarioTipo(),
-                novaNotificacao.getRemetenteId(),
-                novaNotificacao.getRemetenteTipo(),
-                novaNotificacao.getClass()
+    public boolean salvarNotificacao(Notificacao notificacao) {
+        List<Notificacao> pendentes = notificacaoDao.buscarNotificacoesSimilaresNaoLidas(
+                notificacao.getDestinatarioId(),
+                notificacao.getDestinatarioTipo(),
+                notificacao.getRemetenteId(),
+                notificacao.getRemetenteTipo(),
+                notificacao.getClass()
         );
-
-        // Remove as notificações antigas duplicadas
-        if (!notificacoesSimilares.isEmpty()) {
-            log.info("Removendo {} notificações duplicadas do tipo {} de remetente {} para destinatário {}",
-                    notificacoesSimilares.size(),
-                    novaNotificacao.getTipoNotificacao(),
-                    novaNotificacao.getRemetenteId(),
-                    novaNotificacao.getDestinatarioId());
-            notificacaoDao.deleteAll(notificacoesSimilares);
+        if (!pendentes.isEmpty()) {
+            log.info("Notificacao duplicada bloqueada: tipo={} remetente={} destinatario={}",
+                    notificacao.getTipoNotificacao(),
+                    notificacao.getRemetenteId(),
+                    notificacao.getDestinatarioId());
+            return false;
         }
+        notificacaoDao.save(notificacao);
+        return true;
     }
 
     @Override
@@ -201,14 +194,22 @@ public class NotificacaoServiceImpl implements NotificacaoService {
 
     @Override
     public void lerNotificacao(Long id) {
-        Notificacao notificacao = notificacaoDao.findById(id).orElseThrow();
+        Notificacao notificacao = notificacaoDao.findById(id).orElseThrow(() -> new ResourceNotFoundException("Notificação não encontrada."));
         notificacao.setLida(true);
         notificacaoDao.save(notificacao);
     }
 
+    @Override
+    public void deletarPorId(Long id) {
+        if (!notificacaoDao.existsById(id)) {
+            throw new ResourceNotFoundException("Notificação não encontrada.");
+        }
+        notificacaoDao.deleteById(id);
+    }
+
     private void criarEEnviarNotificacaoResposta(Long idNotificacao, RespostaNotificacaoDTO respostaDTO) {
         Notificacao notificacao = notificacaoDao.findById(idNotificacao)
-                .orElseThrow(() -> new RuntimeException("Notificação não encontrada"));
+                .orElseThrow(() -> new ResourceNotFoundException("Notificação não encontrada."));
 
         notificacao.setLida(true);
         notificacaoDao.save(notificacao);
@@ -234,8 +235,8 @@ public class NotificacaoServiceImpl implements NotificacaoService {
                 SolicitacaoParaIngressarBanda solicitacaoBanda = (SolicitacaoParaIngressarBanda) notificacao;
                 if(acao.equals(AcaoResposta.ACEITAR)){
                     musicoBandaService.cadastrarUsuarioEmBanda(
-                            usuarioDao.findById(solicitacaoBanda.getRemetenteId()).orElseThrow(),
-                            bandaDao.findById(solicitacaoBanda.getDestinatarioId()).orElseThrow(),
+                            usuarioDao.findById(solicitacaoBanda.getRemetenteId()).orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado.")),
+                            bandaDao.findById(solicitacaoBanda.getDestinatarioId()).orElseThrow(() -> new ResourceNotFoundException("Banda não encontrada. Ela pode ter sido deletada.")),
                             solicitacaoBanda.getInstrumento(),
                             List.of(PermissaoMusico.MEMBRO_REGULAR)
                     );
@@ -246,8 +247,8 @@ public class NotificacaoServiceImpl implements NotificacaoService {
                 if(acao.equals(AcaoResposta.ACEITAR)){
                     ConviteParaUsuarioIngressarBanda conviteBanda = (ConviteParaUsuarioIngressarBanda) notificacao;
                     musicoBandaService.cadastrarUsuarioEmBanda(
-                            usuarioDao.findById(conviteBanda.getDestinatarioId()).orElseThrow(),
-                            bandaDao.findById(conviteBanda.getRemetenteId()).orElseThrow(),
+                            usuarioDao.findById(conviteBanda.getDestinatarioId()).orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado.")),
+                            bandaDao.findById(conviteBanda.getRemetenteId()).orElseThrow(() -> new ResourceNotFoundException("Banda não encontrada. Ela pode ter sido deletada.")),
                             conviteBanda.getInstrumento() != null ? conviteBanda.getInstrumento() : "",
                             List.of(PermissaoMusico.MEMBRO_REGULAR)
                     );

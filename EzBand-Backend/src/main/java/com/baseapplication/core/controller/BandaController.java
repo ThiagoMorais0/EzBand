@@ -48,10 +48,13 @@ public class BandaController {
     }
 
     @PostMapping("/novaBanda")
-    public ResponseEntity<?> novaBanda(@RequestParam("banda") String bandaJson, MultipartFile logo) {
+    public ResponseEntity<?> novaBanda(
+            @RequestParam("banda") String bandaJson,
+            @RequestParam(required = false) MultipartFile logo,
+            @RequestParam(required = false) MultipartFile banner) {
         try{
-            bandaService.novaBanda(bandaJson, logo);
-            return ResponseEntity.ok("Banda criada com sucesso");
+            Long idBanda = bandaService.novaBanda(bandaJson, logo, banner);
+            return ResponseEntity.ok(idBanda);
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }

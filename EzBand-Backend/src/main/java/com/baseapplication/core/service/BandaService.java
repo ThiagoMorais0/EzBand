@@ -30,7 +30,7 @@ public interface BandaService {
     List<InfoMembroBandaDTO> buscarMembros(Long idBanda);
 
 
-    void novaBanda(String bandaJson, MultipartFile logo);
+    Long novaBanda(String bandaJson, MultipartFile logo, MultipartFile banner);
 
     ResponseEntity<?> buscarBandaParaIngressar(Long idBanda);
 

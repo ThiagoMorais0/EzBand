@@ -14,9 +14,7 @@ import com.baseapplication.core.model.Ensaio;
 
 @Repository
 public interface EnsaioDao extends JpaRepository<Ensaio, Long> {
-    @Query(value = "select distinct e.* from musico_evento me " +
-            "inner join ensaio e on me.id_evento = e.id " +
-            "where me.tipo_evento = 'ENSAIO' and me.id_usuario = :idUsuario", nativeQuery = true )
+    @Query("SELECT DISTINCT e FROM Ensaio e JOIN e.participantes me WHERE me.id.idUsuario = :idUsuario")
     List<Ensaio> buscarPorIdUsuario(Long idUsuario);
 
     @Query(value = "select distinct e.* " +

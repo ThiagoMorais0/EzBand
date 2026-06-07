@@ -66,4 +66,10 @@ public class NotificacaoController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletar(@PathVariable Long id) {
+        notificacaoService.deletarPorId(id);
+        return ResponseEntity.noContent().build();
+    }
 }
