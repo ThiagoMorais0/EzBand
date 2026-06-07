@@ -16,7 +16,7 @@ import java.util.List;
 
 @Repository
 public interface ShowDao extends JpaRepository<Show, Long> {
-    @Query("SELECT DISTINCT s FROM Show s JOIN s.participantes me WHERE me.id.idUsuario = :idUsuario")
+    @Query("SELECT DISTINCT s FROM Show s INNER JOIN MusicoEvento me ON me.id.idEvento = s.id WHERE me.usuario.id = :idUsuario AND me.id.tipoEvento = com.baseapplication.core.enums.TipoEvento.SHOW")
     List<Show> buscarPorIdUsuario(Long idUsuario);
 
     @Query(value = "select distinct s.* " +
