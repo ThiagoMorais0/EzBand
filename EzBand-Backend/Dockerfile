@@ -9,7 +9,7 @@ RUN mvn dependency:go-offline
 # Agora copia o código e gera o build
 COPY . .
 # Substitua a linha 11 por esta:
-RUN mvn clean package -DskipTests -Dfile.encoding=UTF-8
+RUN mvn clean package -DskipTests -Dmaven.test.skip=true -Dfile.encoding=UTF-8
 
 # Etapa 2: Imagem final (Runtime)
 # Usamos JRE em vez de JDK para produção porque é muito menor e mais seguro
