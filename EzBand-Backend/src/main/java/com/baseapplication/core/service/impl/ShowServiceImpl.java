@@ -11,6 +11,7 @@ import com.baseapplication.core.model.*;
 import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.baseapplication.core.dao.ShowDao;
 import com.baseapplication.core.enums.StatusEvento;
@@ -49,6 +50,7 @@ public class ShowServiceImpl implements ShowService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public List<RepertorioEvento> buscarRepertorio(Long idEvento) {
 		return buscarPorId(idEvento).getRepertorio();
 	}

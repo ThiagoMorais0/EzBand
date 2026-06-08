@@ -54,7 +54,7 @@ import com.baseapplication.core.service.ShowService;
 import com.baseapplication.core.service.UsuarioService;
 import com.baseapplication.core.utils.Context;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
@@ -131,6 +131,7 @@ public class EventoServiceImpl implements EventoService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public InformacoesEventoDTO buscarPobuscarInformacoesEventorId(Long idEvento, TipoEvento tipoEvento) {
 		Evento evento = buscarEvento(idEvento, tipoEvento);
 		MusicoEvento musicoEvento = musicoEventoService.buscar(idEvento, tipoEvento,
@@ -190,6 +191,7 @@ public class EventoServiceImpl implements EventoService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public List<RepertorioEventoDTO> buscarRepertorioEvento(Long idEvento, TipoEvento tipoEvento) {
 		//Ordernar por indice
 		return buscarEvento(idEvento, tipoEvento).getRepertorio().stream().map(RepertorioEventoDTO::new)
@@ -478,6 +480,7 @@ public class EventoServiceImpl implements EventoService {
 	}
 
 	@Override
+	@Transactional
 	public void editarShow(NovoShowDTO novoShowDTO, Long idShow) {
 		Show show = (Show) buscarEvento(idShow, TipoEvento.SHOW);
 		Banda banda = show.getBanda();
@@ -589,6 +592,7 @@ public class EventoServiceImpl implements EventoService {
 	}
 
 	@Override
+	@Transactional
 	public void editarEnsaio(NovoEnsaioDTO novoEnsaioDTO, Long idEnsaio) {
 		Ensaio ensaio = (Ensaio) buscarEvento(idEnsaio, TipoEvento.ENSAIO);
 		Banda banda = ensaio.getBanda();

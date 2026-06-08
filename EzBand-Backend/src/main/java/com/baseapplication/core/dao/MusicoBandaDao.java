@@ -11,7 +11,6 @@ import com.baseapplication.core.model.MusicoBandaId;
 
 @Repository
 public interface MusicoBandaDao extends JpaRepository<MusicoBanda, MusicoBandaId> {
-    @Query(value = "SELECT mb FROM MusicoBanda mb " +
-            "WHERE mb.id.idBanda = :idBanda")
+    @Query("SELECT mb FROM MusicoBanda mb LEFT JOIN FETCH mb.permissoes WHERE mb.id.idBanda = :idBanda")
     List<MusicoBanda> buscarMembrosPorIdBanda(Long idBanda);
 }

@@ -16,7 +16,7 @@ import com.baseapplication.core.event.events.UsuarioExpulsoDeBandaEvent;
 import com.baseapplication.core.model.*;
 import com.baseapplication.core.model.embedded.ParametrosBanda;
 import com.baseapplication.core.service.*;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.text.similarity.LevenshteinDistance;
@@ -93,6 +93,7 @@ public class BandaServiceImpl implements BandaService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public List<InfoMembroBandaDTO> buscarMembros(Long idBanda) {
 		List<InfoMembroBandaDTO> membros = new ArrayList<>();
 		
@@ -180,6 +181,7 @@ public class BandaServiceImpl implements BandaService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public List<String> getPermissoesMusico(Long idBanda, Long idUsuario) {
 		MusicoBanda musicoBanda = musicoBandaService.buscarPorIdUsuarioEIdBanda(idUsuario, idBanda);
 		if (musicoBanda == null) {
@@ -233,6 +235,7 @@ public class BandaServiceImpl implements BandaService {
 	}
 
     @Override
+    @Transactional
     public void alterarPermissaoMembro(EditarMembroMusicoBandaDTO permissaoMusicoDTO) {
 		MusicoBanda usuario = musicoBandaService.buscarPorIdUsuarioEIdBanda(Context.getUsuarioLogado().getId(), permissaoMusicoDTO.getIdBanda());
 		if(!usuario.getPermissoes().contains(PermissaoMusico.ADMINISTRADOR) || !usuario.getPermissoes().contains(PermissaoMusico.FUNDADOR)){
