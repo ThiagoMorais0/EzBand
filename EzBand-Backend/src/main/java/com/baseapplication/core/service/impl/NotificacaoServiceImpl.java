@@ -69,7 +69,7 @@ public class NotificacaoServiceImpl implements NotificacaoService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true, timeout = 5)
     public List<Notificacao> buscarNaoLidas(Long destinatarioId, TipoParticipante destinatarioTipo) {
         List<Notificacao> notificacoesUsuario = new ArrayList<>(notificacaoDao.buscarNaoLidas(destinatarioId, destinatarioTipo));
         if (destinatarioTipo.equals(TipoParticipante.USUARIO)) {
@@ -109,61 +109,59 @@ public class NotificacaoServiceImpl implements NotificacaoService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    // Com JpaTransactionManager (não-reativo), o Spring commita esta transação
+    // imediatamente após o método retornar o Flux — antes de qualquer subscriber SSE.
+    // O timeout=5 garante que as queries iniciais (N+1 de bandas) não segurem a
+    // conexão além de 5s. NÃO mover a lógica de DB para dentro do Flux.
+    @Transactional(readOnly = true, timeout = 5)
     public Flux<NotificacaoDTO> streamNotificacoes(Long destinatarioId, TipoParticipante destinatarioTipo) {
-        String chave = key(destinatarioId, destinatarioTipo);
+        // Carga do banco: todas as queries acontecem aqui, dentro da transação.
+        // A transação fecha quando este método retorna — a conexão volta ao pool
+        // antes do SSE começar a emitir eventos.
+        List<NotificacaoDTO> naoLidasList = buscarNaoLidas(destinatarioId, destinatarioTipo).stream()
+                .map(i -> new NotificacaoDTO(
+                        i.getId(),
+                        i.getMensagem(),
+                        i.getDestinatarioId(),
+                        i.getDestinatarioTipo().name(),
+                        i.getRemetenteTipo().name(),
+                        i.isLida(),
+                        i.getUrlImagem(),
+                        i.getTitulo(), i.getTipoNotificacao(), i.isPermiteResposta(),
+                        i.getRemetenteId()))
+                .toList();
 
-        // Sempre cria um novo sink para este cliente, substituindo qualquer conexão anterior
+        List<Long> bandaAdminIds = List.of();
+        if (destinatarioTipo == TipoParticipante.USUARIO) {
+            bandaAdminIds = usuarioDao.findById(destinatarioId)
+                    .map(usuario -> usuario.getMusicoBandaList().stream()
+                            .filter(mb -> mb.getPermissoes().contains(PermissaoMusico.ADMINISTRADOR)
+                                    || mb.getPermissoes().contains(PermissaoMusico.FUNDADOR))
+                            .map(mb -> mb.getBanda().getId())
+                            .toList())
+                    .orElse(List.of());
+        }
+        // Fim do acesso ao banco. A partir daqui: apenas memória e Reactor.
+
+        String chave = key(destinatarioId, destinatarioTipo);
         Sinks.Many<NotificacaoDTO> sink = Sinks.many().multicast().onBackpressureBuffer();
         sinks.put(chave, sink);
 
-        // Busca notificações não lidas do banco para entrega imediata
-        Flux<NotificacaoDTO> naoLidas = Flux.fromIterable(
-                buscarNaoLidas(destinatarioId, destinatarioTipo).stream()
-                        .map(i -> new NotificacaoDTO(
-                                i.getId(),
-                                i.getMensagem(),
-                                i.getDestinatarioId(),
-                                i.getDestinatarioTipo().name(),
-                                i.getRemetenteTipo().name(),
-                                i.isLida(),
-                                i.getUrlImagem(),
-                                i.getTitulo(), i.getTipoNotificacao(), i.isPermiteResposta(),
-                                i.getRemetenteId()))
-                        .toList()
-        );
-
-        // Rastreia subscriptions de bridge para cancelamento correto ao desconectar
         List<Disposable> bridgeSubscriptions = new ArrayList<>();
-
-        if (destinatarioTipo == TipoParticipante.USUARIO) {
-            usuarioDao.findById(destinatarioId).ifPresent(usuario -> {
-                for (MusicoBanda musicoBanda : usuario.getMusicoBandaList()) {
-                    if (musicoBanda.getPermissoes().contains(PermissaoMusico.ADMINISTRADOR)
-                            || musicoBanda.getPermissoes().contains(PermissaoMusico.FUNDADOR)) {
-                        Long bandaId = musicoBanda.getBanda().getId();
-                        String chaveBanda = key(bandaId, TipoParticipante.BANDA);
-
-                        // Obtém ou cria sink da banda (preservado para outros admins conectados)
-                        Sinks.Many<NotificacaoDTO> sinkBanda = sinks.computeIfAbsent(
-                                chaveBanda, k -> Sinks.many().multicast().onBackpressureBuffer());
-
-                        // Bridge: notificações da banda chegam ao sink deste usuário
-                        Disposable sub = sinkBanda.asFlux().subscribe(sink::tryEmitNext);
-                        bridgeSubscriptions.add(sub);
-                        log.info("Bridge configurado: {} -> {}", chave, chaveBanda);
-                    }
-                }
-            });
+        for (Long bandaId : bandaAdminIds) {
+            String chaveBanda = key(bandaId, TipoParticipante.BANDA);
+            Sinks.Many<NotificacaoDTO> sinkBanda = sinks.computeIfAbsent(
+                    chaveBanda, k -> Sinks.many().multicast().onBackpressureBuffer());
+            Disposable sub = sinkBanda.asFlux().subscribe(sink::tryEmitNext);
+            bridgeSubscriptions.add(sub);
+            log.info("Bridge configurado: {} -> {}", chave, chaveBanda);
         }
 
         log.info("Stream SSE iniciado para {}", chave);
         return Flux.merge(
-                naoLidas,
+                Flux.fromIterable(naoLidasList),
                 sink.asFlux().doFinally(signal -> {
-                    // Remove apenas se for o mesmo sink (evita remover reconexão mais recente)
                     sinks.remove(chave, sink);
-                    // Cancela todas as subscriptions de bridge deste cliente
                     bridgeSubscriptions.forEach(Disposable::dispose);
                     log.info("Conexão SSE encerrada para {}", chave);
                 })
