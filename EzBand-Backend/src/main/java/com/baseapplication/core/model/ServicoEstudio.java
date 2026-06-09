@@ -20,4 +20,5 @@ public class ServicoEstudio {
     private String nome;
     private String descricao;
     private BigDecimal valor;
+    private String unidade;
 }

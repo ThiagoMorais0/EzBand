@@ -133,6 +133,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 					usuario.getId() + "_" + System.currentTimeMillis() + "." + FileUtils.getSufix(imagem)));
 			usuarioService.salvar(usuario);
 		}
+		usuarioService.salvarInstrumentosRegistro(
+				usuario.getId(),
+				cadastroUsuarioDTO.getInstrumentos(),
+				cadastroUsuarioDTO.getInstrumentoFavorito()
+		);
 //		emailService.enviarEmail("Novo usuário no EzBand", "O usuário " + usuario.getNome() + " acabou de se cadastrar no EzBand.", "ezband3@gmail.com");
 		return ResponseEntity.ok(null);
 	}

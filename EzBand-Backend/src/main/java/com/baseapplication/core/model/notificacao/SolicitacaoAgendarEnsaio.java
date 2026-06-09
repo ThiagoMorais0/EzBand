@@ -22,15 +22,15 @@ public class SolicitacaoAgendarEnsaio extends Notificacao {
 
     private Long idEnsaio;
 
-    public SolicitacaoAgendarEnsaio(Ensaio ensaio){
+    public SolicitacaoAgendarEnsaio(Ensaio ensaio, Long destinatarioUserId) {
         super.setLida(false);
         super.setMensagem("Banda \"" + ensaio.getBanda().getNome() +
                 "\" está solicitando um agendamento em " +
                 ensaio.getData().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) +
                 " às " + ensaio.getHorarioInicio());
 
-        super.setDestinatarioId(ensaio.getEstudio().getId());
-        super.setDestinatarioTipo(TipoParticipante.ESTUDIO);
+        super.setDestinatarioId(destinatarioUserId);
+        super.setDestinatarioTipo(TipoParticipante.USUARIO);
 
         super.setRemetenteId(ensaio.getBanda().getId());
         super.setRemetenteTipo(TipoParticipante.BANDA);

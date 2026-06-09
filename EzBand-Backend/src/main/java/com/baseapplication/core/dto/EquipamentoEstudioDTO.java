@@ -10,11 +10,13 @@ import org.springframework.beans.BeanUtils;
 @Setter
 @NoArgsConstructor
 public class EquipamentoEstudioDTO {
+    private Long id;
     private String marca;
     private String modelo;
     private String observacao;
     private Boolean ativo;
     private Integer quantidade;
+    private String urlFoto;
 
     public EquipamentoEstudioDTO(EquipamentoEstudio entity){
         BeanUtils.copyProperties(entity, this);

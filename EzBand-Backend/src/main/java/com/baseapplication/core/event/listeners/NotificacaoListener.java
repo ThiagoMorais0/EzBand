@@ -4,13 +4,18 @@ import com.baseapplication.core.controller.NotificacaoController;
 import com.baseapplication.core.event.events.*;
 import com.baseapplication.core.event.events.resposta.RespostaSolicitacaoAgendarEnsaioEvent;
 import com.baseapplication.core.event.events.resposta.RespostaSolicitacaoAgendarShowEvent;
+import com.baseapplication.core.model.Ensaio;
 import com.baseapplication.core.model.notificacao.*;
 import com.baseapplication.core.model.superClasses.Notificacao;
 import com.baseapplication.core.service.NotificacaoService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class NotificacaoListener {
@@ -27,11 +32,17 @@ public class NotificacaoListener {
 
     @EventListener
     public void handleSolicitacaoAgendarEnsaio(SolicitacaoAgendarEnsaioEvent event) {
-        SolicitacaoAgendarEnsaio notificacao = new SolicitacaoAgendarEnsaio(event.getEnsaio());
-        notificacao.setIdEnsaio(event.getEnsaio().getId());
-        notificacao.setUrlImagem(event.getEnsaio().getBanda().getUrlLogo());
-        notificacao.setTitulo("Novo agendamento!");
-        enviar(notificacao);
+        Ensaio ensaio = event.getEnsaio();
+        List<Long> destinatarioIds = event.getDestinatarioIds();
+        log.info("Processando SolicitacaoAgendarEnsaio: ensaioId={} destinatarios={}", ensaio.getId(), destinatarioIds);
+        for (Long destinatarioId : destinatarioIds) {
+            SolicitacaoAgendarEnsaio notificacao = new SolicitacaoAgendarEnsaio(ensaio, destinatarioId);
+            notificacao.setIdEnsaio(ensaio.getId());
+            notificacao.setUrlImagem(ensaio.getBanda().getUrlLogo());
+            notificacao.setTitulo("Novo agendamento!");
+            log.info("Enviando notificação para destinatarioId={}", destinatarioId);
+            enviar(notificacao);
+        }
     }
 
     @EventListener

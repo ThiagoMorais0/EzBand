@@ -55,13 +55,14 @@ public class MinioBucketInitializer implements ApplicationRunner {
     private void ensureBucket(S3Client s3, String bucket) {
         try {
             s3.headBucket(HeadBucketRequest.builder().bucket(bucket).build());
-            log.info("MinIO bucket '{}' already exists.", bucket);
+            log.info("MinIO bucket '{}' already exists — applying public-read policy.", bucket);
         } catch (NoSuchBucketException e) {
             log.info("MinIO bucket '{}' not found — creating...", bucket);
             s3.createBucket(CreateBucketRequest.builder().bucket(bucket).build());
-            applyPublicReadPolicy(s3, bucket);
-            log.info("MinIO bucket '{}' created and set to public-read.", bucket);
+            log.info("MinIO bucket '{}' created.", bucket);
         }
+        applyPublicReadPolicy(s3, bucket);
+        log.info("MinIO bucket '{}' public-read policy applied.", bucket);
     }
 
     private void applyPublicReadPolicy(S3Client s3, String bucket) {

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/usuario")
@@ -192,5 +193,45 @@ public class UsuarioController {
 		}
 	}
 
+	@GetMapping("/instrumentos")
+	public ResponseEntity<?> buscarInstrumentos(@RequestParam(required = false) Long idUsuario) {
+		try {
+			Long id = idUsuario != null ? idUsuario : Context.getUsuarioLogado().getId();
+			return ResponseEntity.ok(usuarioService.buscarInstrumentosDoUsuario(id));
+		} catch (Exception e) {
+			return ResponseEntity.status(500).body(e.getMessage());
+		}
+	}
+
+	@PostMapping("/instrumentos")
+	public ResponseEntity<?> adicionarInstrumento(@RequestBody Map<String, String> body) {
+		try {
+			String nome = body.get("nome");
+			if (nome == null || nome.isBlank())
+				return ResponseEntity.badRequest().body("Nome do instrumento é obrigatório");
+			return ResponseEntity.ok(usuarioService.adicionarInstrumento(nome));
+		} catch (Exception e) {
+			return ResponseEntity.status(500).body(e.getMessage());
+		}
+	}
+
+	@DeleteMapping("/instrumentos/{id}")
+	public ResponseEntity<?> removerInstrumento(@PathVariable Long id) {
+		try {
+			usuarioService.removerInstrumento(id);
+			return ResponseEntity.ok().build();
+		} catch (Exception e) {
+			return ResponseEntity.status(500).body(e.getMessage());
+		}
+	}
+
+	@PostMapping("/instrumentos/{id}/favorito")
+	public ResponseEntity<?> definirInstrumentoFavorito(@PathVariable Long id) {
+		try {
+			return ResponseEntity.ok(usuarioService.definirInstrumentoFavorito(id));
+		} catch (Exception e) {
+			return ResponseEntity.status(500).body(e.getMessage());
+		}
+	}
 
 }

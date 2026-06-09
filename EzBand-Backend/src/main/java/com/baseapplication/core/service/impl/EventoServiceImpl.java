@@ -310,22 +310,37 @@ public class EventoServiceImpl implements EventoService {
         Ensaio ensaio = novoEnsaioDTO.toEntity();
         Banda banda = bandaService.buscarPorId(novoEnsaioDTO.getIdBanda());
 		ensaio.setBanda(banda);
-		if (banda.getParametros().getExigirAprovacaoCompromissos()) {
+		setarEstudio(novoEnsaioDTO, ensaio);
+
+		boolean exigeConfirmacaoEstudio = ensaio.getEstudio() != null && ensaio.getEstudio().isExigirConfirmacaoEnsaios();
+
+		if (banda.getParametros().getExigirAprovacaoCompromissos() || exigeConfirmacaoEstudio) {
 			ensaio.setStatus(StatusEvento.AGUARDANDO_APROVACAO);
 		} else {
-			if(novoEnsaioDTO.getIdEstudio() != null){
-				ensaio.setStatus(StatusEvento.AGUARDANDO_APROVACAO);
-			}else{
-				ensaio.setStatus(StatusEvento.PENDENTE);
-			}
+			ensaio.setStatus(StatusEvento.PENDENTE);
 		}
 
-		setarEstudio(novoEnsaioDTO, ensaio);
 		ensaio = ensaioService.salvar(ensaio);
 
-		if (ensaio.getEstudio() != null) {
-			System.out.println("Publicando notificação");
-			notificacaoService.enviarNotificacao(new SolicitacaoAgendarEnsaioEvent(ensaio));
+		if (exigeConfirmacaoEstudio) {
+			// Carrega os IDs AQUI, dentro da transação, antes de publicar o evento.
+			// Evita LazyInitializationException no listener (socios é LAZY).
+			Estudio estudioConfirmacao = ensaio.getEstudio();
+			List<Long> destinatarioIds = new ArrayList<>();
+			if (estudioConfirmacao.getProprietario() != null && estudioConfirmacao.getProprietario().getId() != null) {
+				destinatarioIds.add(estudioConfirmacao.getProprietario().getId());
+			}
+			estudioConfirmacao.getSocios().stream()
+					.map(Usuario::getId)
+					.filter(id -> id != null)
+					.forEach(destinatarioIds::add);
+			System.out.println("[EzBand] Enviando notificação de confirmação de ensaio. Estudio ID=" + estudioConfirmacao.getId()
+					+ " | Destinatarios: " + destinatarioIds);
+			if (!destinatarioIds.isEmpty()) {
+				notificacaoService.enviarNotificacao(new SolicitacaoAgendarEnsaioEvent(ensaio, destinatarioIds));
+			} else {
+				System.out.println("[EzBand] AVISO: Estúdio exige confirmação mas não tem proprietário/sócios cadastrados.");
+			}
 		}
 		incluirMusicosNoEvento(novoEnsaioDTO.getMusicos(), banda, ensaio, TipoEvento.ENSAIO);
 		incluirMembrosFantasmaNoEvento(novoEnsaioDTO.getMembrosFantasma(), ensaio, TipoEvento.ENSAIO);
@@ -505,6 +520,7 @@ public class EventoServiceImpl implements EventoService {
 		show.setPorcentagemPortaria(novoShowDTO.getPorcentagemPortaria());
 		show.setIsPortaria(novoShowDTO.getIsPortaria());
 		show.setConsumacaoPorMusico(novoShowDTO.getConsumacaoPorMusico());
+		show.setLinkIngresso(novoShowDTO.getLinkIngresso());
 	}
 
 	private static void VerificarHorariosNulos(NovoShowDTO novoShowDTO, Show show) {

@@ -36,6 +36,7 @@ public class NovoShowDTO {
 	private Integer porcentagemPortaria;
 	private Boolean isPortaria;
 	private BigDecimal consumacaoPorMusico;
+	private String linkIngresso;
 	private List<MusicoEventoDTO> musicos = new ArrayList<>();
 	private List<MembroFantasmaEventoDTO> membrosFantasma = new ArrayList<>();
 
@@ -47,6 +48,7 @@ public class NovoShowDTO {
 		show.setData(DateUtils.stringToLocalDate(this.dataShow));
 		show.setDataInclusao(LocalDate.now());
 		show.setConsumacaoPorMusico(this.consumacaoPorMusico);
+		show.setLinkIngresso(this.linkIngresso);
 		verificarHorariosNulos(show);
 
 		return show;

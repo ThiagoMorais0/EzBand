@@ -202,7 +202,7 @@ class EstudioControllerTest {
     @DisplayName("Deve buscar sugestões de estúdios com sucesso")
     void deveBuscarSugestoesDeEstudiosComSucesso() {
         BuscaEstudioDTO buscaDTO = new BuscaEstudioDTO();
-        List<Estudio> estudios = new ArrayList<>();
+        List<EstudioDTO> estudios = new ArrayList<>();
         when(estudioService.buscarSugestoes(any(BuscaEstudioDTO.class))).thenReturn(estudios);
 
         ResponseEntity resposta = estudioController.buscarSugestoes(buscaDTO);

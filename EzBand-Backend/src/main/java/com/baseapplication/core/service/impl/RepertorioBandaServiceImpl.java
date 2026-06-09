@@ -35,4 +35,9 @@ public class RepertorioBandaServiceImpl implements RepertorioBandaService {
         return indice == null ? 0 : indice;
     }
 
+    @Override
+    public void updateIndice(Long id, Integer indice) {
+        repertorioBandaDao.updateIndice(id, indice);
+    }
+
 }

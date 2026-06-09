@@ -499,12 +499,11 @@ public class BandaServiceImpl implements BandaService {
 	}
 
 	@Override
+	@Transactional
 	public void atualizarOrdemRepertorio(Long idBanda, List<RepertorioBandaDTO> repertorio) {
-		repertorio.forEach(repertorioBandaDTO -> {
-			RepertorioBanda repertorioBanda = repertorioBandaService.buscarPorId(repertorioBandaDTO.getId());
-			repertorioBanda.setIndice(repertorioBandaDTO.getIndice());
-			repertorioBandaService.salvar(repertorioBanda);
-		});
+		repertorio.forEach(repertorioBandaDTO ->
+			repertorioBandaService.updateIndice(repertorioBandaDTO.getId(), repertorioBandaDTO.getIndice())
+		);
 	}
 
 }

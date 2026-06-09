@@ -12,4 +12,6 @@ public interface RepertorioBandaService {
     void deletar(RepertorioBanda repertorioBanda);
 
     Integer buscarUltimoIndice(Long idBanda);
+
+    void updateIndice(Long id, Integer indice);
 }

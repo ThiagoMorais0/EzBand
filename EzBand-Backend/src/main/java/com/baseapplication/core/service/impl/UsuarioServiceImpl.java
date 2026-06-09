@@ -8,12 +8,14 @@ import com.baseapplication.core.dto.*;
 import com.baseapplication.core.event.events.NovoSeguidorEvent;
 import com.baseapplication.core.event.events.SolicitacaoIngressarBandaEvent;
 import com.baseapplication.core.model.Banda;
+import com.baseapplication.core.model.InstrumentoUsuario;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.baseapplication.core.dao.InstrumentoUsuarioDao;
 import com.baseapplication.core.dao.UsuarioDao;
 import com.baseapplication.core.enums.TipoContato;
 import com.baseapplication.core.exception.InternalException;
@@ -42,6 +44,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UsuarioServiceImpl implements UsuarioService {
 	private final UsuarioDao usuarioDao;
+	private final InstrumentoUsuarioDao instrumentoUsuarioDao;
 	private final BandaService bandaService;
 	private final NotificacaoService notificacaoService;
 	private final EventoHelperService eventoHelperService;
@@ -202,6 +205,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 		dto.setTipoRelacionamento(relacionamentoSeguidorService.buscarTipoRelacionamento(Context.getUsuarioLogado().getId(), idUsuario));
 		dto.setQuantidadeSeguidores(relacionamentoSeguidorService.contarSeguidores(idUsuario));
 		dto.setQuantidadeSeguindo(relacionamentoSeguidorService.contarSeguindo(idUsuario));
+		dto.setInstrumentosPerfil(buscarInstrumentosDoUsuario(idUsuario));
 		// Address is private — strip before returning public profile
 		dto.setEndPais(null);
 		dto.setEndEstado(null);
@@ -315,5 +319,54 @@ public class UsuarioServiceImpl implements UsuarioService {
 				.toList();
 
 		return resultados.stream().map(InfoPerfilUsuarioDTO::new).toList();
+	}
+
+	@Override
+	public List<InstrumentoDTO> buscarInstrumentosDoUsuario(Long idUsuario) {
+		return instrumentoUsuarioDao.findByIdUsuarioOrderByFavoritoDescNomeAsc(idUsuario)
+				.stream().map(InstrumentoDTO::new).toList();
+	}
+
+	@Override
+	@jakarta.transaction.Transactional
+	public InstrumentoDTO adicionarInstrumento(String nome) {
+		Long idUsuario = Context.getUsuarioLogado().getId();
+		InstrumentoUsuario instrumento = new InstrumentoUsuario(idUsuario, nome.trim(), false);
+		return new InstrumentoDTO(instrumentoUsuarioDao.save(instrumento));
+	}
+
+	@Override
+	@jakarta.transaction.Transactional
+	public void removerInstrumento(Long idInstrumento) {
+		Long idUsuario = Context.getUsuarioLogado().getId();
+		InstrumentoUsuario instrumento = instrumentoUsuarioDao.findById(idInstrumento)
+				.orElseThrow(() -> new ResourceNotFoundException("Instrumento não encontrado"));
+		if (!instrumento.getIdUsuario().equals(idUsuario))
+			throw new InvalidParamException("Instrumento não pertence ao usuário");
+		instrumentoUsuarioDao.delete(instrumento);
+	}
+
+	@Override
+	@jakarta.transaction.Transactional
+	public InstrumentoDTO definirInstrumentoFavorito(Long idInstrumento) {
+		Long idUsuario = Context.getUsuarioLogado().getId();
+		InstrumentoUsuario instrumento = instrumentoUsuarioDao.findById(idInstrumento)
+				.orElseThrow(() -> new ResourceNotFoundException("Instrumento não encontrado"));
+		if (!instrumento.getIdUsuario().equals(idUsuario))
+			throw new InvalidParamException("Instrumento não pertence ao usuário");
+		instrumentoUsuarioDao.clearFavoritosDoUsuario(idUsuario);
+		instrumento.setFavorito(true);
+		return new InstrumentoDTO(instrumentoUsuarioDao.save(instrumento));
+	}
+
+	@Override
+	@jakarta.transaction.Transactional
+	public void salvarInstrumentosRegistro(Long idUsuario, List<String> instrumentos, String instrumentoFavorito) {
+		if (instrumentos == null || instrumentos.isEmpty()) return;
+		for (String nome : instrumentos) {
+			if (nome == null || nome.isBlank()) continue;
+			boolean isFavorito = nome.trim().equalsIgnoreCase(instrumentoFavorito != null ? instrumentoFavorito.trim() : "");
+			instrumentoUsuarioDao.save(new InstrumentoUsuario(idUsuario, nome.trim(), isFavorito));
+		}
 	}
 }

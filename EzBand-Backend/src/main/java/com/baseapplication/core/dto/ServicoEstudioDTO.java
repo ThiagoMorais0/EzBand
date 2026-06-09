@@ -12,9 +12,11 @@ import java.math.BigDecimal;
 @Setter
 @NoArgsConstructor
 public class ServicoEstudioDTO {
+    private Long id;
     private String nome;
     private String descricao;
     private BigDecimal valor;
+    private String unidade;
 
     public ServicoEstudioDTO(ServicoEstudio entity){
         BeanUtils.copyProperties(entity, this);

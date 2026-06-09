@@ -22,6 +22,7 @@ public class ShowDTO extends EventoDTO {
     private Integer porcentagemPortaria;
     private BigDecimal cacheIndividual;
     private BigDecimal consumacaoPorMusico;
+    private String linkIngresso;
 
     public ShowDTO(Evento evento){
         Show show = (Show) evento;
@@ -33,6 +34,7 @@ public class ShowDTO extends EventoDTO {
         this.setStatus(show.getStatus().getDescricao());
         this.setData(DateUtils.localDateToString(show.getData()));
         this.setConsumacaoPorMusico(show.getConsumacaoPorMusico());
+        this.setLinkIngresso(show.getLinkIngresso());
     }
 
     public ShowDTO(Evento evento, BigDecimal cacheIndividual){
@@ -46,5 +48,6 @@ public class ShowDTO extends EventoDTO {
         this.setData(DateUtils.localDateToString(show.getData()));
         this.setCacheIndividual(cacheIndividual);
         this.setConsumacaoPorMusico(show.getConsumacaoPorMusico());
+        this.setLinkIngresso(show.getLinkIngresso());
     }
 }

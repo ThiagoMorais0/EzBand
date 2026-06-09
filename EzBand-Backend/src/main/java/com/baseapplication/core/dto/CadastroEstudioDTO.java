@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.BeanUtils;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +22,8 @@ public class CadastroEstudioDTO {
     private String horarioFinalFuncionamento;
     private List<ServicoEstudioDTO> servicos = new ArrayList<>();
     private List<EquipamentoEstudioDTO> equipamentos = new ArrayList<>();
+    private List<String> diasFuncionamento = new ArrayList<>();
+    private boolean exigirConfirmacaoEnsaios = false;
 
     public Estudio toEntity() {
         Estudio entity = new Estudio();
@@ -50,6 +53,13 @@ public class CadastroEstudioDTO {
 
         entity.setServicos(servicosEntity);
         entity.setEquipamentos(equipamentosEntity);
+        entity.setDiasFuncionamento(new ArrayList<>(this.diasFuncionamento));
+        entity.setExigirConfirmacaoEnsaios(this.exigirConfirmacaoEnsaios);
+
+        if (this.horarioInicioFuncionamento != null && !this.horarioInicioFuncionamento.isBlank())
+            entity.setHorarioInicioFuncionamento(LocalDateTime.parse(this.horarioInicioFuncionamento));
+        if (this.horarioFinalFuncionamento != null && !this.horarioFinalFuncionamento.isBlank())
+            entity.setHorarioFinalFuncionamento(LocalDateTime.parse(this.horarioFinalFuncionamento));
 
         return entity;
     }

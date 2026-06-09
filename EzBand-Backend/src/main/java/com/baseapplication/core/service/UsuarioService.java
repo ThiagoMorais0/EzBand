@@ -9,6 +9,7 @@ import com.baseapplication.core.dto.EmailDTO;
 import com.baseapplication.core.dto.InfoPerfilUsuarioDTO;
 import com.baseapplication.core.dto.InfoUsuarioPainelDTO;
 import com.baseapplication.core.dto.BuscaGlobalDTO;
+import com.baseapplication.core.dto.InstrumentoDTO;
 import com.baseapplication.core.enums.TipoContato;
 import com.baseapplication.core.model.Usuario;
 
@@ -61,4 +62,14 @@ public interface UsuarioService {
     List<InfoPerfilUsuarioDTO> buscarSugestoes(String termo);
 
     List<SeguidorDTO> buscarSeguidores(Long idUsuario);
+
+    List<InstrumentoDTO> buscarInstrumentosDoUsuario(Long idUsuario);
+
+    InstrumentoDTO adicionarInstrumento(String nome);
+
+    void removerInstrumento(Long idInstrumento);
+
+    InstrumentoDTO definirInstrumentoFavorito(Long idInstrumento);
+
+    void salvarInstrumentosRegistro(Long idUsuario, List<String> instrumentos, String instrumentoFavorito);
 }

@@ -22,6 +22,7 @@ public class Show extends Evento {
     private Boolean isPortaria;
     private Integer porcentagemPortaria;
     private BigDecimal consumacaoPorMusico;
+    private String linkIngresso;
 
     public Show(){
         this.setTipoEvento(TipoEvento.SHOW);

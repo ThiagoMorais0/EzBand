@@ -12,7 +12,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(exclude = {"socios", "servicos", "equipamentos", "ensaios", "avaliacoes", "diasFuncionamento"})
 @Entity
 @Table(name = "ESTUDIO")
 public class Estudio {
@@ -30,6 +30,21 @@ public class Estudio {
     private LocalDateTime horarioFinalFuncionamento;
     private LocalDateTime DataInclusao = LocalDateTime.now();
     private String urlFotoPerfil;
+    private boolean exigirConfirmacaoEnsaios = false;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "ESTUDIO_DIAS_FUNCIONAMENTO", joinColumns = @JoinColumn(name = "ID_ESTUDIO"))
+    @Column(name = "DIA")
+    private List<String> diasFuncionamento = new ArrayList<>();
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "ESTUDIO_SOCIOS",
+        joinColumns = @JoinColumn(name = "ID_ESTUDIO"),
+        inverseJoinColumns = @JoinColumn(name = "ID_USUARIO")
+    )
+    private List<Usuario> socios = new ArrayList<>();
+
     @OneToMany(mappedBy = "estudio", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ServicoEstudio> servicos = new ArrayList<>();
 

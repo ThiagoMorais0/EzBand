@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.sql.Time;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
@@ -44,8 +45,13 @@ public class SugestaoRepertorioServiceImpl implements SugestaoRepertorioService 
                 dto.getDuracaoShowMinutos() * 60
         );
         
-        // Ordenar músicas selecionadas por posição no show
-        List<RepertorioBanda> musicasOrdenadas = ordenarPorPosicaoShow(musicasSelecionadas);
+        // Ordenar músicas: por curva de energia (se fornecida) ou por posição no show
+        List<RepertorioBanda> musicasOrdenadas;
+        if (dto.getCurvaEnergia() != null && !dto.getCurvaEnergia().isEmpty()) {
+            musicasOrdenadas = ordenarPorCurvaEnergia(musicasSelecionadas, dto.getCurvaEnergia());
+        } else {
+            musicasOrdenadas = ordenarPorPosicaoShow(musicasSelecionadas);
+        }
         
         // Calcular duração total
         int duracaoTotal = calcularDuracaoTotal(musicasOrdenadas);
@@ -174,6 +180,52 @@ public class SugestaoRepertorioServiceImpl implements SugestaoRepertorioService 
         return Math.round(pontuacao * 100.0) / 100.0;
     }
     
+    /**
+     * FASE 3: Ordena as músicas selecionadas para seguir a curva de energia desenhada.
+     * Interpola a curva para o tamanho exato do set e usa rank-matching para atribuir
+     * a música com energia mais próxima a cada posição desejada.
+     */
+    private List<RepertorioBanda> ordenarPorCurvaEnergia(List<RepertorioBanda> musicas, List<Integer> curva) {
+        int n = musicas.size();
+        List<Integer> curvaInterpolada = interpolarCurva(curva, n);
+
+        // Posições ordenadas pela energia desejada (crescente)
+        List<Integer> posicoesPorEnergiaDesejada = IntStream.range(0, n)
+                .boxed()
+                .sorted(Comparator.comparingInt(curvaInterpolada::get))
+                .collect(Collectors.toList());
+
+        // Músicas ordenadas pela energia real (crescente)
+        List<RepertorioBanda> musicasPorEnergia = new ArrayList<>(musicas);
+        musicasPorEnergia.sort(Comparator.comparingInt(this::obterEnergia));
+
+        // Atribui: o slot com i-ésima menor energia desejada recebe a música com i-ésima menor energia real
+        RepertorioBanda[] resultado = new RepertorioBanda[n];
+        for (int rank = 0; rank < n; rank++) {
+            resultado[posicoesPorEnergiaDesejada.get(rank)] = musicasPorEnergia.get(rank);
+        }
+
+        return new ArrayList<>(Arrays.asList(resultado));
+    }
+
+    private List<Integer> interpolarCurva(List<Integer> curva, int n) {
+        if (n == 1) return Collections.singletonList(curva.get(curva.size() / 2));
+        int curvaSize = curva.size();
+        List<Integer> resultado = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            double t = (double) i / (n - 1) * (curvaSize - 1);
+            int idx = (int) t;
+            double frac = t - idx;
+            if (idx >= curvaSize - 1) {
+                resultado.add(curva.get(curvaSize - 1));
+            } else {
+                int v = (int) Math.round(curva.get(idx) * (1 - frac) + curva.get(idx + 1) * frac);
+                resultado.add(Math.max(1, Math.min(10, v)));
+            }
+        }
+        return resultado;
+    }
+
     private int timeToSeconds(Time time) {
         if (time == null) return 0;
         return time.toLocalTime().toSecondOfDay();

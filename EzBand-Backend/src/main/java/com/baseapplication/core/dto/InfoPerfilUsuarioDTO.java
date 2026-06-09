@@ -17,6 +17,7 @@ import lombok.Setter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Collections;
 
 @Getter
 @Setter
@@ -45,6 +46,8 @@ public class InfoPerfilUsuarioDTO {
     private String endNumero;
     private String endCep;
     private String endComplemento;
+    private List<InstrumentoDTO> instrumentosPerfil = new ArrayList<>();
+
     public InfoPerfilUsuarioDTO(Usuario usuario){
         BeanUtils.copyProperties(usuario, this);
 

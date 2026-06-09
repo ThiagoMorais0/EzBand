@@ -16,6 +16,7 @@ import com.baseapplication.core.model.notificacao.ConviteParaUsuarioIngressarBan
 import com.baseapplication.core.model.notificacao.SolicitacaoAgendarEnsaio;
 import com.baseapplication.core.model.notificacao.SolicitacaoAgendarShow;
 import com.baseapplication.core.model.notificacao.SolicitacaoParaIngressarBanda;
+import com.baseapplication.core.model.superClasses.Evento;
 import com.baseapplication.core.model.superClasses.Notificacao;
 import com.baseapplication.core.exception.ResourceNotFoundException;
 import com.baseapplication.core.service.*;
@@ -228,7 +229,10 @@ public class NotificacaoServiceImpl implements NotificacaoService {
         switch (notificacao.getTipoNotificacao()){
             case "SOLICITACAO_PARA_AGENDAR_ENSAIO":
                 SolicitacaoAgendarEnsaio solicitacao = (SolicitacaoAgendarEnsaio) notificacao;
-                eventoHelperService.alterarStatus(solicitacao.getIdEnsaio(), TipoEvento.ENSAIO, acao.equals(AcaoResposta.ACEITAR) ? StatusEvento.PENDENTE : StatusEvento.CANCELADO);
+                Evento ensaioEvento = eventoHelperService.buscarEvento(solicitacao.getIdEnsaio(), TipoEvento.ENSAIO);
+                if (StatusEvento.AGUARDANDO_APROVACAO.equals(ensaioEvento.getStatus())) {
+                    eventoHelperService.alterarStatus(solicitacao.getIdEnsaio(), TipoEvento.ENSAIO, acao.equals(AcaoResposta.ACEITAR) ? StatusEvento.PENDENTE : StatusEvento.CANCELADO);
+                }
                 return;
             case "SOLICITACAO_PARA_AGENDAR_SHOW":
                 SolicitacaoAgendarShow solicitacaoShow = (SolicitacaoAgendarShow) notificacao;

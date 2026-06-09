@@ -16,6 +16,9 @@ public interface EstudioDao extends JpaRepository<Estudio, Long> {
     @Query(value = "SELECT e FROM Estudio e WHERE e.proprietario.id = :idProprietario")
     List<Estudio> findByProprietario(Long idProprietario);
 
+    @Query("SELECT e FROM Estudio e JOIN e.socios s WHERE s.id = :idSocio")
+    List<Estudio> findBySocio(@Param("idSocio") Long idSocio);
+
     @Query("SELECT e FROM Estudio e \n" +
             "WHERE (:#{#dto.nome} IS NULL OR :#{#dto.nome} = '' OR LOWER(e.nome) LIKE LOWER(CONCAT('%', :#{#dto.nome}, '%'))) AND \n" +
             "(:#{#dto.cidade} IS NULL OR :#{#dto.cidade} = '' OR LOWER(e.endereco.cidade) LIKE LOWER(CONCAT('%', :#{#dto.cidade}, '%'))) AND \n" +
