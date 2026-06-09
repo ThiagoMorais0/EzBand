@@ -19,6 +19,7 @@ public class LoginResponseDTO {
     private String celular;
     private Boolean celularValidado;
     private List<String> tiposUsuario;
+    private Boolean cadastroCompleto;
 
     public LoginResponseDTO(String token, Usuario usuario){
         this.token = token;
@@ -28,5 +29,6 @@ public class LoginResponseDTO {
         this.celular = usuario.getCelular();
         this.celularValidado = Boolean.TRUE.equals(usuario.getCelularValidado());
         this.tiposUsuario = usuario.getTiposUsuario() != null ? usuario.getTiposUsuario() : new ArrayList<>();
+        this.cadastroCompleto = !Boolean.FALSE.equals(usuario.getCadastroCompleto());
     }
 }

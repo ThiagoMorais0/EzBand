@@ -8,6 +8,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.baseapplication.core.dto.CadastroDTO;
 import com.baseapplication.core.dto.CadastroUsuarioDTO;
+import com.baseapplication.core.dto.CompletarCadastroGoogleDTO;
+import com.baseapplication.core.dto.GoogleLoginDTO;
 import com.baseapplication.core.dto.InfoUsuarioDTO;
 import com.baseapplication.core.dto.LoginDTO;
 import com.baseapplication.core.exception.InternalException;
@@ -58,6 +60,16 @@ public class AuthenticationController {
 	@GetMapping("buscarInfoUsuario")
 	public InfoUsuarioDTO buscarInfoUsuario(@RequestParam String email) {
 		return authenticationService.buscarInfoUsuario(email);
+	}
+
+	@PostMapping("/google")
+	public ResponseEntity<?> loginComGoogle(@RequestBody GoogleLoginDTO body) {
+		return authenticationService.loginComGoogle(body.getCredential());
+	}
+
+	@PostMapping("/completarCadastroGoogle")
+	public ResponseEntity<?> completarCadastroGoogle(@RequestBody CompletarCadastroGoogleDTO dto) {
+		return authenticationService.completarCadastroGoogle(dto);
 	}
 
 	@GetMapping("/validate")

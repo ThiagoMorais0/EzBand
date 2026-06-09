@@ -52,6 +52,7 @@ public class Usuario implements UserDetails {
     private String urlFotoPerfil;
     private LocalDateTime dataUltimoLogin;
     private Boolean celularValidado = false;
+    private Boolean cadastroCompleto = true;
 
     @Column(name = "end_pais")
     private String endPais;

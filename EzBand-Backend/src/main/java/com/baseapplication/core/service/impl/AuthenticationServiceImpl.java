@@ -2,6 +2,8 @@ package com.baseapplication.core.service.impl;
 
 import com.baseapplication.core.config.TokenService;
 import com.baseapplication.core.dto.*;
+import com.baseapplication.core.utils.Context;
+import com.baseapplication.core.utils.DateUtils;
 import com.baseapplication.core.exception.ConflictException;
 import com.baseapplication.core.model.Usuario;
 import com.baseapplication.core.service.AuthenticationService;
@@ -9,9 +11,13 @@ import com.baseapplication.core.service.EmailService;
 import com.baseapplication.core.service.ImagemService;
 import com.baseapplication.core.service.UsuarioService;
 import com.baseapplication.core.utils.FileUtils;
+import com.baseapplication.core.enums.PermissaoUsuario;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.*;
@@ -22,9 +28,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Log4j2
 @Service
@@ -44,6 +57,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 	@Autowired
 	private EmailService emailService;
+
+	@Value("${google.client.id}")
+	private String googleClientId;
 
 	@Override
 	public ResponseEntity<LoginResponseDTO> login(LoginDTO data) {
@@ -144,6 +160,110 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		);
 //		emailService.enviarEmail("Novo usuário no EzBand", "O usuário " + usuario.getNome() + " acabou de se cadastrar no EzBand.", "ezband3@gmail.com");
 		return ResponseEntity.ok(null);
+	}
+
+	@Override
+	public ResponseEntity<?> loginComGoogle(String credential) {
+		try {
+			HttpClient client = HttpClient.newHttpClient();
+			HttpRequest request = HttpRequest.newBuilder()
+					.uri(URI.create("https://oauth2.googleapis.com/tokeninfo?id_token=" + credential))
+					.GET()
+					.build();
+			HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+			if (response.statusCode() != 200) {
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token do Google inválido");
+			}
+
+			Map<String, String> tokenInfo = new ObjectMapper().readValue(
+					response.body(), new TypeReference<Map<String, String>>() {});
+
+			String aud = tokenInfo.get("aud");
+			if (aud == null || !aud.equals(googleClientId)) {
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token não pertence a esta aplicação");
+			}
+
+			String email = tokenInfo.get("email");
+			String nome  = tokenInfo.get("name");
+			String foto  = tokenInfo.get("picture");
+
+			if (email == null || email.isBlank()) {
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("E-mail não disponível no token");
+			}
+
+			Usuario usuario = usuarioService.findByEmail(email);
+
+			if (usuario == null) {
+				usuario = new Usuario();
+				usuario.setNome(nome != null ? nome : email);
+				usuario.setEmail(email);
+				usuario.setSenha(new BCryptPasswordEncoder().encode(UUID.randomUUID().toString()));
+				usuario.setPermissao(PermissaoUsuario.USUARIO);
+				usuario.setAtivo(true);
+				usuario.setBloqueado(false);
+				usuario.setUrlFotoPerfil(foto != null && !foto.isBlank() ? foto : "default");
+				usuario.setDataCriacao(LocalDate.now());
+				usuario.setDataUltimoLogin(LocalDateTime.now());
+				usuario.setDescricao("");
+				usuario.setCelularValidado(false);
+				usuario.setCadastroCompleto(false);
+				usuario = usuarioService.salvar(usuario);
+			} else {
+				salvarDataUltimoLogin(usuario);
+			}
+
+			String token = tokenService.gerarToken(usuario);
+			return ResponseEntity.ok(new LoginResponseDTO(token, usuario));
+
+		} catch (Exception e) {
+			log.error("Erro no login com Google: {}", e.getMessage());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao processar login com Google");
+		}
+	}
+
+	@Override
+	@Transactional
+	public ResponseEntity<?> completarCadastroGoogle(CompletarCadastroGoogleDTO dto) {
+		try {
+			if (dto.getCelular() == null || dto.getCelular().isBlank())
+				return ResponseEntity.badRequest().body("Celular é obrigatório");
+			if (dto.getNascimento() == null || dto.getNascimento().isBlank())
+				return ResponseEntity.badRequest().body("Data de nascimento é obrigatória");
+			if (dto.getCidade() == null || dto.getCidade().isBlank())
+				return ResponseEntity.badRequest().body("Cidade é obrigatória");
+			if (dto.getTiposUsuario() == null || dto.getTiposUsuario().isEmpty())
+				return ResponseEntity.badRequest().body("Tipo de perfil é obrigatório");
+
+			Usuario existenteCelular = usuarioService.findByCelular(dto.getCelular());
+			if (existenteCelular != null) {
+				return ResponseEntity.status(HttpStatus.CONFLICT).body("Celular já cadastrado");
+			}
+
+			Usuario usuario = Context.getUsuarioLogado();
+			usuario.setCelular(dto.getCelular());
+			usuario.setDataNascimento(DateUtils.stringToLocalDate(dto.getNascimento()));
+			usuario.setCidade(dto.getCidade());
+			usuario.setTiposUsuario(dto.getTiposUsuario());
+			if (dto.getPais() != null)        usuario.setEndPais(dto.getPais());
+			if (dto.getEstado() != null)      usuario.setEndEstado(dto.getEstado());
+			if (dto.getBairro() != null)      usuario.setEndBairro(dto.getBairro());
+			if (dto.getRua() != null)         usuario.setEndRua(dto.getRua());
+			if (dto.getNumero() != null)      usuario.setEndNumero(dto.getNumero());
+			if (dto.getCep() != null)         usuario.setEndCep(dto.getCep());
+			if (dto.getComplemento() != null) usuario.setEndComplemento(dto.getComplemento());
+			usuario.setCadastroCompleto(true);
+			usuarioService.salvar(usuario);
+
+			return ResponseEntity.ok(Map.of(
+				"cadastroCompleto", true,
+				"tiposUsuario", usuario.getTiposUsuario(),
+				"celular", usuario.getCelular()
+			));
+		} catch (Exception e) {
+			log.error("Erro ao completar cadastro Google: {}", e.getMessage());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao completar cadastro");
+		}
 	}
 
 	@Override
