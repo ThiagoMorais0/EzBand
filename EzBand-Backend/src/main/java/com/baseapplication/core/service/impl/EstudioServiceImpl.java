@@ -5,7 +5,12 @@ import com.baseapplication.core.dao.EquipamentoEstudioDao;
 import com.baseapplication.core.dao.EstudioDao;
 import com.baseapplication.core.dao.ServicoEstudioDao;
 import com.baseapplication.core.dao.UsuarioDao;
+import com.baseapplication.core.enums.StatusEvento;
+import com.baseapplication.core.event.events.EnsaioAprovadoPeloEstudioEvent;
+import com.baseapplication.core.event.events.EnsaioCanceladoPeloEstudioEvent;
+import com.baseapplication.core.event.events.EnsaioRecusadoPeloEstudioEvent;
 import com.baseapplication.core.exception.InternalException;
+import com.baseapplication.core.model.Ensaio;
 import com.baseapplication.core.model.EquipamentoEstudio;
 import com.baseapplication.core.model.Estudio;
 import com.baseapplication.core.model.ServicoEstudio;
@@ -23,6 +28,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.springframework.beans.BeanUtils;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -45,6 +51,7 @@ public class EstudioServiceImpl implements EstudioService {
     private final EquipamentoEstudioDao equipamentoDao;
     private final ImagemService imagemService;
     private final EnsaioService ensaioService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     public Estudio cadastrar(Estudio estudio) {
@@ -287,6 +294,69 @@ public class EstudioServiceImpl implements EstudioService {
                 .orElseThrow(() -> new InternalException("Equipamento não encontrado"));
         if (eq.getUrlFoto() != null) imagemService.deletarImagemPorUrl(eq.getUrlFoto());
         equipamentoDao.delete(eq);
+    }
+
+    @Override
+    @Transactional
+    public List<EnsaioDTO> buscarEnsaiosPendentesPorEstudio(Long idEstudio) {
+        Estudio estudio = buscarPorId(idEstudio);
+        if (estudio == null) throw new InternalException("Estúdio não encontrado");
+        return estudio.getEnsaios().stream()
+                .filter(e -> StatusEvento.PENDENTE.equals(e.getStatus()))
+                .sorted(Comparator.comparing(Ensaio::getData, Comparator.nullsLast(Comparator.naturalOrder())))
+                .map(EnsaioDTO::new)
+                .toList();
+    }
+
+    @Override
+    @Transactional
+    public List<EnsaioDTO> buscarEnsaiosAguardandoAprovacaoPorEstudio(Long idEstudio) {
+        Estudio estudio = buscarPorId(idEstudio);
+        if (estudio == null) throw new InternalException("Estúdio não encontrado");
+        return estudio.getEnsaios().stream()
+                .filter(e -> StatusEvento.AGUARDANDO_APROVACAO.equals(e.getStatus()))
+                .sorted(Comparator.comparing(Ensaio::getData, Comparator.nullsLast(Comparator.naturalOrder())))
+                .map(EnsaioDTO::new)
+                .toList();
+    }
+
+    @Override
+    @Transactional
+    public List<EnsaioDTO> buscarEnsaiosHistoricoPorEstudio(Long idEstudio) {
+        Estudio estudio = buscarPorId(idEstudio);
+        if (estudio == null) throw new InternalException("Estúdio não encontrado");
+        return estudio.getEnsaios().stream()
+                .filter(e -> StatusEvento.REALIZADO.equals(e.getStatus()) || StatusEvento.CANCELADO.equals(e.getStatus()))
+                .sorted(Comparator.comparing(Ensaio::getData, Comparator.nullsLast(Comparator.reverseOrder())))
+                .map(EnsaioDTO::new)
+                .toList();
+    }
+
+    @Override
+    @Transactional
+    public void aprovarEnsaio(Long idEnsaio) {
+        Ensaio ensaio = ensaioService.buscarPorId(idEnsaio);
+        Estudio estudio = ensaio.getEstudio();
+        ensaioService.alterarStatus(idEnsaio, StatusEvento.PENDENTE);
+        eventPublisher.publishEvent(new EnsaioAprovadoPeloEstudioEvent(ensaio, estudio));
+    }
+
+    @Override
+    @Transactional
+    public void recusarEnsaio(Long idEnsaio, String motivo) {
+        Ensaio ensaio = ensaioService.buscarPorId(idEnsaio);
+        Estudio estudio = ensaio.getEstudio();
+        ensaioService.alterarStatus(idEnsaio, StatusEvento.CANCELADO);
+        eventPublisher.publishEvent(new EnsaioRecusadoPeloEstudioEvent(ensaio, estudio, motivo));
+    }
+
+    @Override
+    @Transactional
+    public void cancelarEnsaioComoEstudio(Long idEnsaio, String motivo) {
+        Ensaio ensaio = ensaioService.buscarPorId(idEnsaio);
+        Estudio estudio = ensaio.getEstudio();
+        ensaioService.alterarStatus(idEnsaio, StatusEvento.CANCELADO);
+        eventPublisher.publishEvent(new EnsaioCanceladoPeloEstudioEvent(ensaio, estudio, motivo));
     }
 
     @Override

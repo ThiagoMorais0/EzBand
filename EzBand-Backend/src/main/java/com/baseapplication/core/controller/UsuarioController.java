@@ -234,4 +234,14 @@ public class UsuarioController {
 		}
 	}
 
+	@PostMapping("/tiposUsuario")
+	public ResponseEntity<?> atualizarTiposUsuario(@RequestBody List<String> tipos) {
+		try {
+			usuarioService.atualizarTiposUsuario(tipos);
+			return ResponseEntity.ok().build();
+		} catch (Exception e) {
+			return ResponseEntity.status(500).body(e.getMessage());
+		}
+	}
+
 }

@@ -199,6 +199,65 @@ public class EstudioController {
         }
     }
 
+    @GetMapping("/buscarEnsaiosPendentesPorEstudio")
+    public ResponseEntity<?> buscarEnsaiosPendentesPorEstudio(@RequestParam Long idEstudio) {
+        try {
+            return ResponseEntity.ok(service.buscarEnsaiosPendentesPorEstudio(idEstudio));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/buscarEnsaiosAguardandoAprovacaoPorEstudio")
+    public ResponseEntity<?> buscarEnsaiosAguardandoAprovacaoPorEstudio(@RequestParam Long idEstudio) {
+        try {
+            return ResponseEntity.ok(service.buscarEnsaiosAguardandoAprovacaoPorEstudio(idEstudio));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/buscarEnsaiosHistoricoPorEstudio")
+    public ResponseEntity<?> buscarEnsaiosHistoricoPorEstudio(@RequestParam Long idEstudio) {
+        try {
+            return ResponseEntity.ok(service.buscarEnsaiosHistoricoPorEstudio(idEstudio));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/aprovarEnsaio")
+    public ResponseEntity<?> aprovarEnsaio(@RequestParam Long idEnsaio) {
+        try {
+            service.aprovarEnsaio(idEnsaio);
+            return ResponseEntity.ok("Ensaio aprovado");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/recusarEnsaio")
+    public ResponseEntity<?> recusarEnsaio(@RequestParam Long idEnsaio,
+                                            @RequestParam(required = false) String motivo) {
+        try {
+            service.recusarEnsaio(idEnsaio, motivo);
+            return ResponseEntity.ok("Ensaio recusado");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/cancelarEnsaio")
+    public ResponseEntity<?> cancelarEnsaio(@RequestParam Long idEnsaio,
+                                             @RequestParam(required = false) String motivo) {
+        try {
+            service.cancelarEnsaioComoEstudio(idEnsaio, motivo);
+            return ResponseEntity.ok("Ensaio cancelado");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
     @PostMapping("/buscarSugestoes")
     public ResponseEntity<?> buscarSugestoes(@RequestBody BuscaEstudioDTO dto ){
         try{

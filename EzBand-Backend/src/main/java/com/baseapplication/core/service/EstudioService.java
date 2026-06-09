@@ -59,4 +59,16 @@ public interface EstudioService {
     void editarEquipamento(Long idEquipamento, String dadosJson, MultipartFile imagem);
 
     void removerEquipamento(Long idEquipamento);
+
+    List<EnsaioDTO> buscarEnsaiosPendentesPorEstudio(Long idEstudio);
+
+    List<EnsaioDTO> buscarEnsaiosAguardandoAprovacaoPorEstudio(Long idEstudio);
+
+    List<EnsaioDTO> buscarEnsaiosHistoricoPorEstudio(Long idEstudio);
+
+    void aprovarEnsaio(Long idEnsaio);
+
+    void recusarEnsaio(Long idEnsaio, String motivo);
+
+    void cancelarEnsaioComoEstudio(Long idEnsaio, String motivo);
 }

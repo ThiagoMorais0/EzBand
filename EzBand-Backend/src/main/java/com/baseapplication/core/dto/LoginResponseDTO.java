@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -15,6 +18,7 @@ public class LoginResponseDTO {
     private String urlFotoPerfil;
     private String celular;
     private Boolean celularValidado;
+    private List<String> tiposUsuario;
 
     public LoginResponseDTO(String token, Usuario usuario){
         this.token = token;
@@ -23,5 +27,6 @@ public class LoginResponseDTO {
         this.urlFotoPerfil = usuario.getUrlFotoPerfil();
         this.celular = usuario.getCelular();
         this.celularValidado = Boolean.TRUE.equals(usuario.getCelularValidado());
+        this.tiposUsuario = usuario.getTiposUsuario() != null ? usuario.getTiposUsuario() : new ArrayList<>();
     }
 }

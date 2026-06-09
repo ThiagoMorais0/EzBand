@@ -68,6 +68,11 @@ public class Usuario implements UserDetails {
     @Column(name = "end_complemento")
     private String endComplemento;
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "usuario_tipos", joinColumns = @JoinColumn(name = "usuario_id"))
+    @Column(name = "tipo")
+    private List<String> tiposUsuario = new ArrayList<>();
+
     @OneToMany(mappedBy = "id.idUsuario", fetch = FetchType.EAGER)
     private List<MusicoBanda> musicoBandaList = new ArrayList<>();
 

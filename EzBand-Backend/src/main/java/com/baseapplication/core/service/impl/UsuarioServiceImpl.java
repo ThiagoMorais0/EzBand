@@ -176,7 +176,9 @@ public class UsuarioServiceImpl implements UsuarioService {
 			imagemService.deletarImagemPorUrl(urlImagem);
 			urlImagem = "default";
 		}
+		List<String> tiposUsuarioAtual = usuario.getTiposUsuario();
 		BeanUtils.copyProperties(usuarioDTO, usuario);
+		usuario.setTiposUsuario(tiposUsuarioAtual);
 		usuario.setUrlFotoPerfil(urlImagem);
 		usuario.setAtivo(true);
 		usuarioDao.save(usuario);
@@ -368,5 +370,13 @@ public class UsuarioServiceImpl implements UsuarioService {
 			boolean isFavorito = nome.trim().equalsIgnoreCase(instrumentoFavorito != null ? instrumentoFavorito.trim() : "");
 			instrumentoUsuarioDao.save(new InstrumentoUsuario(idUsuario, nome.trim(), isFavorito));
 		}
+	}
+
+	@Override
+	@jakarta.transaction.Transactional
+	public void atualizarTiposUsuario(List<String> tipos) {
+		Usuario usuario = Context.getUsuarioLogado();
+		usuario.setTiposUsuario(tipos != null ? tipos : new java.util.ArrayList<>());
+		usuarioDao.save(usuario);
 	}
 }

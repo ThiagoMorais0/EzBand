@@ -72,4 +72,6 @@ public interface UsuarioService {
     InstrumentoDTO definirInstrumentoFavorito(Long idInstrumento);
 
     void salvarInstrumentosRegistro(Long idUsuario, List<String> instrumentos, String instrumentoFavorito);
+
+    void atualizarTiposUsuario(List<String> tipos);
 }

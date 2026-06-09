@@ -35,6 +35,7 @@ public class CadastroUsuarioDTO {
     private String complemento;
     private List<String> instrumentos;
     private String instrumentoFavorito;
+    private List<String> tiposUsuario;
 
     public Usuario toEntity(String url){
         Usuario usuario = new Usuario();

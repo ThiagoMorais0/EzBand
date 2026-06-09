@@ -106,5 +106,23 @@ public class NotificacaoListener {
         enviar(notificacao);
     }
 
+    @EventListener
+    public void handleEnsaioAprovadoPeloEstudio(EnsaioAprovadoPeloEstudioEvent event) {
+        EnsaioAprovadoPeloEstudio notificacao = new EnsaioAprovadoPeloEstudio(event.getEnsaio(), event.getEstudio());
+        enviar(notificacao);
+    }
+
+    @EventListener
+    public void handleEnsaioRecusadoPeloEstudio(EnsaioRecusadoPeloEstudioEvent event) {
+        EnsaioRecusadoPeloEstudio notificacao = new EnsaioRecusadoPeloEstudio(event.getEnsaio(), event.getEstudio(), event.getMotivo());
+        enviar(notificacao);
+    }
+
+    @EventListener
+    public void handleEnsaioCanceladoPeloEstudio(EnsaioCanceladoPeloEstudioEvent event) {
+        EnsaioCanceladoPeloEstudio notificacao = new EnsaioCanceladoPeloEstudio(event.getEnsaio(), event.getEstudio(), event.getMotivo());
+        enviar(notificacao);
+    }
+
 }
 

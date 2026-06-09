@@ -127,7 +127,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 			return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
 		}
 		cadastroUsuarioDTO.setSenha(criptografar(cadastroUsuarioDTO.getSenha()));
-		Usuario usuario = usuarioService.salvar(new Usuario(cadastroUsuarioDTO));
+		Usuario novoUsuario = new Usuario(cadastroUsuarioDTO);
+		if (cadastroUsuarioDTO.getTiposUsuario() != null && !cadastroUsuarioDTO.getTiposUsuario().isEmpty()) {
+			novoUsuario.setTiposUsuario(cadastroUsuarioDTO.getTiposUsuario());
+		}
+		Usuario usuario = usuarioService.salvar(novoUsuario);
 		if (imagem != null) {
 			usuario.setUrlFotoPerfil(imagemService.saveImageAndGetUrl(imagem, "profilepictures",
 					usuario.getId() + "_" + System.currentTimeMillis() + "." + FileUtils.getSufix(imagem)));

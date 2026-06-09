@@ -47,6 +47,7 @@ public class InfoPerfilUsuarioDTO {
     private String endCep;
     private String endComplemento;
     private List<InstrumentoDTO> instrumentosPerfil = new ArrayList<>();
+    private List<String> tiposUsuario = new ArrayList<>();
 
     public InfoPerfilUsuarioDTO(Usuario usuario){
         BeanUtils.copyProperties(usuario, this);
