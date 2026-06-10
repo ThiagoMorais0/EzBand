@@ -24,4 +24,5 @@ public class CadastroBandaDTO {
     private String youtubeUrl;
     private Boolean permiteEntradaPorConvite = true;
     private Boolean exigirAprovacaoCompromissos = false;
+    private String corHex;
 }

@@ -36,6 +36,7 @@ import com.baseapplication.core.model.MusicoBanda;
 import com.baseapplication.core.model.MusicoEvento;
 import com.baseapplication.core.model.MusicoEventoId;
 import com.baseapplication.core.model.RepertorioEvento;
+import com.baseapplication.core.model.CompromissoPessoal;
 import com.baseapplication.core.model.Show;
 import com.baseapplication.core.model.Usuario;
 import com.baseapplication.core.model.dto.EnsaioDTO;
@@ -50,6 +51,8 @@ import com.baseapplication.core.service.MembroFantasmaEventoService;
 import com.baseapplication.core.service.MusicoEventoService;
 import com.baseapplication.core.service.NotificacaoService;
 import com.baseapplication.core.service.RepertorioEventoService;
+import com.baseapplication.core.dao.CompromissoPessoalDao;
+import com.baseapplication.core.dao.EnsaioDao;
 import com.baseapplication.core.service.ShowService;
 import com.baseapplication.core.service.UsuarioService;
 import com.baseapplication.core.utils.Context;
@@ -75,6 +78,8 @@ public class EventoServiceImpl implements EventoService {
 	private final LocalEventoService localEventoService;
 	private final MembroFantasmaEventoService membroFantasmaEventoService;
 	private final com.baseapplication.core.service.NotificacaoEventoService notificacaoEventoService;
+	private final CompromissoPessoalDao compromissoPessoalDao;
+	private final EnsaioDao ensaioDao;
 
 	@Override
 	public Evento buscarPorId(Long idEvento, TipoEvento tipoEvento) {
@@ -230,10 +235,19 @@ public class EventoServiceImpl implements EventoService {
 		
 		// Adicionar músicos normais da banda
 		for (MusicoBanda musico : musicos) {
-//            if(isMusicoDiferenteDoUsuarioLogado(musico)){
-			List<Evento> eventos = verificarDisponibilidadeEObterPossiveisEventos(musico.getId().getIdUsuario(), data);
-			musicosParaEvento.add(montarDisponibilidadeMusicoDTO(musico, eventos));
-//            }
+			Long idMusico = musico.getId().getIdUsuario();
+			List<Evento> eventos = verificarDisponibilidadeEObterPossiveisEventos(idMusico, data);
+			DisponibilidadeMusicoParaEventoDTO dto = montarDisponibilidadeMusicoDTO(musico, eventos);
+			if (temCompromissoPessoal(idMusico, data)) {
+				dto.setDisponivel(false);
+				if (dto.getMensagem() == null) {
+					dto.setMensagem("O músico " + musico.getUsuario().getNome() + " tem um compromisso pessoal nessa data.");
+				}
+				List<String> eventosStr = dto.getEventos() != null ? new ArrayList<>(dto.getEventos()) : new ArrayList<>();
+				eventosStr.add("Compromisso pessoal");
+				dto.setEventos(eventosStr);
+			}
+			musicosParaEvento.add(dto);
 		}
 		
 		// Adicionar membros fantasma da banda
@@ -729,7 +743,13 @@ public class EventoServiceImpl implements EventoService {
 	}
 
 	private List<Evento> verificarDisponibilidadeEObterPossiveisEventos(Long idUsuario, LocalDate data) {
-		return showService.buscarPorUsuarioEData(idUsuario, data);
+		List<Evento> eventos = new ArrayList<>(showService.buscarPorUsuarioEData(idUsuario, data));
+		eventos.addAll(ensaioDao.buscarPorUsuarioEData(idUsuario, data));
+		return eventos;
+	}
+
+	private boolean temCompromissoPessoal(Long idUsuario, LocalDate data) {
+		return compromissoPessoalDao.existsByUsuarioIdAndData(idUsuario, data);
 	}
 
 	private boolean isMusicoDiferenteDoUsuarioLogado(MusicoBanda musico) {

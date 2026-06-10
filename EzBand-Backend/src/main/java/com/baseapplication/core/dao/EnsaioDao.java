@@ -32,6 +32,15 @@ public interface EnsaioDao extends JpaRepository<Ensaio, Long> {
             "order by e.\"data\", e.horario_inicio", nativeQuery = true)
     List<Ensaio> buscarEnsaiosPorStatusBandaEUsuarioOrdenadoPorData(Long idBanda, Long idUsuario, String status);
 
+    @Query("SELECT e FROM Ensaio e INNER JOIN MusicoEvento me ON me.id.idEvento = e.id AND e.tipoEvento = 'ENSAIO' " +
+            "WHERE me.usuario.id = :idUsuario AND e.data BETWEEN :inicio AND :fim " +
+            "AND e.status IN ('PENDENTE', 'AGUARDANDO_APROVACAO') ORDER BY e.data, e.horarioInicio")
+    List<Ensaio> buscarPorUsuarioEPeriodo(Long idUsuario, LocalDate inicio, LocalDate fim);
+
+    @Query("SELECT e FROM Ensaio e INNER JOIN MusicoEvento me ON me.id.idEvento = e.id AND e.tipoEvento = 'ENSAIO' " +
+            "WHERE me.usuario.id = :idUsuario AND e.data = :data AND e.status IN ('PENDENTE', 'AGUARDANDO_APROVACAO')")
+    List<Ensaio> buscarPorUsuarioEData(Long idUsuario, LocalDate data);
+
     @Query(value = "SELECT e FROM Ensaio e WHERE e.data <= :now and e.status <> :status ")
     List<Ensaio> buscarComDataAnteriorAHoje(LocalDate now, StatusEvento status);
 

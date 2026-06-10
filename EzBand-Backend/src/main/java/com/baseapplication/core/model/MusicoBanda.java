@@ -20,6 +20,7 @@ public class MusicoBanda implements Serializable {
     @EmbeddedId
     private MusicoBandaId id;
     private String instrumentos;
+    private String corHex;
 
     @ElementCollection(targetClass = PermissaoMusico.class)
     @CollectionTable(

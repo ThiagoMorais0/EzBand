@@ -46,6 +46,11 @@ public interface ShowDao extends JpaRepository<Show, Long> {
             "ORDER BY s.data DESC LIMIT 1")
     List<Evento> buscarPorUsuarioEData(Long idUsuario, LocalDate data);
 
+    @Query("SELECT s FROM Show s INNER JOIN MusicoEvento me ON me.id.idEvento = s.id AND s.tipoEvento = 'SHOW' " +
+            "WHERE me.usuario.id = :idUsuario AND s.data BETWEEN :inicio AND :fim " +
+            "AND s.status IN ('PENDENTE', 'AGUARDANDO_APROVACAO') ORDER BY s.data, s.horarioInicio")
+    List<Show> buscarPorUsuarioEPeriodo(Long idUsuario, LocalDate inicio, LocalDate fim);
+
     @Query(value = "SELECT e FROM Show e WHERE e.data <= :now and e.status <> :status ")
     List<Show> buscarComDataAnteriorAHoje(LocalDate now, StatusEvento status);
 

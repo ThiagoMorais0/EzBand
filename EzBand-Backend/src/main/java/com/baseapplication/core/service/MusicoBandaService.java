@@ -12,6 +12,10 @@ public interface MusicoBandaService {
 
     MusicoBanda cadastrarUsuarioEmBanda(Usuario usuario, Banda banda, String instrumentos, List<PermissaoMusico> permissaoMusico);
 
+    MusicoBanda cadastrarUsuarioEmBanda(Usuario usuario, Banda banda, String instrumentos, List<PermissaoMusico> permissaoMusico, String corHex);
+
+    void atualizarCorHex(Long idBanda, String corHex);
+
     void expulsar(Long idBanda, Long idUsuario);
 
     List<MusicoBanda> buscarMembrosPorIdBanda(Long idBanda);

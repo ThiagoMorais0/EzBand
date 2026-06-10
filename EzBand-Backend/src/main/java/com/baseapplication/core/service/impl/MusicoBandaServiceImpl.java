@@ -25,13 +25,28 @@ public class MusicoBandaServiceImpl implements MusicoBandaService {
     @Override
     public MusicoBanda cadastrarUsuarioEmBanda(Usuario usuario, Banda banda, String instrumentos,
                                                List<PermissaoMusico> permissoes) {
+        return cadastrarUsuarioEmBanda(usuario, banda, instrumentos, permissoes, null);
+    }
+
+    @Override
+    public MusicoBanda cadastrarUsuarioEmBanda(Usuario usuario, Banda banda, String instrumentos,
+                                               List<PermissaoMusico> permissoes, String corHex) {
         MusicoBanda musicoBanda = new MusicoBanda();
         musicoBanda.setId(new MusicoBandaId(usuario.getId(), banda.getId()));
         musicoBanda.setUsuario(usuario);
         musicoBanda.setBanda(banda);
         musicoBanda.setInstrumentos(instrumentos);
         musicoBanda.setPermissoes(permissoes);
+        musicoBanda.setCorHex(corHex);
         return musicoBandaDao.save(musicoBanda);
+    }
+
+    @Override
+    public void atualizarCorHex(Long idBanda, String corHex) {
+        Long idUsuario = com.baseapplication.core.utils.Context.getUsuarioLogado().getId();
+        MusicoBanda musicoBanda = musicoBandaDao.findById(new MusicoBandaId(idUsuario, idBanda)).orElseThrow();
+        musicoBanda.setCorHex(corHex);
+        musicoBandaDao.save(musicoBanda);
     }
 
     @Override

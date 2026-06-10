@@ -264,7 +264,7 @@ public class BandaServiceImpl implements BandaService {
 
 	private void cadastrarUsuarioEmBanda(CadastroBandaDTO bandaDTO, Banda novaBanda, List<PermissaoMusico> permissoes) {
 		musicoBandaService.cadastrarUsuarioEmBanda(Context.getUsuarioLogado(), novaBanda, bandaDTO.getInstrumento(),
-				permissoes);
+				permissoes, bandaDTO.getCorHex());
 	}
 
 	@Override
