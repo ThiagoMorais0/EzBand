@@ -1,19 +1,26 @@
 package com.baseapplication.core.event.listeners;
 
 import com.baseapplication.core.controller.NotificacaoController;
+import com.baseapplication.core.dao.ConfiguracaoNotificacaoUsuarioDao;
+import com.baseapplication.core.dao.UsuarioDao;
+import com.baseapplication.core.enums.TipoParticipante;
 import com.baseapplication.core.event.events.*;
 import com.baseapplication.core.event.events.resposta.RespostaSolicitacaoAgendarEnsaioEvent;
 import com.baseapplication.core.event.events.resposta.RespostaSolicitacaoAgendarShowEvent;
+import com.baseapplication.core.model.ConfiguracaoNotificacaoUsuario;
 import com.baseapplication.core.model.Ensaio;
+import com.baseapplication.core.model.Usuario;
 import com.baseapplication.core.model.notificacao.*;
 import com.baseapplication.core.model.superClasses.Notificacao;
 import com.baseapplication.core.service.NotificacaoService;
+import com.baseapplication.core.service.WhatsappService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Component
@@ -22,12 +29,35 @@ public class NotificacaoListener {
 
     private final NotificacaoController notificacaoController;
     private final NotificacaoService notificacaoService;
+    private final WhatsappService whatsappService;
+    private final ConfiguracaoNotificacaoUsuarioDao configuracaoNotificacaoDao;
+    private final UsuarioDao usuarioDao;
 
     private void enviar(Notificacao notificacao) {
         boolean salva = notificacaoService.salvarNotificacao(notificacao);
         if (salva) {
             notificacaoController.enviarNotificacao(notificacao);
+            dispararWhatsappSeNecessario(notificacao);
         }
+    }
+
+    private void dispararWhatsappSeNecessario(Notificacao notificacao) {
+        if (!TipoParticipante.USUARIO.equals(notificacao.getDestinatarioTipo())) return;
+
+        Long idUsuario = notificacao.getDestinatarioId();
+        Optional<ConfiguracaoNotificacaoUsuario> configOpt = configuracaoNotificacaoDao.findByIdUsuario(idUsuario);
+        if (configOpt.isEmpty() || !Boolean.TRUE.equals(configOpt.get().getReceberNotificacoesWhatsapp())) return;
+
+        Optional<Usuario> usuarioOpt = usuarioDao.findById(idUsuario);
+        if (usuarioOpt.isEmpty()) return;
+        Usuario usuario = usuarioOpt.get();
+
+        if (!Boolean.TRUE.equals(usuario.getCelularValidado()) || usuario.getCelular() == null) return;
+
+        String titulo = notificacao.getTitulo() != null ? notificacao.getTitulo() : "EzBand";
+        String mensagem = "*" + titulo + "*\n" + notificacao.getMensagem();
+        whatsappService.enviarMensagem(usuario.getCelular(), mensagem);
+        log.info("Notificação enviada via WhatsApp para usuário {}", idUsuario);
     }
 
     @EventListener
