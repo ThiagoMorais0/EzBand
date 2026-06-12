@@ -1,6 +1,7 @@
 package com.baseapplication.core.service.impl;
 
 import com.baseapplication.core.dto.*;
+import com.baseapplication.core.dto.EnsaioEstudioDTO;
 import com.baseapplication.core.dao.EquipamentoEstudioDao;
 import com.baseapplication.core.dao.EstudioDao;
 import com.baseapplication.core.dao.ServicoEstudioDao;
@@ -34,10 +35,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -357,6 +360,40 @@ public class EstudioServiceImpl implements EstudioService {
         Estudio estudio = ensaio.getEstudio();
         ensaioService.alterarStatus(idEnsaio, StatusEvento.CANCELADO);
         eventPublisher.publishEvent(new EnsaioCanceladoPeloEstudioEvent(ensaio, estudio, motivo));
+    }
+
+    @Override
+    @Transactional
+    public Map<String, List<EnsaioEstudioDTO>> buscarAgendaEstudioPorMes(int ano, int mes) {
+        List<Estudio> estudios = buscarEstudiosDoUsuario();
+        List<EnsaioEstudioDTO> eventos = estudios.stream()
+                .flatMap(e -> e.getEnsaios().stream())
+                .filter(ensaio -> ensaio.getData() != null
+                        && ensaio.getData().getYear() == ano
+                        && ensaio.getData().getMonthValue() == mes
+                        && (StatusEvento.PENDENTE.equals(ensaio.getStatus())
+                            || StatusEvento.AGUARDANDO_APROVACAO.equals(ensaio.getStatus())))
+                .sorted(Comparator.comparing(Ensaio::getData, Comparator.nullsLast(Comparator.naturalOrder())))
+                .map(EnsaioEstudioDTO::new)
+                .toList();
+        return Map.of("eventos", eventos);
+    }
+
+    @Override
+    @Transactional
+    public Map<String, List<EnsaioEstudioDTO>> buscarProximosEventosEstudios() {
+        List<Estudio> estudios = buscarEstudiosDoUsuario();
+        LocalDate hoje = LocalDate.now();
+        List<EnsaioEstudioDTO> ensaios = estudios.stream()
+                .flatMap(e -> e.getEnsaios().stream())
+                .filter(ensaio -> ensaio.getData() != null
+                        && !ensaio.getData().isBefore(hoje)
+                        && (StatusEvento.PENDENTE.equals(ensaio.getStatus())
+                            || StatusEvento.AGUARDANDO_APROVACAO.equals(ensaio.getStatus())))
+                .sorted(Comparator.comparing(Ensaio::getData, Comparator.nullsLast(Comparator.naturalOrder())))
+                .map(EnsaioEstudioDTO::new)
+                .toList();
+        return Map.of("ensaios", ensaios);
     }
 
     @Override

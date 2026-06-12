@@ -48,6 +48,8 @@ public class InfoPerfilUsuarioDTO {
     private String endComplemento;
     private List<InstrumentoDTO> instrumentosPerfil = new ArrayList<>();
     private List<String> tiposUsuario = new ArrayList<>();
+    private String instagramUrl;
+    private String youtubeUrl;
 
     public InfoPerfilUsuarioDTO(Usuario usuario){
         BeanUtils.copyProperties(usuario, this);

@@ -258,6 +258,24 @@ public class EstudioController {
         }
     }
 
+    @GetMapping("/buscarAgendaEstudioPorMes")
+    public ResponseEntity<?> buscarAgendaEstudioPorMes(@RequestParam int ano, @RequestParam int mes) {
+        try {
+            return ResponseEntity.ok(service.buscarAgendaEstudioPorMes(ano, mes));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/buscarProximosEventosEstudios")
+    public ResponseEntity<?> buscarProximosEventosEstudios() {
+        try {
+            return ResponseEntity.ok(service.buscarProximosEventosEstudios());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
     @PostMapping("/buscarSugestoes")
     public ResponseEntity<?> buscarSugestoes(@RequestBody BuscaEstudioDTO dto ){
         try{

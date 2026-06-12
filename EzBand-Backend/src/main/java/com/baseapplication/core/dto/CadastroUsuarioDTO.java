@@ -36,6 +36,8 @@ public class CadastroUsuarioDTO {
     private List<String> instrumentos;
     private String instrumentoFavorito;
     private List<String> tiposUsuario;
+    private String instagramUrl;
+    private String youtubeUrl;
 
     public Usuario toEntity(String url){
         Usuario usuario = new Usuario();

@@ -54,6 +54,11 @@ public class Usuario implements UserDetails {
     private Boolean celularValidado = false;
     private Boolean cadastroCompleto = true;
 
+    @Column(length = 500)
+    private String instagramUrl;
+    @Column(length = 500)
+    private String youtubeUrl;
+
     @Column(name = "end_pais")
     private String endPais;
     @Column(name = "end_estado")
@@ -113,6 +118,8 @@ public class Usuario implements UserDetails {
         this.endNumero = usuarioDTO.getNumero();
         this.endCep = usuarioDTO.getCep();
         this.endComplemento = usuarioDTO.getComplemento();
+        this.instagramUrl = usuarioDTO.getInstagramUrl();
+        this.youtubeUrl = usuarioDTO.getYoutubeUrl();
         this.ativo = true;
         this.bloqueado = false;
         this.dataCriacao = LocalDate.now();

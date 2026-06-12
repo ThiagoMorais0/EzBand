@@ -7,6 +7,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.sql.Time;
+import java.util.List;
 
 @Data
 @Entity
@@ -23,6 +24,9 @@ public class Show extends Evento {
     private Integer porcentagemPortaria;
     private BigDecimal consumacaoPorMusico;
     private String linkIngresso;
+
+    @OneToMany(mappedBy = "show", fetch = FetchType.LAZY)
+    private List<CustoOperacional> custosOperacionais;
 
     public Show(){
         this.setTipoEvento(TipoEvento.SHOW);

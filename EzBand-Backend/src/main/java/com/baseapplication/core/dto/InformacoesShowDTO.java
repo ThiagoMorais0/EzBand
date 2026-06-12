@@ -27,6 +27,7 @@ public class InformacoesShowDTO extends InformacoesEventoDTO {
     private Integer porcentagemPortaria;
     private BigDecimal cacheIndividual;
     private BigDecimal consumacaoPorMusico;
+    private List<CustoOperacionalDTO> custosOperacionais;
 
 
     public InformacoesShowDTO(Show show, MusicoEvento musicoEvento) {
@@ -47,6 +48,10 @@ public class InformacoesShowDTO extends InformacoesEventoDTO {
         Hibernate.initialize(show.getParticipantes());
         this.setParticipantes(show.getParticipantes().stream().map(MusicoEventoDTO::new).collect(Collectors.toList()));
         this.setConsumacaoPorMusico(show.getConsumacaoPorMusico());
+        Hibernate.initialize(show.getCustosOperacionais());
+        this.setCustosOperacionais(show.getCustosOperacionais() != null
+                ? show.getCustosOperacionais().stream().map(CustoOperacionalDTO::new).collect(Collectors.toList())
+                : new ArrayList<>());
     }
 
     public InformacoesShowDTO(Show show, MusicoEvento musicoEvento, List<MembroFantasmaEvento> membrosFantasma) {

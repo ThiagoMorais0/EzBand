@@ -10,8 +10,10 @@ import com.baseapplication.core.model.dto.EnsaioDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.baseapplication.core.dto.EnsaioEstudioDTO;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public interface EstudioService {
     Estudio cadastrar(Estudio toEntity);
@@ -71,4 +73,8 @@ public interface EstudioService {
     void recusarEnsaio(Long idEnsaio, String motivo);
 
     void cancelarEnsaioComoEstudio(Long idEnsaio, String motivo);
+
+    Map<String, List<EnsaioEstudioDTO>> buscarAgendaEstudioPorMes(int ano, int mes);
+
+    Map<String, List<EnsaioEstudioDTO>> buscarProximosEventosEstudios();
 }
