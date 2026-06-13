@@ -182,27 +182,37 @@ public class SugestaoRepertorioServiceImpl implements SugestaoRepertorioService 
     
     /**
      * FASE 3: Ordena as músicas selecionadas para seguir a curva de energia desenhada.
-     * Interpola a curva para o tamanho exato do set e usa rank-matching para atribuir
-     * a música com energia mais próxima a cada posição desejada.
+     * Interpola a curva para o tamanho exato do set e usa rank-matching com score
+     * combinado: posição (60%) tem precedência sobre energia (40%).
      */
     private List<RepertorioBanda> ordenarPorCurvaEnergia(List<RepertorioBanda> musicas, List<Integer> curva) {
         int n = musicas.size();
         List<Integer> curvaInterpolada = interpolarCurva(curva, n);
 
-        // Posições ordenadas pela energia desejada (crescente)
-        List<Integer> posicoesPorEnergiaDesejada = IntStream.range(0, n)
+        // Score desejado para cada slot: posição esperada (1-10) com 60% + energia da curva com 40%
+        List<Double> scoresDesejados = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            double posicaoDesejada = (n == 1) ? 5.5 : 1.0 + ((double) i / (n - 1)) * 9.0;
+            double energiaDesejada = curvaInterpolada.get(i);
+            scoresDesejados.add(0.6 * posicaoDesejada + 0.4 * energiaDesejada);
+        }
+
+        // Slots ordenados pelo score desejado crescente
+        List<Integer> slotsPorScoreDesejado = IntStream.range(0, n)
                 .boxed()
-                .sorted(Comparator.comparingInt(curvaInterpolada::get))
+                .sorted(Comparator.comparingDouble(scoresDesejados::get))
                 .collect(Collectors.toList());
 
-        // Músicas ordenadas pela energia real (crescente)
-        List<RepertorioBanda> musicasPorEnergia = new ArrayList<>(musicas);
-        musicasPorEnergia.sort(Comparator.comparingInt(this::obterEnergia));
+        // Músicas ordenadas pelo score combinado crescente (posição=60%, energia=40%)
+        List<RepertorioBanda> musicasPorScore = new ArrayList<>(musicas);
+        musicasPorScore.sort(Comparator.comparingDouble(m ->
+                0.6 * obterPosicaoShow(m) + 0.4 * obterEnergia(m)
+        ));
 
-        // Atribui: o slot com i-ésima menor energia desejada recebe a música com i-ésima menor energia real
+        // Atribui: slot com i-ésimo menor score desejado recebe música com i-ésimo menor score combinado
         RepertorioBanda[] resultado = new RepertorioBanda[n];
         for (int rank = 0; rank < n; rank++) {
-            resultado[posicoesPorEnergiaDesejada.get(rank)] = musicasPorEnergia.get(rank);
+            resultado[slotsPorScoreDesejado.get(rank)] = musicasPorScore.get(rank);
         }
 
         return new ArrayList<>(Arrays.asList(resultado));
