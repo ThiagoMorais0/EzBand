@@ -1,11 +1,13 @@
 package com.baseapplication.core.service.impl;
 
+import com.baseapplication.core.dao.ConfiguracaoNotificacaoUsuarioDao;
 import com.baseapplication.core.dao.MembroFantasmaDao;
 import com.baseapplication.core.dao.TokenValidacaoCelularDao;
 import com.baseapplication.core.dao.UsuarioDao;
 import com.baseapplication.core.dto.ConfirmacaoTokenDTO;
 import com.baseapplication.core.dto.ValidacaoCelularRequestDTO;
 import com.baseapplication.core.exception.ResourceNotFoundException;
+import com.baseapplication.core.model.ConfiguracaoNotificacaoUsuario;
 import com.baseapplication.core.model.MembroFantasma;
 import com.baseapplication.core.model.TokenValidacaoCelular;
 import com.baseapplication.core.model.Usuario;
@@ -33,6 +35,7 @@ public class ValidacaoCelularServiceImpl implements ValidacaoCelularService {
     private final UsuarioDao usuarioDao;
     private final WhatsappService whatsappService;
     private final PhoneNumberUtil phoneNumberUtil;
+    private final ConfiguracaoNotificacaoUsuarioDao configuracaoNotificacaoDao;
 
     @Value("${app.frontend.url:https://ezband.cloud}")
     private String frontendUrl;
@@ -144,6 +147,7 @@ public class ValidacaoCelularServiceImpl implements ValidacaoCelularService {
                     .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
             usuario.setCelularValidado(true);
             usuarioDao.save(usuario);
+            ativarNotificacoesWhatsappSeNaoConfigurado(usuario.getId());
             enviarMensagemBoasVindas(celularNormalizado, usuario.getNome());
         }
 
@@ -202,6 +206,21 @@ public class ValidacaoCelularServiceImpl implements ValidacaoCelularService {
         } catch (Exception e) {
             log.warn("Falha ao enviar mensagem de boas-vindas para {}: {}", celular, e.getMessage());
         }
+    }
+
+    // Habilita automaticamente notificações WhatsApp na primeira validação de celular.
+    // Se o usuário já tem configuração, preserva a escolha dele.
+    private void ativarNotificacoesWhatsappSeNaoConfigurado(Long idUsuario) {
+        configuracaoNotificacaoDao.findByIdUsuario(idUsuario).ifPresentOrElse(
+            config -> log.info("Usuário {} já tem configuração de notificação (receberWhatsapp={}), mantendo.", idUsuario, config.getReceberNotificacoesWhatsapp()),
+            () -> {
+                ConfiguracaoNotificacaoUsuario config = new ConfiguracaoNotificacaoUsuario();
+                config.setIdUsuario(idUsuario);
+                config.setReceberNotificacoesWhatsapp(true);
+                configuracaoNotificacaoDao.save(config);
+                log.info("Notificações WhatsApp habilitadas automaticamente para usuário {} após validação de celular.", idUsuario);
+            }
+        );
     }
 
     private String gerarToken() {

@@ -41,41 +41,59 @@ public class LembreteEventoScheduler {
     @Scheduled(cron = "0 0 8 * * *")
     public void executar() {
         LocalDate hoje = LocalDate.now();
-        log.info("LembreteEventoScheduler rodando para {}", hoje);
+        log.info("[Scheduler] LembreteEventoScheduler rodando para {}", hoje);
 
         List<ConfiguracaoNotificacaoUsuario> configs = configuracaoDao.findByReceberNotificacoesWhatsappTrue();
+        log.info("[Scheduler] {} usuário(s) com notificações WhatsApp habilitadas.", configs.size());
 
         for (ConfiguracaoNotificacaoUsuario config : configs) {
             try {
                 processarUsuario(config, hoje);
             } catch (Exception e) {
-                log.error("Erro ao processar lembretes para usuário {}: {}", config.getIdUsuario(), e.getMessage());
+                log.error("[Scheduler] Erro ao processar lembretes para usuário {}: {}", config.getIdUsuario(), e.getMessage(), e);
             }
         }
+        log.info("[Scheduler] LembreteEventoScheduler concluído para {}", hoje);
     }
 
     private void processarUsuario(ConfiguracaoNotificacaoUsuario config, LocalDate hoje) {
-        Optional<Usuario> usuarioOpt = usuarioDao.findById(config.getIdUsuario());
-        if (usuarioOpt.isEmpty()) return;
+        Long idUsuario = config.getIdUsuario();
+        Optional<Usuario> usuarioOpt = usuarioDao.findById(idUsuario);
+        if (usuarioOpt.isEmpty()) {
+            log.warn("[Scheduler] Usuário {} da configuração não encontrado no banco.", idUsuario);
+            return;
+        }
 
         Usuario usuario = usuarioOpt.get();
-        if (!Boolean.TRUE.equals(usuario.getCelularValidado()) || usuario.getCelular() == null) return;
+        if (!Boolean.TRUE.equals(usuario.getCelularValidado())) {
+            log.info("[Scheduler] Usuário {} pulado: celular não validado.", idUsuario);
+            return;
+        }
+        if (usuario.getCelular() == null) {
+            log.info("[Scheduler] Usuário {} pulado: celular não cadastrado.", idUsuario);
+            return;
+        }
 
+        log.info("[Scheduler] Processando lembretes para usuário {} ({})", idUsuario, usuario.getCelular());
         enviarLembretes(config, usuario, hoje);
         verificarResumoSemanal(config, usuario, hoje);
     }
 
     private void enviarLembretes(ConfiguracaoNotificacaoUsuario config, Usuario usuario, LocalDate hoje) {
-        if (config.getDiasAntecedenciaLembrete() == null || config.getDiasAntecedenciaLembrete().isEmpty()) return;
+        if (config.getDiasAntecedenciaLembrete() == null || config.getDiasAntecedenciaLembrete().isEmpty()) {
+            log.debug("[Scheduler] Usuário {} sem dias de antecedência configurados, pulando lembretes.", usuario.getId());
+            return;
+        }
 
         for (Integer dias : config.getDiasAntecedenciaLembrete()) {
             LocalDate dataAlvo = hoje.plusDays(dias);
             List<Evento> eventos = buscarEventosParaData(usuario.getId(), dataAlvo);
+            log.info("[Scheduler] Usuário {}: {} evento(s) encontrado(s) para daqui a {} dia(s) ({})", usuario.getId(), eventos.size(), dias, dataAlvo);
 
             for (Evento evento : eventos) {
                 String mensagem = montarMensagemLembrete(evento, dias);
                 whatsappService.enviarMensagem(usuario.getCelular(), mensagem);
-                log.info("Lembrete enviado para usuário {} - evento {} em {}", usuario.getId(), evento.getId(), dataAlvo);
+                log.info("[Scheduler] Lembrete enviado para usuário {} - evento {} em {}", usuario.getId(), evento.getId(), dataAlvo);
             }
         }
     }
@@ -104,11 +122,15 @@ public class LembreteEventoScheduler {
             return 0;
         });
 
-        if (todos.isEmpty()) return;
+        if (todos.isEmpty()) {
+            log.info("[Scheduler] Usuário {}: nenhum evento na semana {}-{}, resumo semanal não enviado.", usuario.getId(), inicioSemana, fimSemana);
+            return;
+        }
 
+        log.info("[Scheduler] Enviando resumo semanal para usuário {} com {} evento(s).", usuario.getId(), todos.size());
         String mensagem = montarMensagemResumoSemanal(todos, inicioSemana, fimSemana);
         whatsappService.enviarMensagem(usuario.getCelular(), mensagem);
-        log.info("Resumo semanal enviado para usuário {} com {} eventos", usuario.getId(), todos.size());
+        log.info("[Scheduler] Resumo semanal enviado para usuário {} com {} eventos", usuario.getId(), todos.size());
     }
 
     private List<Evento> buscarEventosParaData(Long idUsuario, LocalDate data) {

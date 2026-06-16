@@ -46,17 +46,40 @@ public class NotificacaoListener {
     }
 
     private void dispararWhatsappSeNecessario(Notificacao notificacao) {
-        if (!TipoParticipante.USUARIO.equals(notificacao.getDestinatarioTipo())) return;
+        String tipoNotif = notificacao.getTipoNotificacao();
+        Long idDestinatario = notificacao.getDestinatarioId();
+
+        if (!TipoParticipante.USUARIO.equals(notificacao.getDestinatarioTipo())) {
+            log.debug("[WhatsApp] Notificação {} ignorada: destinatário não é USUARIO (tipo={})", tipoNotif, notificacao.getDestinatarioTipo());
+            return;
+        }
 
         Long idUsuario = notificacao.getDestinatarioId();
         Optional<ConfiguracaoNotificacaoUsuario> configOpt = configuracaoNotificacaoDao.findByIdUsuario(idUsuario);
-        if (configOpt.isEmpty() || !Boolean.TRUE.equals(configOpt.get().getReceberNotificacoesWhatsapp())) return;
+        if (configOpt.isEmpty()) {
+            log.info("[WhatsApp] Notificação {} NÃO enviada: usuário {} não tem ConfiguracaoNotificacaoUsuario.", tipoNotif, idUsuario);
+            return;
+        }
+        if (!Boolean.TRUE.equals(configOpt.get().getReceberNotificacoesWhatsapp())) {
+            log.info("[WhatsApp] Notificação {} NÃO enviada: usuário {} tem receberNotificacoesWhatsapp=false.", tipoNotif, idUsuario);
+            return;
+        }
 
         Optional<Usuario> usuarioOpt = usuarioDao.findById(idUsuario);
-        if (usuarioOpt.isEmpty()) return;
+        if (usuarioOpt.isEmpty()) {
+            log.warn("[WhatsApp] Notificação {} NÃO enviada: usuário {} não encontrado.", tipoNotif, idUsuario);
+            return;
+        }
         Usuario usuario = usuarioOpt.get();
 
-        if (!Boolean.TRUE.equals(usuario.getCelularValidado()) || usuario.getCelular() == null) return;
+        if (!Boolean.TRUE.equals(usuario.getCelularValidado())) {
+            log.info("[WhatsApp] Notificação {} NÃO enviada: celular do usuário {} não está validado.", tipoNotif, idUsuario);
+            return;
+        }
+        if (usuario.getCelular() == null) {
+            log.info("[WhatsApp] Notificação {} NÃO enviada: usuário {} não tem celular cadastrado.", tipoNotif, idUsuario);
+            return;
+        }
 
         String titulo = notificacao.getTitulo() != null ? notificacao.getTitulo() : "EzBand";
         String mensagem = "*" + titulo + "*\n" + notificacao.getMensagem();
@@ -65,8 +88,9 @@ public class NotificacaoListener {
             mensagem += "\n\nClique no link para aceitar o convite:\n" + frontendUrl + "/aceitar-convite?token=" + convite.getLinkToken();
         }
 
+        log.info("[WhatsApp] Enviando notificação {} para usuário {} ({})", tipoNotif, idUsuario, usuario.getCelular());
         whatsappService.enviarMensagem(usuario.getCelular(), mensagem);
-        log.info("Notificação enviada via WhatsApp para usuário {}", idUsuario);
+        log.info("[WhatsApp] Notificação {} enviada com sucesso para usuário {}", tipoNotif, idUsuario);
     }
 
     @EventListener
