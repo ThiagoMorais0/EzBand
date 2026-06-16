@@ -1,6 +1,7 @@
 package com.baseapplication.core.dao;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.baseapplication.core.enums.TipoParticipante;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import com.baseapplication.core.enums.StatusNotificacao;
 import com.baseapplication.core.enums.TipoEvento;
 import com.baseapplication.core.model.notificacao.ConviteParaEvento;
+import com.baseapplication.core.model.notificacao.ConviteParaUsuarioIngressarBanda;
 import com.baseapplication.core.model.superClasses.Notificacao;
 
 @Repository
@@ -32,4 +34,7 @@ public interface NotificacaoDao extends JpaRepository<Notificacao, Long> {
             @Param("remetenteTipo") TipoParticipante remetenteTipo,
             @Param("tipoNotificacao") Class<? extends Notificacao> tipoNotificacao
     );
+
+    @Query("SELECT c FROM ConviteParaUsuarioIngressarBanda c WHERE c.linkToken = :token")
+    Optional<ConviteParaUsuarioIngressarBanda> findConviteByLinkToken(@Param("token") String token);
 }

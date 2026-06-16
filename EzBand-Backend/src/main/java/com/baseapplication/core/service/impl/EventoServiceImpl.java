@@ -726,7 +726,7 @@ public class EventoServiceImpl implements EventoService {
 		if (!eventos.isEmpty()) {
 			dto.setDisponivel(false);
 			dto.setMensagem("O músico " + musico.getUsuario().getNome() + " já tem eventos nessa data.");
-			dto.setEventos(eventos.stream().map(evento -> DateUtils.localDateToString(evento.getData())  + " " + evento.getHorarioInicio().toString().substring(0, 5) + ", " + evento.getLocal()).toList());
+			dto.setEventos(eventos.stream().map(evento -> DateUtils.localDateToString(evento.getData()) + " " + (evento.getHorarioInicio() != null ? evento.getHorarioInicio().toString().substring(0, 5) : "--:--") + ", " + evento.getLocal()).toList());
 		}
 		return dto;
 	}

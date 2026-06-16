@@ -26,6 +26,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.baseapplication.core.dao.BandaDao;
+import com.baseapplication.core.dao.NotificacaoDao;
+import com.baseapplication.core.model.notificacao.ConviteParaUsuarioIngressarBanda;
 import com.baseapplication.core.dto.CadastroBandaDTO;
 import com.baseapplication.core.dto.EdicaoBandaDTO;
 import com.baseapplication.core.dto.EnsaiosFuturosDTO;
@@ -62,6 +64,7 @@ public class BandaServiceImpl implements BandaService {
 	private final RepertorioBandaService repertorioBandaService;
 	private final NotificacaoService notificacaoService;
 	private final MembroFantasmaService membroFantasmaService;
+	private final NotificacaoDao notificacaoDao;
 
 	@Override
 	public List<Banda> buscarBandasPorUsuario(Long idUsuario) {
@@ -505,6 +508,33 @@ public class BandaServiceImpl implements BandaService {
 		repertorio.forEach(repertorioBandaDTO ->
 			repertorioBandaService.updateIndice(repertorioBandaDTO.getId(), repertorioBandaDTO.getIndice())
 		);
+	}
+
+	@Override
+	@Transactional
+	public Long aceitarConvitePorLink(String token) {
+		ConviteParaUsuarioIngressarBanda convite = notificacaoDao.findConviteByLinkToken(token)
+				.orElseThrow(() -> new ResourceNotFoundException("Convite não encontrado ou expirado."));
+
+		Usuario usuarioLogado = Context.getUsuarioLogado();
+		if (!convite.getDestinatarioId().equals(usuarioLogado.getId())) {
+			throw new RestrictionException("Este convite não é para você.");
+		}
+
+		Long idBanda = convite.getRemetenteId();
+		Banda banda = buscarPorId(idBanda);
+
+		musicoBandaService.cadastrarUsuarioEmBanda(
+				usuarioLogado,
+				banda,
+				convite.getInstrumento() != null ? convite.getInstrumento() : "",
+				List.of(PermissaoMusico.MEMBRO_REGULAR)
+		);
+
+		convite.setLida(true);
+		notificacaoDao.save(convite);
+
+		return idBanda;
 	}
 
 }

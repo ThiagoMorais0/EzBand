@@ -244,6 +244,16 @@ public class BandaController {
 
     }
 
+    @GetMapping("/aceitar-convite-link")
+    public ResponseEntity<?> aceitarConvitePorLink(@RequestParam String token) {
+        try {
+            Long idBanda = bandaService.aceitarConvitePorLink(token);
+            return ResponseEntity.ok(idBanda);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
     @PostMapping("/alterarPermissaoMembro")
     public ResponseEntity<?> alterarPermissaoMembro(@RequestBody EditarMembroMusicoBandaDTO permissaoMusicoDTO){
         try{

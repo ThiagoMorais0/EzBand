@@ -16,6 +16,7 @@ import com.baseapplication.core.service.NotificacaoService;
 import com.baseapplication.core.service.WhatsappService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
@@ -32,6 +33,9 @@ public class NotificacaoListener {
     private final WhatsappService whatsappService;
     private final ConfiguracaoNotificacaoUsuarioDao configuracaoNotificacaoDao;
     private final UsuarioDao usuarioDao;
+
+    @Value("${app.frontend.url:http://localhost:5173}")
+    private String frontendUrl;
 
     private void enviar(Notificacao notificacao) {
         boolean salva = notificacaoService.salvarNotificacao(notificacao);
@@ -56,6 +60,11 @@ public class NotificacaoListener {
 
         String titulo = notificacao.getTitulo() != null ? notificacao.getTitulo() : "EzBand";
         String mensagem = "*" + titulo + "*\n" + notificacao.getMensagem();
+
+        if (notificacao instanceof ConviteParaUsuarioIngressarBanda convite && convite.getLinkToken() != null) {
+            mensagem += "\n\nClique no link para aceitar o convite:\n" + frontendUrl + "/aceitar-convite?token=" + convite.getLinkToken();
+        }
+
         whatsappService.enviarMensagem(usuario.getCelular(), mensagem);
         log.info("Notificação enviada via WhatsApp para usuário {}", idUsuario);
     }

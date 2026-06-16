@@ -73,4 +73,6 @@ public interface BandaService {
     void removerMusicaDoRepertorio(Long id, Long idBanda);
 
     void atualizarOrdemRepertorio(Long idBanda, List<RepertorioBandaDTO> repertorio);
+
+    Long aceitarConvitePorLink(String token);
 }
