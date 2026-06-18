@@ -310,6 +310,13 @@ public class UsuarioServiceImpl implements UsuarioService {
 	}
 
 	@Override
+	public List<com.baseapplication.core.dto.SeguidorDTO> buscarSeguindo(Long idUsuario) {
+		return relacionamentoSeguidorService.buscarSeguindo(idUsuario).stream()
+				.map(u -> new com.baseapplication.core.dto.SeguidorDTO(u.getId(), u.getNome(), u.getUrlFotoPerfil()))
+				.toList();
+	}
+
+	@Override
 	public List<InfoPerfilUsuarioDTO> buscarSugestoes(String termo) {
 		List<Usuario> resultados = usuarioDao.buscarSugestoes(termo);
 

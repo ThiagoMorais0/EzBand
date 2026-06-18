@@ -193,6 +193,15 @@ public class UsuarioController {
 		}
 	}
 
+	@GetMapping("/buscarSeguindo")
+	public ResponseEntity<?> buscarSeguindo(@RequestParam Long idUsuario){
+		try{
+			return ResponseEntity.ok(usuarioService.buscarSeguindo(idUsuario));
+		}catch (Exception e){
+			return ResponseEntity.status(500).body(e.getMessage());
+		}
+	}
+
 	@GetMapping("/instrumentos")
 	public ResponseEntity<?> buscarInstrumentos(@RequestParam(required = false) Long idUsuario) {
 		try {

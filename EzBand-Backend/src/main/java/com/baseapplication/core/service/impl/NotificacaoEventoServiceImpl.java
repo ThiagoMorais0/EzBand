@@ -5,6 +5,7 @@ import com.baseapplication.core.enums.TipoEvento;
 import com.baseapplication.core.model.*;
 import com.baseapplication.core.model.superClasses.Evento;
 import com.baseapplication.core.service.NotificacaoEventoService;
+import com.baseapplication.core.service.WebPushService;
 import com.baseapplication.core.service.WhatsappService;
 import com.baseapplication.core.utils.PhoneNumberUtil;
 import jakarta.persistence.EntityManager;
@@ -25,26 +26,57 @@ public class NotificacaoEventoServiceImpl implements NotificacaoEventoService {
 
     private final PreferenciaNotificacaoMembroDao preferenciaDao;
     private final WhatsappService whatsappService;
+    private final WebPushService webPushService;
     private final PhoneNumberUtil phoneNumberUtil;
     private final EntityManager entityManager;
 
     @Override
     @Async
     public void notificarNovoEvento(Long idEvento, TipoEvento tipoEvento) {
+        notificarNovoEvento(idEvento, tipoEvento, null);
+    }
+
+    @Override
+    @Async
+    public void notificarNovoEvento(Long idEvento, TipoEvento tipoEvento, Long idUsuarioCriador) {
         log.info("Notificando novo evento: {} - {}", idEvento, tipoEvento);
-        
+
         Evento evento = buscarEvento(idEvento, tipoEvento);
         if (evento == null) {
             log.warn("Evento não encontrado: {} - {}", idEvento, tipoEvento);
             return;
         }
-        
+
         Banda banda = evento.getBanda();
         List<PreferenciaNotificacaoMembro> preferencias = preferenciaDao.buscarPorBanda(banda.getId());
-        
+
+        String nomeCriador = null;
+        if (idUsuarioCriador != null) {
+            Usuario criador = entityManager.find(Usuario.class, idUsuarioCriador);
+            if (criador != null) nomeCriador = criador.getNome();
+        }
+
+        String tipoNome = tipoEvento == TipoEvento.SHOW ? "show" : "ensaio";
+        String local = evento.getLocal() != null ? evento.getLocal() : "local a definir";
+        String titulo = "EzBand";
+        String mensagem = nomeCriador != null
+                ? nomeCriador + " está marcando um " + tipoNome + " em " + local
+                : "Novo " + tipoNome + " marcado em " + local;
+
+        String url = tipoEvento == TipoEvento.SHOW
+                ? "/banda/" + banda.getId() + "/show/" + idEvento
+                : "/banda/" + banda.getId() + "/ensaio/" + idEvento;
+
         for (PreferenciaNotificacaoMembro preferencia : preferencias) {
-            if (Boolean.TRUE.equals(preferencia.getNotificarNovoEvento())) {
-                enviarNotificacaoNovoEvento(preferencia, evento, tipoEvento);
+            if (!Boolean.TRUE.equals(preferencia.getNotificarNovoEvento())) continue;
+
+            // WhatsApp
+            enviarNotificacaoNovoEvento(preferencia, evento, tipoEvento);
+
+            // Push — apenas membros reais (não fantasmas) exceto o criador
+            if (preferencia.getIdUsuario() != null &&
+                !preferencia.getIdUsuario().equals(idUsuarioCriador)) {
+                webPushService.enviarDireto(preferencia.getIdUsuario(), titulo, mensagem, url);
             }
         }
     }

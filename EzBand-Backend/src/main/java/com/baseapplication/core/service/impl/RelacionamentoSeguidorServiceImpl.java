@@ -79,6 +79,11 @@ public class RelacionamentoSeguidorServiceImpl implements RelacionamentoSeguidor
     }
 
     @Override
+    public List<Usuario> buscarSeguindo(Long idUsuario) {
+        return relacionamentoSeguidorDao.buscarSeguindo(idUsuario, StatusSeguidor.ACEITO);
+    }
+
+    @Override
     public Long contarSeguidores(Long idUsuario) {
         return relacionamentoSeguidorDao.contarSeguidores(idUsuario, StatusSeguidor.ACEITO);
     }

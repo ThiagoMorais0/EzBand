@@ -39,6 +39,8 @@ public class BandaDTO {
     private Integer quantidadeEnsaios;
     private Integer quantidadeNotificacoes;
     private Integer quantidadeMembros;
+    private Long quantidadeSeguidores;
+    private Boolean estouSeguindo;
     private List<InfoPerfilUsuarioDTO> membros;
     private List<PublicacaoDTO> publicacoes;
 

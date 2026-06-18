@@ -57,11 +57,21 @@ public class WebPushService {
             .build();
 
     public void enviarDireto(Long usuarioId, String titulo, String mensagem) {
+        enviarDireto(usuarioId, titulo, mensagem, null);
+    }
+
+    public void enviarDireto(Long usuarioId, String titulo, String mensagem, String url) {
         List<PushSubscription> subscriptions = pushSubscriptionDao.findByUsuarioId(usuarioId);
         if (subscriptions.isEmpty()) return;
         for (PushSubscription sub : subscriptions) {
             try {
-                String json = objectMapper.writeValueAsString(Map.of("titulo", titulo, "mensagem", mensagem));
+                Map<String, Object> payload = new java.util.LinkedHashMap<>();
+                payload.put("titulo", titulo);
+                payload.put("mensagem", mensagem);
+                if (url != null && !url.isBlank()) {
+                    payload.put("url", url);
+                }
+                String json = objectMapper.writeValueAsString(payload);
                 sendPush(sub, json.getBytes(java.nio.charset.StandardCharsets.UTF_8));
             } catch (Exception e) {
                 log.warn("[WebPush] Falha ao enviar push direto para usuário {}: {}", usuarioId, e.getMessage());

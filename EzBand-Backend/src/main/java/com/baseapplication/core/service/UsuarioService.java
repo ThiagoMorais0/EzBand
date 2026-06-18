@@ -63,6 +63,8 @@ public interface UsuarioService {
 
     List<SeguidorDTO> buscarSeguidores(Long idUsuario);
 
+    List<SeguidorDTO> buscarSeguindo(Long idUsuario);
+
     List<InstrumentoDTO> buscarInstrumentosDoUsuario(Long idUsuario);
 
     InstrumentoDTO adicionarInstrumento(String nome);

@@ -1,8 +1,12 @@
 package com.baseapplication.core.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 
+import com.baseapplication.core.dao.SeguirBandaDao;
 import com.baseapplication.core.dto.*;
+import com.baseapplication.core.model.SeguirBanda;
+import com.baseapplication.core.model.SeguirBandaId;
 import com.baseapplication.core.service.MembroFantasmaService;
 import com.baseapplication.core.service.SugestaoRepertorioService;
 import lombok.extern.log4j.Log4j2;
@@ -34,9 +38,16 @@ public class BandaController {
     @Autowired
     private MusicoBandaService musicoBandaService;
 
+    @Autowired
+    private SeguirBandaDao seguirBandaDao;
+
     @GetMapping("/getInfo")
     public BandaDTO getInfo(@RequestParam Long idBanda) {
-        return bandaService.getInfo(idBanda);
+        BandaDTO dto = bandaService.getInfo(idBanda);
+        Long idUsuario = Context.getUsuarioLogado().getId();
+        dto.setQuantidadeSeguidores(seguirBandaDao.countByIdIdBanda(idBanda));
+        dto.setEstouSeguindo(seguirBandaDao.existsByIdIdUsuarioAndIdIdBanda(idUsuario, idBanda));
+        return dto;
     }
 
     @GetMapping("/buscarBandaParaIngressar")
@@ -337,6 +348,45 @@ public class BandaController {
             return ResponseEntity.ok("Ordem atualizada com sucesso");
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PostMapping("/seguir")
+    public ResponseEntity<?> seguirBanda(@RequestParam Long idBanda) {
+        try {
+            Long idUsuario = Context.getUsuarioLogado().getId();
+            SeguirBandaId id = new SeguirBandaId(idUsuario, idBanda);
+            if (!seguirBandaDao.existsByIdIdUsuarioAndIdIdBanda(idUsuario, idBanda)) {
+                SeguirBanda sb = new SeguirBanda();
+                sb.setId(id);
+                sb.setDataSeguindo(LocalDate.now());
+                seguirBandaDao.save(sb);
+            }
+            return ResponseEntity.ok("Seguindo banda");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/deixarDeSeguir")
+    public ResponseEntity<?> deixarDeSeguirBanda(@RequestParam Long idBanda) {
+        try {
+            Long idUsuario = Context.getUsuarioLogado().getId();
+            SeguirBandaId id = new SeguirBandaId(idUsuario, idBanda);
+            seguirBandaDao.deleteById(id);
+            return ResponseEntity.ok("Deixou de seguir a banda");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/buscarSeguidores")
+    public ResponseEntity<?> buscarSeguidoresDaBanda(@RequestParam Long idBanda) {
+        try {
+            return ResponseEntity.ok(seguirBandaDao.buscarSeguidoresDaBanda(idBanda)
+                    .stream().map(InfoPerfilUsuarioDTO::new).toList());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 

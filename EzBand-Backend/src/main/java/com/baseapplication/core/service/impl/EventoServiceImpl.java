@@ -301,8 +301,8 @@ public class EventoServiceImpl implements EventoService {
 			show.setStatus(StatusEvento.AGUARDANDO_APROVACAO);
 			showService.salvar(show);
 		}
-		
-		notificacaoEventoService.notificarNovoEvento(show.getId(), TipoEvento.SHOW);
+
+		notificacaoEventoService.notificarNovoEvento(show.getId(), TipoEvento.SHOW, novoShowDTO.getIdUsuario());
 	}
 
 	private void setarLocalEvento(NovoShowDTO novoShowDTO, Show show) {
@@ -366,8 +366,8 @@ public class EventoServiceImpl implements EventoService {
 			ensaio.setStatus(StatusEvento.AGUARDANDO_APROVACAO);
 			ensaioService.salvar(ensaio);
 		}
-		
-		notificacaoEventoService.notificarNovoEvento(ensaio.getId(), TipoEvento.ENSAIO);
+
+		notificacaoEventoService.notificarNovoEvento(ensaio.getId(), TipoEvento.ENSAIO, novoEnsaioDTO.getIdUsuario());
 	}
 
     private void validarDataEnsaio(String dataEnsaio) {
