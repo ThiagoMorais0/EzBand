@@ -16,6 +16,14 @@ import java.util.List;
 
 @Repository
 public interface ShowDao extends JpaRepository<Show, Long> {
+
+    @Query("SELECT DISTINCT s FROM Show s " +
+            "LEFT JOIN FETCH s.participantes p " +
+            "LEFT JOIN FETCH p.usuario " +
+            "LEFT JOIN FETCH s.localEvento " +
+            "WHERE s.data = :data AND s.status = :status")
+    List<Show> buscarPorDataEStatus(@Param("data") LocalDate data, @Param("status") StatusEvento status);
+
     @Query("SELECT DISTINCT s FROM Show s INNER JOIN MusicoEvento me ON me.id.idEvento = s.id WHERE me.usuario.id = :idUsuario AND me.id.tipoEvento = com.baseapplication.core.enums.TipoEvento.SHOW")
     List<Show> buscarPorIdUsuario(Long idUsuario);
 

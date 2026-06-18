@@ -47,6 +47,7 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.GET, "/v3/api-docs").permitAll()
                         .requestMatchers(HttpMethod.GET, "/v3/api-docs/*").permitAll()
                         .requestMatchers("/notificacoes/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/push/vapid-public-key").permitAll()
                         // PAINEL ADMIN EVOLUTION API
                         .requestMatchers("/admin/evolution/**").permitAll()
                         .anyRequest().authenticated()

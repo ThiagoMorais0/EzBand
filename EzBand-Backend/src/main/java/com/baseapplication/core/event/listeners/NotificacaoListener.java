@@ -13,6 +13,7 @@ import com.baseapplication.core.model.Usuario;
 import com.baseapplication.core.model.notificacao.*;
 import com.baseapplication.core.model.superClasses.Notificacao;
 import com.baseapplication.core.service.NotificacaoService;
+import com.baseapplication.core.service.WebPushService;
 import com.baseapplication.core.service.WhatsappService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +32,7 @@ public class NotificacaoListener {
     private final NotificacaoController notificacaoController;
     private final NotificacaoService notificacaoService;
     private final WhatsappService whatsappService;
+    private final WebPushService webPushService;
     private final ConfiguracaoNotificacaoUsuarioDao configuracaoNotificacaoDao;
     private final UsuarioDao usuarioDao;
 
@@ -42,6 +44,7 @@ public class NotificacaoListener {
         if (salva) {
             notificacaoController.enviarNotificacao(notificacao);
             dispararWhatsappSeNecessario(notificacao);
+            webPushService.enviar(notificacao);
         }
     }
 
