@@ -14,5 +14,6 @@ public record NotificacaoDTO(
         String titulo,
         String tipoNotificacao,
         Boolean permiteResposta,
-        Long remetenteId) {
+        Long remetenteId,
+        String url) {
 }

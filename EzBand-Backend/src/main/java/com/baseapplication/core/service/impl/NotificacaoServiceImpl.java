@@ -129,7 +129,7 @@ public class NotificacaoServiceImpl implements NotificacaoService {
                         i.isLida(),
                         i.getUrlImagem(),
                         i.getTitulo(), i.getTipoNotificacao(), i.isPermiteResposta(),
-                        i.getRemetenteId()))
+                        i.getRemetenteId(), i.getUrl()))
                 .toList();
 
         List<Long> bandaAdminIds = List.of();
@@ -187,7 +187,8 @@ public class NotificacaoServiceImpl implements NotificacaoService {
                     notificacao.getTitulo(),
                     notificacao.getTipoNotificacao(),
                     notificacao.isPermiteResposta(),
-                    notificacao.getRemetenteId()
+                    notificacao.getRemetenteId(),
+                    notificacao.getUrl()
             ));
         } else {
             log.debug("Nenhum sink ativo para {}, notificação será entregue quando o cliente conectar", chave);

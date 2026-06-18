@@ -11,6 +11,7 @@ import com.baseapplication.core.model.ConfiguracaoNotificacaoUsuario;
 import com.baseapplication.core.model.Ensaio;
 import com.baseapplication.core.model.Usuario;
 import com.baseapplication.core.model.notificacao.*;
+import com.baseapplication.core.event.events.NovoEventoMarcadoEvent;
 import com.baseapplication.core.model.superClasses.Notificacao;
 import com.baseapplication.core.service.NotificacaoService;
 import com.baseapplication.core.service.WebPushService;
@@ -188,6 +189,24 @@ public class NotificacaoListener {
     public void handleEnsaioCanceladoPeloEstudio(EnsaioCanceladoPeloEstudioEvent event) {
         EnsaioCanceladoPeloEstudio notificacao = new EnsaioCanceladoPeloEstudio(event.getEnsaio(), event.getEstudio(), event.getMotivo());
         enviar(notificacao);
+    }
+
+    @EventListener
+    public void handleNovoEventoMarcado(NovoEventoMarcadoEvent event) {
+        for (Long destinatarioId : event.getDestinatarioIds()) {
+            NovoEventoMarcado notificacao = new NovoEventoMarcado(
+                    event.getIdEvento(),
+                    event.getTipoEvento(),
+                    event.getIdBanda(),
+                    event.getNomeBanda(),
+                    event.getUrlLogoBanda(),
+                    event.getLocal(),
+                    event.getIdCriador(),
+                    event.getNomeCriador(),
+                    destinatarioId
+            );
+            enviar(notificacao);
+        }
     }
 
 }

@@ -29,6 +29,8 @@ public abstract class Notificacao {
     @Column(length = 1000)
     private String urlImagem;
     private String titulo;
+    @Column(length = 500)
+    private String url;
 
     public abstract String getTipoNotificacao();
 }

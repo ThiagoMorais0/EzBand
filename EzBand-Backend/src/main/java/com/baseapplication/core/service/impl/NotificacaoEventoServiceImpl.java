@@ -2,15 +2,16 @@ package com.baseapplication.core.service.impl;
 
 import com.baseapplication.core.dao.PreferenciaNotificacaoMembroDao;
 import com.baseapplication.core.enums.TipoEvento;
+import com.baseapplication.core.event.events.NovoEventoMarcadoEvent;
 import com.baseapplication.core.model.*;
 import com.baseapplication.core.model.superClasses.Evento;
 import com.baseapplication.core.service.NotificacaoEventoService;
-import com.baseapplication.core.service.WebPushService;
 import com.baseapplication.core.service.WhatsappService;
 import com.baseapplication.core.utils.PhoneNumberUtil;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -26,9 +28,9 @@ public class NotificacaoEventoServiceImpl implements NotificacaoEventoService {
 
     private final PreferenciaNotificacaoMembroDao preferenciaDao;
     private final WhatsappService whatsappService;
-    private final WebPushService webPushService;
     private final PhoneNumberUtil phoneNumberUtil;
     private final EntityManager entityManager;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
     @Async
@@ -50,35 +52,44 @@ public class NotificacaoEventoServiceImpl implements NotificacaoEventoService {
         Banda banda = evento.getBanda();
         List<PreferenciaNotificacaoMembro> preferencias = preferenciaDao.buscarPorBanda(banda.getId());
 
-        String nomeCriador = null;
-        if (idUsuarioCriador != null) {
-            Usuario criador = entityManager.find(Usuario.class, idUsuarioCriador);
-            if (criador != null) nomeCriador = criador.getNome();
-        }
-
-        String tipoNome = tipoEvento == TipoEvento.SHOW ? "show" : "ensaio";
-        String local = evento.getLocal() != null ? evento.getLocal() : "local a definir";
-        String titulo = "EzBand";
-        String mensagem = nomeCriador != null
-                ? nomeCriador + " está marcando um " + tipoNome + " em " + local
-                : "Novo " + tipoNome + " marcado em " + local;
-
-        String url = tipoEvento == TipoEvento.SHOW
-                ? "/banda/" + banda.getId() + "/show/" + idEvento
-                : "/banda/" + banda.getId() + "/ensaio/" + idEvento;
-
+        // WhatsApp — mantém comportamento existente
         for (PreferenciaNotificacaoMembro preferencia : preferencias) {
-            if (!Boolean.TRUE.equals(preferencia.getNotificarNovoEvento())) continue;
-
-            // WhatsApp
-            enviarNotificacaoNovoEvento(preferencia, evento, tipoEvento);
-
-            // Push — apenas membros reais (não fantasmas) exceto o criador
-            if (preferencia.getIdUsuario() != null &&
-                !preferencia.getIdUsuario().equals(idUsuarioCriador)) {
-                webPushService.enviarDireto(preferencia.getIdUsuario(), titulo, mensagem, url);
+            if (Boolean.TRUE.equals(preferencia.getNotificarNovoEvento())) {
+                enviarNotificacaoNovoEvento(preferencia, evento, tipoEvento);
             }
         }
+
+        // In-app + push — via evento, só para membros reais com preferência ativa, excluindo o criador
+        if (idUsuarioCriador == null) return;
+
+        Usuario criador = entityManager.find(Usuario.class, idUsuarioCriador);
+        if (criador == null) {
+            log.warn("Criador não encontrado: {}", idUsuarioCriador);
+            return;
+        }
+
+        List<Long> destinatarios = preferencias.stream()
+                .filter(p -> Boolean.TRUE.equals(p.getNotificarNovoEvento())
+                        && p.getIdUsuario() != null
+                        && !p.getIdUsuario().equals(idUsuarioCriador))
+                .map(PreferenciaNotificacaoMembro::getIdUsuario)
+                .collect(Collectors.toList());
+
+        if (destinatarios.isEmpty()) return;
+
+        String local = evento.getLocal() != null ? evento.getLocal() : "local a definir";
+
+        applicationEventPublisher.publishEvent(new NovoEventoMarcadoEvent(
+                idEvento,
+                tipoEvento,
+                banda.getId(),
+                banda.getNome(),
+                banda.getUrlLogo(),
+                local,
+                criador.getId(),
+                criador.getNome(),
+                destinatarios
+        ));
     }
 
     @Override

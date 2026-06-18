@@ -88,10 +88,13 @@ public class WebPushService {
 
         for (PushSubscription sub : subscriptions) {
             try {
-                String json = objectMapper.writeValueAsString(Map.of(
-                        "titulo", notificacao.getTitulo() != null ? notificacao.getTitulo() : "EzBand",
-                        "mensagem", notificacao.getMensagem() != null ? notificacao.getMensagem() : ""
-                ));
+                Map<String, Object> payload = new java.util.LinkedHashMap<>();
+                payload.put("titulo", notificacao.getTitulo() != null ? notificacao.getTitulo() : "EzBand");
+                payload.put("mensagem", notificacao.getMensagem() != null ? notificacao.getMensagem() : "");
+                if (notificacao.getUrl() != null && !notificacao.getUrl().isBlank()) {
+                    payload.put("url", notificacao.getUrl());
+                }
+                String json = objectMapper.writeValueAsString(payload);
                 sendPush(sub, json.getBytes(java.nio.charset.StandardCharsets.UTF_8));
             } catch (Exception e) {
                 log.warn("[WebPush] Falha ao enviar push para usuário {}: {}", usuarioId, e.getMessage());
