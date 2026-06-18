@@ -12,7 +12,6 @@ import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -33,13 +32,11 @@ public class NotificacaoEventoServiceImpl implements NotificacaoEventoService {
     private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
-    @Async
     public void notificarNovoEvento(Long idEvento, TipoEvento tipoEvento) {
         notificarNovoEvento(idEvento, tipoEvento, null);
     }
 
     @Override
-    @Async
     public void notificarNovoEvento(Long idEvento, TipoEvento tipoEvento, Long idUsuarioCriador) {
         log.info("Notificando novo evento: {} - {}", idEvento, tipoEvento);
 
@@ -50,14 +47,14 @@ public class NotificacaoEventoServiceImpl implements NotificacaoEventoService {
         }
 
         Banda banda = evento.getBanda();
-        List<PreferenciaNotificacaoMembro> preferencias = preferenciaDao.buscarPorBanda(banda.getId());
+//        List<PreferenciaNotificacaoMembro> preferencias = preferenciaDao.buscarPorBanda(banda.getId());
 
         // WhatsApp — mantém comportamento existente
-        for (PreferenciaNotificacaoMembro preferencia : preferencias) {
-            if (Boolean.TRUE.equals(preferencia.getNotificarNovoEvento())) {
-                enviarNotificacaoNovoEvento(preferencia, evento, tipoEvento);
-            }
-        }
+//        for (PreferenciaNotificacaoMembro preferencia : preferencias) {
+//            if (Boolean.TRUE.equals(preferencia.getNotificarNovoEvento())) {
+//                enviarNotificacaoNovoEvento(preferencia, evento, tipoEvento);
+//            }
+//        }
 
         // In-app + push — via evento, só para membros reais com preferência ativa, excluindo o criador
         if (idUsuarioCriador == null) return;
@@ -68,11 +65,16 @@ public class NotificacaoEventoServiceImpl implements NotificacaoEventoService {
             return;
         }
 
-        List<Long> destinatarios = preferencias.stream()
-                .filter(p -> Boolean.TRUE.equals(p.getNotificarNovoEvento())
-                        && p.getIdUsuario() != null
-                        && !p.getIdUsuario().equals(idUsuarioCriador))
-                .map(PreferenciaNotificacaoMembro::getIdUsuario)
+//        List<Long> destinatarios = preferencias.stream()
+//                .filter(p -> Boolean.TRUE.equals(p.getNotificarNovoEvento())
+//                        && p.getIdUsuario() != null
+//                        && !p.getIdUsuario().equals(idUsuarioCriador))
+//                .map(PreferenciaNotificacaoMembro::getIdUsuario)
+//                .collect(Collectors.toList());
+
+        List<Long> destinatarios = banda.getMusicos().stream()
+                .filter(m -> !m.getUsuario().getId().equals(idUsuarioCriador))
+                .map(p -> p.getUsuario().getId())
                 .collect(Collectors.toList());
 
         if (destinatarios.isEmpty()) return;

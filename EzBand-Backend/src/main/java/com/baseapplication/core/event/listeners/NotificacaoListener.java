@@ -85,6 +85,10 @@ public class NotificacaoListener {
             return;
         }
 
+        if(notificacao instanceof NovoEventoMarcado){
+            return;
+        }
+
         String titulo = notificacao.getTitulo() != null ? notificacao.getTitulo() : "EzBand";
         String mensagem = "*" + titulo + "*\n" + notificacao.getMensagem();
 
