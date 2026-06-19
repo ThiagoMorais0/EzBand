@@ -26,4 +26,6 @@ public interface AuthenticationService {
 
 	ResponseEntity<?> completarCadastroGoogle(CompletarCadastroGoogleDTO dto);
 
+	ResponseEntity<?> logout();
+
 }

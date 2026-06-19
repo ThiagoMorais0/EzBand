@@ -1,6 +1,7 @@
 package com.baseapplication.core.controller;
 
 import com.baseapplication.core.dto.NotificacaoDTO;
+import com.baseapplication.core.dto.UserPrincipal;
 import com.baseapplication.core.enums.PermissaoMusico;
 import com.baseapplication.core.enums.TipoParticipante;
 import com.baseapplication.core.model.MusicoBanda;
@@ -13,7 +14,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Sinks;
 
@@ -32,7 +35,14 @@ public class NotificacaoController {
 
     @GetMapping(value = "/{destinatarioId}/{destinatarioTipo}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<NotificacaoDTO> streamNotificacoes(@PathVariable Long destinatarioId,
-                                                   @PathVariable TipoParticipante destinatarioTipo) {
+                                                   @PathVariable TipoParticipante destinatarioTipo,
+                                                   Authentication authentication) {
+        UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
+
+        if (destinatarioTipo == TipoParticipante.USUARIO && !principal.getId().equals(destinatarioId)) {
+            return Flux.error(new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "Acesso negado às notificações deste usuário"));
+        }
 
         return notificacaoService.streamNotificacoes(destinatarioId, destinatarioTipo);
     }

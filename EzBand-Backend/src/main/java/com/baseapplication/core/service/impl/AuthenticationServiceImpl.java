@@ -32,12 +32,16 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 
 @Log4j2
 @Service
@@ -61,23 +65,45 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	@Value("${google.client.id}")
 	private String googleClientId;
 
+	@Value("${app.cookie.secure:true}")
+	private boolean cookieSecure;
+
+	private ResponseCookie buildJwtCookie(String token) {
+		return ResponseCookie.from("jwt", token)
+				.httpOnly(true)
+				.secure(cookieSecure)
+				.sameSite("Strict")
+				.path("/")
+				.maxAge(Duration.ofDays(30))
+				.build();
+	}
+
+	private ResponseCookie clearJwtCookie() {
+		return ResponseCookie.from("jwt", "")
+				.httpOnly(true)
+				.secure(cookieSecure)
+				.sameSite("Strict")
+				.path("/")
+				.maxAge(0)
+				.build();
+	}
+
 	@Override
 	public ResponseEntity<LoginResponseDTO> login(LoginDTO data) {
 		try {
 			var usernamePassword = new UsernamePasswordAuthenticationToken(data.getEmail(), data.getPassword());
 			Authentication auth = this.authenticationManager.authenticate(usernamePassword);
-
 			var token = tokenService.gerarToken((UserDetails) auth.getPrincipal());
-
 			if (auth.isAuthenticated()) {
 				Usuario usuario = usuarioService.findByEmail(data.getEmail());
 				salvarDataUltimoLogin(usuario);
-				return ResponseEntity.ok(new LoginResponseDTO(token, usuario));
+				return ResponseEntity.ok()
+						.header(HttpHeaders.SET_COOKIE, buildJwtCookie(token).toString())
+						.body(new LoginResponseDTO(usuario));
 			} else {
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 			}
 		} catch (InternalAuthenticationServiceException | BadCredentialsException | LockedException | DisabledException e) {
-			// Trate diferentes exceções de autenticação aqui, se necessário
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 		}
 	}
@@ -214,7 +240,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 			}
 
 			String token = tokenService.gerarToken(usuario);
-			return ResponseEntity.ok(new LoginResponseDTO(token, usuario));
+			return ResponseEntity.ok()
+					.header(HttpHeaders.SET_COOKIE, buildJwtCookie(token).toString())
+					.body(new LoginResponseDTO(usuario));
 
 		} catch (Exception e) {
 			log.error("Erro no login com Google: {}", e.getMessage());
@@ -264,6 +292,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 			log.error("Erro ao completar cadastro Google: {}", e.getMessage());
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao completar cadastro");
 		}
+	}
+
+	@Override
+	public ResponseEntity<?> logout() {
+		return ResponseEntity.ok()
+				.header(HttpHeaders.SET_COOKIE, clearJwtCookie().toString())
+				.build();
 	}
 
 	@Override

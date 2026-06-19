@@ -1,6 +1,7 @@
 package com.baseapplication.core.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -13,6 +14,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -21,9 +27,25 @@ public class SecurityConfiguration {
     @Autowired
     SecurityFilter securityFilter;
 
+    @Value("${app.frontend.url}")
+    private String frontendUrl;
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(List.of(frontendUrl));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setAllowCredentials(true);
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
+    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
@@ -35,10 +57,9 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.POST, "/auth/google").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/validarToken").permitAll()
                         .requestMatchers(HttpMethod.GET, "/auth/validate").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/logout").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/teste").permitAll()
                         .requestMatchers(HttpMethod.GET, "/usuario/verificarEmailJaCadastrado").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/usuario/editarUsuarioComImagem").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/banda/criarMembroFantasma").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/validacao-celular/validar-token").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/validacao-celular/status").permitAll()
                         // SWAGGER
@@ -46,7 +67,6 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.GET, "/swagger-ui/*").permitAll()
                         .requestMatchers(HttpMethod.GET, "/v3/api-docs").permitAll()
                         .requestMatchers(HttpMethod.GET, "/v3/api-docs/*").permitAll()
-                        .requestMatchers("/notificacoes/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/push/vapid-public-key").permitAll()
                         // PAINEL ADMIN EVOLUTION API
                         .requestMatchers("/admin/evolution/**").permitAll()

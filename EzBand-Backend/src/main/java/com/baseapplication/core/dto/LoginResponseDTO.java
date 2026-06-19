@@ -1,7 +1,6 @@
 package com.baseapplication.core.dto;
 
 import com.baseapplication.core.model.Usuario;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,9 +9,7 @@ import java.util.List;
 
 @Getter
 @Setter
-@AllArgsConstructor
 public class LoginResponseDTO {
-    private String token;
     private String nome;
     private Long idUsuario;
     private String urlFotoPerfil;
@@ -21,8 +18,7 @@ public class LoginResponseDTO {
     private List<String> tiposUsuario;
     private Boolean cadastroCompleto;
 
-    public LoginResponseDTO(String token, Usuario usuario){
-        this.token = token;
+    public LoginResponseDTO(Usuario usuario) {
         this.nome = usuario.getNome();
         this.idUsuario = usuario.getId();
         this.urlFotoPerfil = usuario.getUrlFotoPerfil();

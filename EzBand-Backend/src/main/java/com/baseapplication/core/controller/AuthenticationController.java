@@ -3,6 +3,9 @@ package com.baseapplication.core.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -73,21 +76,18 @@ public class AuthenticationController {
 	}
 
 	@GetMapping("/validate")
-	public ResponseEntity<?> validateToken(@RequestHeader("Authorization") String authHeader) {
-		try {
-			if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-				return ResponseEntity.status(401)
-					.body(java.util.Map.of("error", "Token não fornecido"));
-			}
-
-			String token = authHeader.substring(7);
-			
-			return authenticationService.validateTokenWithDetails(token);
-			
-		} catch (Exception e) {
-			return ResponseEntity.status(401)
-				.body(java.util.Map.of("error", "Token inválido ou expirado"));
+	public ResponseEntity<?> validateToken() {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (auth == null || !auth.isAuthenticated()
+				|| auth instanceof org.springframework.security.authentication.AnonymousAuthenticationToken) {
+			return ResponseEntity.status(401).body(java.util.Map.of("error", "Não autenticado"));
 		}
+		return ResponseEntity.ok(java.util.Map.of("valid", true));
+	}
+
+	@PostMapping("/logout")
+	public ResponseEntity<?> logout() {
+		return authenticationService.logout();
 	}
 
 }

@@ -82,7 +82,7 @@ public class Usuario implements UserDetails {
     @OneToMany(mappedBy = "id.idUsuario", fetch = FetchType.EAGER)
     private List<MusicoBanda> musicoBandaList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<PublicacaoUsuario> publicacoes = new ArrayList<>();
 
     public Usuario(CadastroDTO data) {
