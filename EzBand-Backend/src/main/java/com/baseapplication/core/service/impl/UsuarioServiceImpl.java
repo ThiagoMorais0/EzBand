@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.baseapplication.core.dao.InstrumentoUsuarioDao;
@@ -202,6 +203,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public InfoPerfilUsuarioDTO buscarInformacoesDoPerfilPorId(Long idUsuario) {
 		InfoPerfilUsuarioDTO dto = new InfoPerfilUsuarioDTO(buscarPorId(idUsuario));
 		dto.setTipoRelacionamento(relacionamentoSeguidorService.buscarTipoRelacionamento(Context.getUsuarioLogado().getId(), idUsuario));
