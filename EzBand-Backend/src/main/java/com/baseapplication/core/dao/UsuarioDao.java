@@ -11,9 +11,13 @@ import org.springframework.stereotype.Repository;
 import com.baseapplication.core.model.Usuario;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface UsuarioDao extends JpaRepository<Usuario, Long> {
+
+    @Query("SELECT u FROM Usuario u LEFT JOIN FETCH u.publicacoes WHERE u.id = :id")
+    Optional<Usuario> findByIdWithPublicacoes(Long id);
 
 //    UserDetails findByLogin(String login);
 

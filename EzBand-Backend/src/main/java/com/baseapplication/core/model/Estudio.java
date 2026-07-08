@@ -12,7 +12,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(exclude = {"socios", "servicos", "equipamentos", "ensaios", "avaliacoes", "diasFuncionamento"})
+@EqualsAndHashCode(exclude = {"socios", "servicos", "equipamentos", "ensaios", "avaliacoes", "diasFuncionamento", "fotos"})
 @Entity
 @Table(name = "ESTUDIO")
 public class Estudio {
@@ -51,6 +51,9 @@ public class Estudio {
     @OneToMany(mappedBy = "estudio", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<EquipamentoEstudio> equipamentos = new ArrayList<>();
 
+    @OneToMany(mappedBy = "estudio", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FotoEstudio> fotos = new ArrayList<>();
+
     @OneToMany(mappedBy = "estudio", fetch = FetchType.LAZY)
     private List<Ensaio> ensaios = new ArrayList<>();
 
@@ -61,11 +64,8 @@ public class Estudio {
     public Double getMediaAvaliacoes() {
         if (avaliacoes.isEmpty()) return 0.0;
         return avaliacoes.stream()
-                .mapToInt(AvaliacaoEstudio::getExperienciaGeral) // ou combinar todos os critérios
+                .mapToInt(AvaliacaoEstudio::getExperienciaGeral)
                 .average()
                 .orElse(0.0);
     }
-
-
-
 }

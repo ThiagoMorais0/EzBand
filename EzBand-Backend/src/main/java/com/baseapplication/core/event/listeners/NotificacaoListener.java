@@ -9,6 +9,7 @@ import com.baseapplication.core.event.events.resposta.RespostaSolicitacaoAgendar
 import com.baseapplication.core.event.events.resposta.RespostaSolicitacaoAgendarShowEvent;
 import com.baseapplication.core.model.ConfiguracaoNotificacaoUsuario;
 import com.baseapplication.core.model.Ensaio;
+import com.baseapplication.core.model.Show;
 import com.baseapplication.core.model.Usuario;
 import com.baseapplication.core.model.notificacao.*;
 import com.baseapplication.core.event.events.NovoEventoMarcadoEvent;
@@ -159,16 +160,29 @@ public class NotificacaoListener {
 
     @EventListener
     public void handleSolicitacaoAgendarShow(SolicitacaoAgendarShowEvent event) {
-        SolicitacaoAgendarShow notificacao = new SolicitacaoAgendarShow(event.getShow());
-        notificacao.setIdShow(event.getShow().getId());
-        notificacao.setUrlImagem(event.getShow().getBanda().getUrlLogo());
-        notificacao.setTitulo("Novo agendamento!");
-        enviar(notificacao);
+        Show show = event.getShow();
+        for (Long destinatarioId : event.getDestinatarioIds()) {
+            SolicitacaoAgendarShow notificacao = new SolicitacaoAgendarShow(show, destinatarioId);
+            notificacao.setUrlImagem(show.getBanda().getUrlLogo());
+            enviar(notificacao);
+        }
     }
 
     @EventListener
     public void handleRespostaSolicitacaoAgendarShow(RespostaSolicitacaoAgendarShowEvent event) {
         notificacaoService.salvarNotificacao(event.getResposta());
+    }
+
+    @EventListener
+    public void handleShowAprovadoPeloLocalEvento(ShowAprovadoPeloLocalEventoEvent event) {
+        ShowAprovadoPeloLocalEvento notificacao = new ShowAprovadoPeloLocalEvento(event.getShow());
+        enviar(notificacao);
+    }
+
+    @EventListener
+    public void handleShowRecusadoPeloLocalEvento(ShowRecusadoPeloLocalEventoEvent event) {
+        ShowRecusadoPeloLocalEvento notificacao = new ShowRecusadoPeloLocalEvento(event.getShow(), event.getMotivo());
+        enviar(notificacao);
     }
 
     @EventListener

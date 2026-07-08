@@ -4,11 +4,8 @@ import com.baseapplication.core.model.Show;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.util.List;
-
 @Getter
 @AllArgsConstructor
-public class SolicitacaoAgendarShowEvent implements NotificacaoEvent {
+public class ShowAprovadoPeloLocalEventoEvent implements NotificacaoEvent {
     private final Show show;
-    private final List<Long> destinatarioIds;
 }

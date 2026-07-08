@@ -1,6 +1,5 @@
 package com.baseapplication.core.dto;
 
-import com.baseapplication.core.model.EquipamentoLocalEvento;
 import com.baseapplication.core.model.LocalEvento;
 import com.baseapplication.core.model.embedded.Endereco;
 import lombok.Getter;
@@ -15,38 +14,38 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class LocalEventoDTO {
-    private EnderecoDTO endereco = new EnderecoDTO();
     private Long id;
     private String nome;
-    private String descricao;
-    private String horarioInicioFuncionamento;
-    private String horarioFinalFuncionamento;
+    private String bio;
+    private String urlFotoPerfil;
+    private String horarioCostumeiroPowerSound;
+    private String horarioCostumeiroInicioShow;
+    private EnderecoDTO endereco = new EnderecoDTO();
     private List<EquipamentoLocalEventoDTO> equipamentos = new ArrayList<>();
+    private List<SocioLocalEventoDTO> socios = new ArrayList<>();
     private InfoUsuarioDTO proprietario;
 
-    public LocalEventoDTO(LocalEvento entity){
-        BeanUtils.copyProperties(entity, this);
-        this.setEndereco(new EnderecoDTO(entity.getEndereco()));
-        this.setProprietario(InfoUsuarioDTO.toDTO(entity.getProprietario()));
-        this.setEquipamentos(entity.getEquipamentos().stream().map(EquipamentoLocalEventoDTO::new).toList());
+    public LocalEventoDTO(LocalEvento entity) {
+        this.id = entity.getId();
+        this.nome = entity.getNome();
+        this.bio = entity.getBio();
+        this.urlFotoPerfil = entity.getUrlFotoPerfil();
+        this.horarioCostumeiroPowerSound = entity.getHorarioCostumeiroPowerSound();
+        this.horarioCostumeiroInicioShow = entity.getHorarioCostumeiroInicioShow();
+        this.endereco = new EnderecoDTO(entity.getEndereco());
+        this.proprietario = InfoUsuarioDTO.toDTO(entity.getProprietario());
+        if (entity.getEquipamentos() != null)
+            this.equipamentos = entity.getEquipamentos().stream().map(EquipamentoLocalEventoDTO::new).toList();
+        if (entity.getSocios() != null)
+            this.socios = entity.getSocios().stream().map(SocioLocalEventoDTO::new).toList();
     }
 
     public void toEntity(LocalEvento entity) {
-        BeanUtils.copyProperties(this, entity);
-        if (entity.getEndereco() == null) {
-            entity.setEndereco(new Endereco());
-        }
-        BeanUtils.copyProperties(this.endereco, entity.getEndereco());
-
-
-        List<EquipamentoLocalEvento> equipamentosEntity = equipamentos.stream()
-                .map(dto -> {
-                    EquipamentoLocalEvento e = dto.toEntity();
-                    e.setLocalEvento(entity);
-                    return e;
-                }).toList();
-
-        entity.setEquipamentos(equipamentosEntity);
+        entity.setNome(this.nome);
+        entity.setBio(this.bio);
+        entity.setHorarioCostumeiroPowerSound(this.horarioCostumeiroPowerSound);
+        entity.setHorarioCostumeiroInicioShow(this.horarioCostumeiroInicioShow);
+        if (entity.getEndereco() == null) entity.setEndereco(new Endereco());
+        if (this.endereco != null) BeanUtils.copyProperties(this.endereco, entity.getEndereco());
     }
-
 }

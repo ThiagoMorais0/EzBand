@@ -10,17 +10,19 @@ import org.springframework.beans.BeanUtils;
 @Setter
 @NoArgsConstructor
 public class EquipamentoLocalEventoDTO {
+    private Long id;
     private String marca;
     private String modelo;
     private String observacao;
     private Boolean ativo;
     private Integer quantidade;
+    private String urlFoto;
 
-    public EquipamentoLocalEventoDTO(EquipamentoLocalEvento entity){
+    public EquipamentoLocalEventoDTO(EquipamentoLocalEvento entity) {
         BeanUtils.copyProperties(entity, this);
     }
 
-    public EquipamentoLocalEvento toEntity(){
+    public EquipamentoLocalEvento toEntity() {
         EquipamentoLocalEvento entity = new EquipamentoLocalEvento();
         BeanUtils.copyProperties(this, entity);
         return entity;

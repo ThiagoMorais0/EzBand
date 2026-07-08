@@ -29,8 +29,9 @@ public class EstudioDTO {
     private List<InfoUsuarioDTO> socios = new ArrayList<>();
     private List<String> diasFuncionamento = new ArrayList<>();
     private boolean exigirConfirmacaoEnsaios = false;
+    private List<FotoEstudioDTO> fotos = new ArrayList<>();
 
-    public EstudioDTO(Estudio entity){
+    public EstudioDTO(Estudio entity) {
         BeanUtils.copyProperties(entity, this);
         this.setEndereco(new EnderecoDTO(entity.getEndereco()));
         this.setProprietario(InfoUsuarioDTO.toDTO(entity.getProprietario()));
@@ -40,6 +41,7 @@ public class EstudioDTO {
         this.setSocios(entity.getSocios().stream().map(InfoUsuarioDTO::toDTO).toList());
         this.setDiasFuncionamento(new ArrayList<>(entity.getDiasFuncionamento()));
         this.setExigirConfirmacaoEnsaios(entity.isExigirConfirmacaoEnsaios());
+        this.setFotos(entity.getFotos().stream().map(FotoEstudioDTO::new).toList());
         if (entity.getHorarioInicioFuncionamento() != null)
             this.horarioInicioFuncionamento = entity.getHorarioInicioFuncionamento().toString();
         if (entity.getHorarioFinalFuncionamento() != null)
@@ -52,7 +54,6 @@ public class EstudioDTO {
             entity.setEndereco(new Endereco());
         }
         BeanUtils.copyProperties(this.endereco, entity.getEndereco());
-
 
         List<ServicoEstudio> servicosEntity = servicos.stream()
                 .map(dto -> {
@@ -71,5 +72,4 @@ public class EstudioDTO {
         entity.setServicos(servicosEntity);
         entity.setEquipamentos(equipamentosEntity);
     }
-
 }

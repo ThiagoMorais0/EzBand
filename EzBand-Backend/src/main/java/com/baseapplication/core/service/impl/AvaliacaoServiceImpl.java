@@ -33,7 +33,7 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
         try{
             switch (tipo){
                 case ESTUDIO -> estudioService.buscarPorId(id).getMediaAvaliacoes();
-                case LOCAL_EVENTO -> localEventoService.buscarPorId(id).getMediaAvaliacoes();
+                case LOCAL_EVENTO -> localEventoService.buscarEntidadePorId(id).getMediaAvaliacoes();
                 default -> {return 0.0;}
             }
             return 0.0;

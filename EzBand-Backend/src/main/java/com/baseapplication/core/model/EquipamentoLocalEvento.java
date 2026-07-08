@@ -19,4 +19,5 @@ public class EquipamentoLocalEvento {
     private String observacao;
     private Boolean ativo;
     private Integer quantidade;
+    private String urlFoto;
 }

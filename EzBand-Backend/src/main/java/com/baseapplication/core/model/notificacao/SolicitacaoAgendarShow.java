@@ -20,18 +20,18 @@ public class SolicitacaoAgendarShow extends Notificacao {
 
     private Long idShow;
 
-    public SolicitacaoAgendarShow(Show show){
+    public SolicitacaoAgendarShow(Show show, Long destinatarioId) {
         super.setLida(false);
+        super.setTitulo("Novo agendamento!");
         super.setMensagem("Banda \"" + show.getBanda().getNome() +
                 "\" está solicitando um agendamento em " +
                 show.getData().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) +
                 " às " + show.getHorarioInicio());
-
-        super.setDestinatarioId(show.getLocalEvento().getId());
-        super.setDestinatarioTipo(TipoParticipante.LOCAL_EVENTO);
-
+        super.setDestinatarioId(destinatarioId);
+        super.setDestinatarioTipo(TipoParticipante.USUARIO);
         super.setRemetenteId(show.getBanda().getId());
         super.setRemetenteTipo(TipoParticipante.BANDA);
+        this.idShow = show.getId();
     }
 
     @Override

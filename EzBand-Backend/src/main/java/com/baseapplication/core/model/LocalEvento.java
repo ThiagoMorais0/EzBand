@@ -27,29 +27,32 @@ public class LocalEvento {
     @ManyToOne
     @JoinColumn(name = "ID_USUARIO")
     private Usuario proprietario = new Usuario();
+
     private String nome;
     private String bio;
     private String urlFotoPerfil;
-    private LocalDateTime horarioInicioFuncionamento;
-    private LocalDateTime horarioFinalFuncionamento;
+    private String horarioCostumeiroPowerSound;
+    private String horarioCostumeiroInicioShow;
     private LocalDateTime DataInclusao;
 
     @OneToMany(mappedBy = "localEvento", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<EquipamentoLocalEvento> equipamentos;
+    private List<EquipamentoLocalEvento> equipamentos = new ArrayList<>();
 
     @OneToMany(mappedBy = "localEvento", fetch = FetchType.LAZY)
-    private List<Show> shows;
+    private List<Show> shows = new ArrayList<>();
 
     @OneToMany(mappedBy = "localEvento", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AvaliacaoLocalEvento> avaliacoes = new ArrayList<>();
 
+    @OneToMany(mappedBy = "localEvento", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SocioLocalEvento> socios = new ArrayList<>();
+
     @Transient
     public Double getMediaAvaliacoes() {
-        if (avaliacoes.isEmpty()) return 0.0;
+        if (avaliacoes == null || avaliacoes.isEmpty()) return 0.0;
         return avaliacoes.stream()
-                .mapToInt(AvaliacaoLocalEvento::getExperienciaGeral) // ou combinar todos os critérios
+                .mapToInt(AvaliacaoLocalEvento::getExperienciaGeral)
                 .average()
                 .orElse(0.0);
     }
-
 }

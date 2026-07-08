@@ -92,7 +92,7 @@ public class EstudioController {
     public ResponseEntity<?> deletar(@RequestParam Long idEstudio) {
         try {
             service.deletar(idEstudio);
-            return ResponseEntity.ok("Estúdio deletado");
+            return ResponseEntity.ok("EstÃºdio deletado");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
@@ -276,6 +276,26 @@ public class EstudioController {
         }
     }
 
+
+    @PostMapping("/adicionarFoto")
+    public ResponseEntity<?> adicionarFoto(@RequestParam Long idEstudio,
+                                           @RequestParam("imagem") MultipartFile imagem) {
+        try {
+            return ResponseEntity.ok(service.adicionarFoto(idEstudio, imagem));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/removerFoto")
+    public ResponseEntity<?> removerFoto(@RequestParam Long idFoto) {
+        try {
+            service.removerFoto(idFoto);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
     @PostMapping("/buscarSugestoes")
     public ResponseEntity<?> buscarSugestoes(@RequestBody BuscaEstudioDTO dto ){
         try{
@@ -286,3 +306,4 @@ public class EstudioController {
         }
     }
 }
+

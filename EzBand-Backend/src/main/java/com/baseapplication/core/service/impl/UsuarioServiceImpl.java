@@ -205,7 +205,9 @@ public class UsuarioServiceImpl implements UsuarioService {
 	@Override
 	@Transactional(readOnly = true)
 	public InfoPerfilUsuarioDTO buscarInformacoesDoPerfilPorId(Long idUsuario) {
-		InfoPerfilUsuarioDTO dto = new InfoPerfilUsuarioDTO(buscarPorId(idUsuario));
+		Usuario usuario = usuarioDao.findByIdWithPublicacoes(idUsuario)
+				.orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado para o id " + idUsuario));
+		InfoPerfilUsuarioDTO dto = new InfoPerfilUsuarioDTO(usuario);
 		dto.setTipoRelacionamento(relacionamentoSeguidorService.buscarTipoRelacionamento(Context.getUsuarioLogado().getId(), idUsuario));
 		dto.setQuantidadeSeguidores(relacionamentoSeguidorService.contarSeguidores(idUsuario));
 		dto.setQuantidadeSeguindo(relacionamentoSeguidorService.contarSeguindo(idUsuario));

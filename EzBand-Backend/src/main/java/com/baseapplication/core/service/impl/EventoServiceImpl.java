@@ -288,8 +288,16 @@ public class EventoServiceImpl implements EventoService {
 		show = showService.salvar(show);
 
 		if (show.getLocalEvento() != null) {
-			System.out.println("Publicando notificação de show");
-			notificacaoService.enviarNotificacao(new SolicitacaoAgendarShowEvent(show));
+			com.baseapplication.core.model.LocalEvento le = show.getLocalEvento();
+			java.util.List<Long> destinatarios = new java.util.ArrayList<>();
+			destinatarios.add(le.getProprietario().getId());
+			le.getSocios().stream()
+					.filter(s -> Boolean.TRUE.equals(s.getAprovaShows()))
+					.map(s -> s.getUsuario().getId())
+					.forEach(destinatarios::add);
+			if (!destinatarios.isEmpty()) {
+				notificacaoService.enviarNotificacao(new SolicitacaoAgendarShowEvent(show, destinatarios));
+			}
 		}
 		incluirMusicosNoEvento(novoShowDTO.getMusicos(), banda, show, TipoEvento.SHOW);
 		incluirMembrosFantasmaNoEvento(novoShowDTO.getMembrosFantasma(), show, TipoEvento.SHOW);
@@ -307,7 +315,7 @@ public class EventoServiceImpl implements EventoService {
 
 	private void setarLocalEvento(NovoShowDTO novoShowDTO, Show show) {
 		if (novoShowDTO.getIdLocalEvento() != null) {
-			LocalEvento localEvento = localEventoService.buscarPorId(novoShowDTO.getIdLocalEvento());
+			LocalEvento localEvento = localEventoService.buscarEntidadePorId(novoShowDTO.getIdLocalEvento());
 			if (localEvento == null) {
 				throw new InternalException("Local de evento não encontrado");
 			} else {

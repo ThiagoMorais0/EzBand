@@ -16,6 +16,9 @@ import com.baseapplication.core.model.EquipamentoEstudio;
 import com.baseapplication.core.model.Estudio;
 import com.baseapplication.core.model.ServicoEstudio;
 import com.baseapplication.core.model.Usuario;
+import com.baseapplication.core.model.FotoEstudio;
+import com.baseapplication.core.dao.FotoEstudioDao;
+import com.baseapplication.core.dto.FotoEstudioDTO;
 import com.baseapplication.core.model.dto.EnsaioDTO;
 import com.baseapplication.core.model.embedded.Endereco;
 import com.baseapplication.core.service.EnsaioService;
@@ -54,6 +57,7 @@ public class EstudioServiceImpl implements EstudioService {
     private final EquipamentoEstudioDao equipamentoDao;
     private final ImagemService imagemService;
     private final EnsaioService ensaioService;
+    private final FotoEstudioDao fotoDao;
     private final ApplicationEventPublisher eventPublisher;
 
     @Override
@@ -90,7 +94,7 @@ public class EstudioServiceImpl implements EstudioService {
     @Transactional
     public void editar(EstudioDTO estudioDTO) {
         Estudio estudio = dao.findById(estudioDTO.getId())
-                .orElseThrow(() -> new InternalException("Estúdio não encontrado"));
+                .orElseThrow(() -> new InternalException("EstÃºdio nÃ£o encontrado"));
 
         estudio.setNome(estudioDTO.getNome());
         estudio.setDescricao(estudioDTO.getDescricao());
@@ -141,7 +145,7 @@ public class EstudioServiceImpl implements EstudioService {
             throw new InternalException(e.getMessage());
         }
         Estudio estudio = dao.findById(estudioDTO.getId())
-                .orElseThrow(() -> new InternalException("Estúdio não encontrado"));
+                .orElseThrow(() -> new InternalException("EstÃºdio nÃ£o encontrado"));
         if (estudio.getUrlFotoPerfil() != null)
             imagemService.deletarImagemPorUrl(estudio.getUrlFotoPerfil());
         String urlImagem = imagemService.saveImageAndGetUrl(imagem, "studiologo", estudioDTO.getId() + "." + FileUtils.getSufix(imagem));
@@ -154,7 +158,7 @@ public class EstudioServiceImpl implements EstudioService {
     public List<EnsaioDTO> buscarEnsaiosPorEstudio(Long idEstudio) {
         Estudio estudio = buscarPorId(idEstudio);
         if(estudio == null){
-            throw new InternalException("Estúdio não encontrado");
+            throw new InternalException("EstÃºdio nÃ£o encontrado");
         }
         return estudio.getEnsaios().stream().map(EnsaioDTO::new).toList();
     }
@@ -162,7 +166,7 @@ public class EstudioServiceImpl implements EstudioService {
     @Override
     public void deletar(Long idEstudio) {
         Estudio estudio = dao.findById(idEstudio)
-                .orElseThrow(() -> new InternalException("Estúdio não encontrado"));
+                .orElseThrow(() -> new InternalException("EstÃºdio nÃ£o encontrado"));
         dao.delete(estudio);
     }
 
@@ -171,22 +175,22 @@ public class EstudioServiceImpl implements EstudioService {
     public ResponseEntity<?> adicionarSocio(Long idEstudio, Long idUsuario) {
         Estudio estudio = dao.findById(idEstudio).orElse(null);
         Usuario usuario = usuarioDao.findById(idUsuario).orElse(null);
-        if (estudio == null || usuario == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
+        if (estudio == null || usuario == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("NÃ£o encontrado");
         if (estudio.getSocios().stream().anyMatch(s -> s.getId().equals(idUsuario)))
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Usuário já é sócio");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("UsuÃ¡rio jÃ¡ Ã© sÃ³cio");
         estudio.getSocios().add(usuario);
         dao.save(estudio);
-        return ResponseEntity.ok("Sócio adicionado");
+        return ResponseEntity.ok("SÃ³cio adicionado");
     }
 
     @Override
     @Transactional
     public ResponseEntity<?> removerSocio(Long idEstudio, Long idUsuario) {
         Estudio estudio = dao.findById(idEstudio).orElse(null);
-        if (estudio == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
+        if (estudio == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("NÃ£o encontrado");
         estudio.getSocios().removeIf(s -> s.getId().equals(idUsuario));
         dao.save(estudio);
-        return ResponseEntity.ok("Sócio removido");
+        return ResponseEntity.ok("SÃ³cio removido");
     }
 
     @Override
@@ -211,7 +215,7 @@ public class EstudioServiceImpl implements EstudioService {
     @Transactional
     public ServicoEstudioDTO adicionarServico(Long idEstudio, ServicoEstudioDTO dto) {
         Estudio estudio = dao.findById(idEstudio)
-                .orElseThrow(() -> new InternalException("Estúdio não encontrado"));
+                .orElseThrow(() -> new InternalException("EstÃºdio nÃ£o encontrado"));
         ServicoEstudio servico = new ServicoEstudio();
         servico.setNome(dto.getNome());
         servico.setDescricao(dto.getDescricao());
@@ -225,7 +229,7 @@ public class EstudioServiceImpl implements EstudioService {
     @Transactional
     public void editarServico(ServicoEstudioDTO dto) {
         ServicoEstudio servico = servicoDao.findById(dto.getId())
-                .orElseThrow(() -> new InternalException("Serviço não encontrado"));
+                .orElseThrow(() -> new InternalException("ServiÃ§o nÃ£o encontrado"));
         servico.setNome(dto.getNome());
         servico.setDescricao(dto.getDescricao());
         servico.setValor(dto.getValor());
@@ -249,7 +253,7 @@ public class EstudioServiceImpl implements EstudioService {
             throw new InternalException(e.getMessage());
         }
         Estudio estudio = dao.findById(idEstudio)
-                .orElseThrow(() -> new InternalException("Estúdio não encontrado"));
+                .orElseThrow(() -> new InternalException("EstÃºdio nÃ£o encontrado"));
         EquipamentoEstudio eq = new EquipamentoEstudio();
         eq.setMarca(dadosDTO.getMarca());
         eq.setModelo(dadosDTO.getModelo());
@@ -276,7 +280,7 @@ public class EstudioServiceImpl implements EstudioService {
             throw new InternalException(e.getMessage());
         }
         EquipamentoEstudio eq = equipamentoDao.findById(idEquipamento)
-                .orElseThrow(() -> new InternalException("Equipamento não encontrado"));
+                .orElseThrow(() -> new InternalException("Equipamento nÃ£o encontrado"));
         eq.setMarca(dadosDTO.getMarca());
         eq.setModelo(dadosDTO.getModelo());
         eq.setQuantidade(dadosDTO.getQuantidade());
@@ -294,16 +298,38 @@ public class EstudioServiceImpl implements EstudioService {
     @Transactional
     public void removerEquipamento(Long idEquipamento) {
         EquipamentoEstudio eq = equipamentoDao.findById(idEquipamento)
-                .orElseThrow(() -> new InternalException("Equipamento não encontrado"));
+                .orElseThrow(() -> new InternalException("Equipamento nÃ£o encontrado"));
         if (eq.getUrlFoto() != null) imagemService.deletarImagemPorUrl(eq.getUrlFoto());
         equipamentoDao.delete(eq);
     }
 
+
+    @Override
+    @Transactional
+    public FotoEstudioDTO adicionarFoto(Long idEstudio, MultipartFile imagem) {
+        Estudio estudio = dao.findById(idEstudio)
+                .orElseThrow(() -> new InternalException("Estudio nao encontrado"));
+        FotoEstudio foto = new FotoEstudio();
+        foto.setEstudio(estudio);
+        foto = fotoDao.save(foto);
+        String url = imagemService.saveImageAndGetUrl(imagem, "studiophotos", foto.getId() + "." + FileUtils.getSufix(imagem));
+        foto.setUrl(url);
+        return new FotoEstudioDTO(fotoDao.save(foto));
+    }
+
+    @Override
+    @Transactional
+    public void removerFoto(Long idFoto) {
+        FotoEstudio foto = fotoDao.findById(idFoto)
+                .orElseThrow(() -> new InternalException("Foto nao encontrada"));
+        if (foto.getUrl() != null) imagemService.deletarImagemPorUrl(foto.getUrl());
+        fotoDao.delete(foto);
+    }
     @Override
     @Transactional
     public List<EnsaioDTO> buscarEnsaiosPendentesPorEstudio(Long idEstudio) {
         Estudio estudio = buscarPorId(idEstudio);
-        if (estudio == null) throw new InternalException("Estúdio não encontrado");
+        if (estudio == null) throw new InternalException("EstÃºdio nÃ£o encontrado");
         return estudio.getEnsaios().stream()
                 .filter(e -> StatusEvento.PENDENTE.equals(e.getStatus()))
                 .sorted(Comparator.comparing(Ensaio::getData, Comparator.nullsLast(Comparator.naturalOrder())))
@@ -315,7 +341,7 @@ public class EstudioServiceImpl implements EstudioService {
     @Transactional
     public List<EnsaioDTO> buscarEnsaiosAguardandoAprovacaoPorEstudio(Long idEstudio) {
         Estudio estudio = buscarPorId(idEstudio);
-        if (estudio == null) throw new InternalException("Estúdio não encontrado");
+        if (estudio == null) throw new InternalException("EstÃºdio nÃ£o encontrado");
         return estudio.getEnsaios().stream()
                 .filter(e -> StatusEvento.AGUARDANDO_APROVACAO.equals(e.getStatus()))
                 .sorted(Comparator.comparing(Ensaio::getData, Comparator.nullsLast(Comparator.naturalOrder())))
@@ -327,7 +353,7 @@ public class EstudioServiceImpl implements EstudioService {
     @Transactional
     public List<EnsaioDTO> buscarEnsaiosHistoricoPorEstudio(Long idEstudio) {
         Estudio estudio = buscarPorId(idEstudio);
-        if (estudio == null) throw new InternalException("Estúdio não encontrado");
+        if (estudio == null) throw new InternalException("EstÃºdio nÃ£o encontrado");
         return estudio.getEnsaios().stream()
                 .filter(e -> StatusEvento.REALIZADO.equals(e.getStatus()) || StatusEvento.CANCELADO.equals(e.getStatus()))
                 .sorted(Comparator.comparing(Ensaio::getData, Comparator.nullsLast(Comparator.reverseOrder())))
@@ -415,3 +441,5 @@ public class EstudioServiceImpl implements EstudioService {
         return stream.limit(20).map(EstudioDTO::new).collect(Collectors.toList());
     }
 }
+
+
