@@ -23,6 +23,8 @@ public class MusicaDTO {
     private Integer tonalidade;
     private String urlYoutube;
     private String urlSpotify;
+    private String letra;
+    private Integer bpm;
 
     public MusicaDTO(Musica musica){
         BeanUtils.copyProperties(musica, this);

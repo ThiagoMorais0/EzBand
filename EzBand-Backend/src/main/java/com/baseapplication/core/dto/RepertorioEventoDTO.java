@@ -31,6 +31,8 @@ public class RepertorioEventoDTO {
     private String bloco;
     private String urlYoutube;
     private String urlSpotify;
+    private String letra;
+    private Integer bpm;
 
     public static RepertorioEvento toEntity(RepertorioEventoDTO repertorioEventoDTO,
                                       Long idEvento,
@@ -52,7 +54,9 @@ public class RepertorioEventoDTO {
                 repertorioEventoDTO.duracao != null ? Time.valueOf(repertorioEventoDTO.duracao) : null,
                 Tonalidade.encontrarPeloNumero(repertorioEventoDTO.getTonalidade()),
                 repertorioEventoDTO.urlYoutube,
-                repertorioEventoDTO.urlSpotify)
+                repertorioEventoDTO.urlSpotify,
+                repertorioEventoDTO.letra,
+                repertorioEventoDTO.bpm)
         );
         return repertorioEvento;
     }

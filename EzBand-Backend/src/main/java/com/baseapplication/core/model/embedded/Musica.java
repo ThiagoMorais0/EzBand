@@ -1,6 +1,7 @@
 package com.baseapplication.core.model.embedded;
 
 import com.baseapplication.core.enums.Tonalidade;
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -27,4 +28,7 @@ public class Musica {
     private Tonalidade tonalidade;
     private String urlYoutube;
     private String urlSpotify;
+    @Column(name = "letra", columnDefinition = "TEXT")
+    private String letra;
+    private Integer bpm;
 }

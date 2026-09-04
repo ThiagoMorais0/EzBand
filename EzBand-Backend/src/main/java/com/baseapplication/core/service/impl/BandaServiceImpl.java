@@ -231,6 +231,8 @@ public class BandaServiceImpl implements BandaService {
 		musicaRepertorio.getMusica().setDescricao(repertorioBandaDTO.getMusica().getDescricao());
 		musicaRepertorio.getMusica().setObservacao(repertorioBandaDTO.getMusica().getObservacao());
 		musicaRepertorio.getMusica().setDuracao(repertorioBandaDTO.getMusica().getDuracao());
+		musicaRepertorio.getMusica().setLetra(repertorioBandaDTO.getMusica().getLetra());
+		musicaRepertorio.getMusica().setBpm(repertorioBandaDTO.getMusica().getBpm());
 		musicaRepertorio.setIndice(repertorioBandaDTO.getIndice());
 		musicaRepertorio.setPosicaoShow(repertorioBandaDTO.getPosicaoShow());
 		musicaRepertorio.setEnergia(repertorioBandaDTO.getEnergia());

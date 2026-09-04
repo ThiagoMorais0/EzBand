@@ -99,7 +99,9 @@ public class SpotifyServiceImpl implements SpotifyService {
                     duracao,
                     Tonalidade.ORIGINAL,
                     null, //urlYoutube
-                    urlSpotify //urlSpotify
+                    urlSpotify, //urlSpotify
+                    null, //letra
+                    null //bpm
             );
             repertorioBanda.setMusica(musica);
             return repertorioBanda;
