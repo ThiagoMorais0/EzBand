@@ -29,4 +29,17 @@ public interface RepertorioEventoDao extends JpaRepository<RepertorioEvento, Rep
 
     @Query(value = "SELECT r FROM RepertorioEvento r WHERE r.id.idEvento = :idEvento and r.id.tipoEvento = :tipoEvento and r.id.indice = :indice")
     RepertorioEvento buscarPorIndiceEEvento(Integer indice, Long idEvento, TipoEvento tipoEvento);
+
+    /**
+     * Índice, título, artista e duração das faixas de um evento, em ordem.
+     *
+     * <p>Usada pelo Modo Performance para congelar o repertório no estado da sessão. Projeção
+     * crua em vez de {@link #buscarPorEvento}: carregar as entidades inteiras traria a coluna
+     * {@code letra} (TEXT) de cada música, que o servidor da sessão nunca usa.
+     */
+    @Query(value = "select re.indice, re.titulo, re.artista, re.duracao "
+            + "from repertorio_evento re "
+            + "where re.id_evento = :idEvento and re.tipo_evento = :tipoEvento "
+            + "order by re.indice", nativeQuery = true)
+    List<Object[]> buscarFaixasParaSessaoAoVivo(Long idEvento, String tipoEvento);
 }
