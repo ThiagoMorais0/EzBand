@@ -1,10 +1,13 @@
 package com.baseapplication.core.service.impl;
 
 import com.baseapplication.core.dao.PreferenciaNotificacaoMembroDao;
+import com.baseapplication.core.enums.SituacaoMusicoEvento;
 import com.baseapplication.core.enums.TipoEvento;
 import com.baseapplication.core.event.events.NovoEventoMarcadoEvent;
+import com.baseapplication.core.event.events.SessaoPalcoIniciadaEvent;
 import com.baseapplication.core.model.*;
 import com.baseapplication.core.model.superClasses.Evento;
+import com.baseapplication.core.service.MusicoEventoService;
 import com.baseapplication.core.service.NotificacaoEventoService;
 import com.baseapplication.core.service.WhatsappService;
 import com.baseapplication.core.utils.PhoneNumberUtil;
@@ -30,6 +33,7 @@ public class NotificacaoEventoServiceImpl implements NotificacaoEventoService {
     private final PhoneNumberUtil phoneNumberUtil;
     private final EntityManager entityManager;
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final MusicoEventoService musicoEventoService;
 
     @Override
     public void notificarNovoEvento(Long idEvento, TipoEvento tipoEvento) {
@@ -90,6 +94,40 @@ public class NotificacaoEventoServiceImpl implements NotificacaoEventoService {
                 local,
                 criador.getId(),
                 criador.getNome(),
+                destinatarios
+        ));
+    }
+
+    @Override
+    public void notificarSessaoPalcoIniciada(Long idEvento, TipoEvento tipoEvento, Long idUsuarioIniciador, String nomeIniciador) {
+        Evento evento = buscarEvento(idEvento, tipoEvento);
+        if (evento == null) {
+            log.warn("Evento não encontrado para notificar início de sessão ao vivo: {} - {}", idEvento, tipoEvento);
+            return;
+        }
+
+        Banda banda = evento.getBanda();
+
+        // Vinculados ao evento, não só membros da banda: quem foi convidado como músico avulso
+        // para este show/ensaio específico também precisa saber que o palco começou.
+        List<Long> destinatarios = musicoEventoService.listarPorEvento(idEvento, tipoEvento).stream()
+                .filter(me -> me.getSituacao() == SituacaoMusicoEvento.ATIVO)
+                .map(me -> me.getId().getIdUsuario())
+                .filter(id -> !id.equals(idUsuarioIniciador))
+                .distinct()
+                .collect(Collectors.toList());
+
+        if (destinatarios.isEmpty()) return;
+
+        applicationEventPublisher.publishEvent(new SessaoPalcoIniciadaEvent(
+                idEvento,
+                tipoEvento,
+                banda.getId(),
+                banda.getNome(),
+                banda.getUrlLogo(),
+                evento.getLocal(),
+                idUsuarioIniciador,
+                nomeIniciador,
                 destinatarios
         ));
     }

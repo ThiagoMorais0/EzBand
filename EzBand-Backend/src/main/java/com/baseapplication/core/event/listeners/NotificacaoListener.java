@@ -227,5 +227,23 @@ public class NotificacaoListener {
         }
     }
 
+    @EventListener
+    public void handleSessaoPalcoIniciada(SessaoPalcoIniciadaEvent event) {
+        for (Long destinatarioId : event.getDestinatarioIds()) {
+            SessaoPalcoIniciada notificacao = new SessaoPalcoIniciada(
+                    event.getIdEvento(),
+                    event.getTipoEvento(),
+                    event.getIdBanda(),
+                    event.getNomeBanda(),
+                    event.getUrlLogoBanda(),
+                    event.getLocal(),
+                    event.getIdIniciador(),
+                    event.getNomeIniciador(),
+                    destinatarioId
+            );
+            enviar(notificacao);
+        }
+    }
+
 }
 

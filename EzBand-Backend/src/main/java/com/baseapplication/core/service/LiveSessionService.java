@@ -1,5 +1,6 @@
 package com.baseapplication.core.service;
 
+import com.baseapplication.core.dto.live.AberturaSessao;
 import com.baseapplication.core.dto.live.LiveSessionSnapshot;
 import com.baseapplication.core.live.LiveUsuarioSessao;
 
@@ -16,7 +17,7 @@ import java.util.Set;
 public interface LiveSessionService {
 
     /** Entra na sessão, criando-a se este for o primeiro a chegar. */
-    LiveSessionSnapshot abrirOuEntrar(LiveUsuarioSessao usuario);
+    AberturaSessao abrirOuEntrar(LiveUsuarioSessao usuario);
 
     LiveSessionSnapshot buscar(String roomKey);
 

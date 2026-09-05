@@ -1,10 +1,12 @@
 package com.baseapplication.core.live;
 
+import com.baseapplication.core.dto.live.AberturaSessao;
 import com.baseapplication.core.dto.live.LiveClientMessage;
 import com.baseapplication.core.dto.live.LiveMembroPresenca;
 import com.baseapplication.core.dto.live.LiveServerMessage;
 import com.baseapplication.core.dto.live.LiveSessionSnapshot;
 import com.baseapplication.core.service.LiveSessionService;
+import com.baseapplication.core.service.NotificacaoEventoService;
 import com.baseapplication.core.service.SessaoAoVivoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -41,17 +43,20 @@ public class LiveSessionHandler extends TextWebSocketHandler {
 
     private final LiveSessionService liveSessionService;
     private final SessaoAoVivoService sessaoAoVivoService;
+    private final NotificacaoEventoService notificacaoEventoService;
     private final LiveSessionRegistry registry;
     private final LiveSessionStore store;
     private final ObjectMapper mapper;
 
     public LiveSessionHandler(LiveSessionService liveSessionService,
                               SessaoAoVivoService sessaoAoVivoService,
+                              NotificacaoEventoService notificacaoEventoService,
                               LiveSessionRegistry registry,
                               LiveSessionStore store,
                               ObjectMapper mapper) {
         this.liveSessionService = liveSessionService;
         this.sessaoAoVivoService = sessaoAoVivoService;
+        this.notificacaoEventoService = notificacaoEventoService;
         this.registry = registry;
         this.store = store;
         this.mapper = mapper;
@@ -72,9 +77,9 @@ public class LiveSessionHandler extends TextWebSocketHandler {
 
         registry.entrar(usuario.getRoomKey(), sessao);
 
-        LiveSessionSnapshot snapshot;
+        AberturaSessao abertura;
         try {
-            snapshot = liveSessionService.abrirOuEntrar(usuario);
+            abertura = liveSessionService.abrirOuEntrar(usuario);
         } catch (Exception e) {
             log.error("Falha ao abrir sessão ao vivo em {}", usuario.getRoomKey(), e);
             registry.enviar(sessao, LiveServerMessage.erro("FALHA_ABERTURA",
@@ -82,6 +87,7 @@ public class LiveSessionHandler extends TextWebSocketHandler {
             fechar(sessao, CloseStatus.SERVER_ERROR);
             return;
         }
+        LiveSessionSnapshot snapshot = abertura.snapshot();
 
         // Quem chega recebe o estado completo antes de qualquer outra coisa: é o snapshot que
         // diz em que música a banda está, não o histórico de eventos que ele perdeu.
@@ -96,6 +102,22 @@ public class LiveSessionHandler extends TextWebSocketHandler {
 
         anunciarPresenca(usuario, snapshot, true);
         log.debug("Usuário {} entrou na sessão ao vivo {}", usuario.getIdUsuario(), usuario.getRoomKey());
+
+        // Só depois de quem abriu já ter o próprio snapshot na tela: push/WhatsApp para o
+        // resto da banda não pode atrasar a resposta de quem está esperando o palco abrir.
+        if (abertura.recemCriada()) {
+            notificarInicioSessao(usuario);
+        }
+    }
+
+    /** Dispara só na abertura de fato — nunca quando alguém apenas entra numa sessão já rolando. */
+    private void notificarInicioSessao(LiveUsuarioSessao usuario) {
+        try {
+            notificacaoEventoService.notificarSessaoPalcoIniciada(
+                    usuario.getIdEvento(), usuario.getTipoEvento(), usuario.getIdUsuario(), usuario.getNome());
+        } catch (Exception e) {
+            log.warn("Falha ao notificar início da sessão ao vivo {}: {}", usuario.getRoomKey(), e.getMessage());
+        }
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.baseapplication.core.service.impl;
 
+import com.baseapplication.core.dto.live.AberturaSessao;
 import com.baseapplication.core.dto.live.LiveFaixaInfo;
 import com.baseapplication.core.dto.live.LiveFaixaTocada;
 import com.baseapplication.core.dto.live.LiveSessionSnapshot;
@@ -51,10 +52,11 @@ public class LiveSessionServiceImpl implements LiveSessionService {
     // ── API ─────────────────────────────────────────────────────────────
 
     @Override
-    public LiveSessionSnapshot abrirOuEntrar(LiveUsuarioSessao usuario) {
+    public AberturaSessao abrirOuEntrar(LiveUsuarioSessao usuario) {
         return comLock(usuario.getRoomKey(), () -> {
             LiveSessionSnapshot snapshot = store.buscar(usuario.getRoomKey());
-            if (snapshot == null) {
+            boolean recemCriada = snapshot == null;
+            if (recemCriada) {
                 snapshot = new LiveSessionSnapshot(
                         usuario.getIdEvento(),
                         usuario.getTipoEvento(),
@@ -67,7 +69,7 @@ public class LiveSessionServiceImpl implements LiveSessionService {
                 log.info("Sessão ao vivo aberta em {} por usuário {} ({} faixas)",
                         usuario.getRoomKey(), usuario.getIdUsuario(), snapshot.getTotalFaixas());
             }
-            return snapshot;
+            return new AberturaSessao(snapshot, recemCriada);
         });
     }
 
