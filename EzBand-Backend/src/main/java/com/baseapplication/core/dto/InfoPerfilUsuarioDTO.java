@@ -65,6 +65,24 @@ public class InfoPerfilUsuarioDTO {
         this.setPublicacoes(usuario.getPublicacoes().stream().map(PublicacaoDTO::new).sorted(Comparator.comparing(PublicacaoDTO::getDataPublicacao).reversed()).toList());
     }
 
+    /**
+     * Versao leve para autocomplete/listagens: copia apenas os dados escalares e
+     * NAO toca nas colecoes LAZY do usuario (publicacoes), que exigiriam uma
+     * sessao Hibernate aberta - o app roda com spring.jpa.open-in-view=false.
+     */
+    public static InfoPerfilUsuarioDTO resumo(Usuario usuario){
+        InfoPerfilUsuarioDTO dto = new InfoPerfilUsuarioDTO();
+        BeanUtils.copyProperties(usuario, dto, "bandas", "publicacoes");
+
+        if(usuario.getDataNascimento() != null)
+            dto.setNascimento(DateUtils.localDateToString(usuario.getDataNascimento()));
+
+        if(usuario.getDataCriacao() != null)
+            dto.setDataCriacao(DateUtils.localDateToString(usuario.getDataCriacao()));
+
+        return dto;
+    }
+
     public InfoPerfilUsuarioDTO(MusicoBanda musico){
         BeanUtils.copyProperties(musico.getUsuario(), this);
         this.nascimento = DateUtils.localDateToString(musico.getUsuario().getDataNascimento());

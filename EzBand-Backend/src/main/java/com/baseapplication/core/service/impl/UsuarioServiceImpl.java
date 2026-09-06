@@ -240,8 +240,11 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
 	@Override
+	@Transactional(readOnly = true)
 	public InfoPerfilUsuarioDTO buscarPorEmail(String email) {
-		return new InfoPerfilUsuarioDTO(findByEmail(email));
+		Usuario usuario = usuarioDao.findByEmailWithPublicacoes(email)
+				.orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado para o email " + email));
+		return new InfoPerfilUsuarioDTO(usuario);
 	}
 
 	@Override
@@ -331,7 +334,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 				.limit(20)
 				.toList();
 
-		return resultados.stream().map(InfoPerfilUsuarioDTO::new).toList();
+		return resultados.stream().map(InfoPerfilUsuarioDTO::resumo).toList();
 	}
 
 	@Override

@@ -20,4 +20,10 @@ public class Endereco {
     private String numero = "";
     private String cep = "";
     private String complemento = "";
+
+    // Preenchidos quando o endereco vem da busca do Google Places. Sempre opcionais:
+    // local que nao existe no Google e preenchimento manual deixam os tres nulos.
+    private String googlePlaceId;
+    private Double latitude;
+    private Double longitude;
 }

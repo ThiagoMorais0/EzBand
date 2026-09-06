@@ -18,6 +18,9 @@ public class EnderecoDTO {
     private String numero;
     private String cep;
     private String complemento;
+    private String googlePlaceId;
+    private Double latitude;
+    private Double longitude;
 
     public EnderecoDTO(Endereco endereco){
         if(endereco != null){

@@ -19,6 +19,9 @@ public interface UsuarioDao extends JpaRepository<Usuario, Long> {
     @Query("SELECT u FROM Usuario u LEFT JOIN FETCH u.publicacoes WHERE u.id = :id")
     Optional<Usuario> findByIdWithPublicacoes(Long id);
 
+    @Query("SELECT u FROM Usuario u LEFT JOIN FETCH u.publicacoes WHERE u.email = :email")
+    Optional<Usuario> findByEmailWithPublicacoes(String email);
+
 //    UserDetails findByLogin(String login);
 
 //    @Query(value = "SELECT u FROM Usuario u WHERE u.login = :login")
