@@ -42,6 +42,12 @@ public interface ShowDao extends JpaRepository<Show, Long> {
             "order by s.\"data\", s.horario_inicio", nativeQuery = true)
     List<Show> buscarShowsPorStatusBandaEUsuarioOrdenadoPorData(Long idBanda, Long idUsuario, String status);
 
+    @Query("SELECT s FROM Show s LEFT JOIN FETCH s.localEvento " +
+            "WHERE s.banda.id = :idBanda AND s.data IS NOT NULL AND s.data >= CURRENT_DATE " +
+            "AND s.status IN ('PENDENTE', 'AGUARDANDO_APROVACAO') " +
+            "ORDER BY s.data, s.horarioInicio")
+    List<Show> buscarFuturosNaoRealizadosPorBanda(@Param("idBanda") Long idBanda);
+
     @Query(value = "SELECT s FROM Show s " +
             "INNER JOIN MusicoEvento me ON me.id.idEvento = s.id AND s.tipoEvento = 'SHOW' " +
             "WHERE s.data = :data AND me.usuario.id = :idUsuario and s.status in ('PENDENTE', 'AGUARDANDO_APROVACAO') " +

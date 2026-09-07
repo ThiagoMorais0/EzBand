@@ -202,6 +202,33 @@ public class UsuarioServiceImpl implements UsuarioService {
 		));
 	}
 
+	/**
+	 * Monta o perfil do usuario logado dentro de uma transacao e ja com as
+	 * publicacoes carregadas por fetch join. O app roda com
+	 * spring.jpa.open-in-view=false, entao montar o DTO fora daqui (por exemplo
+	 * direto no controller) fecha a sessao antes do acesso as colecoes LAZY e
+	 * dispara LazyInitializationException.
+	 */
+	@Override
+	@Transactional(readOnly = true)
+	public InfoPerfilUsuarioDTO buscarInformacoesDoPerfil() {
+		Long idUsuario = Context.getUsuarioLogado().getId();
+		Usuario usuario = usuarioDao.findByIdWithPublicacoes(idUsuario)
+				.orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado para o id " + idUsuario));
+		return new InfoPerfilUsuarioDTO(usuario);
+	}
+
+	/**
+	 * Assim como buscarInformacoesDoPerfil, monta os DTOs dentro da transacao: as
+	 * colecoes de Banda usadas pelo BandaDTO sao EAGER hoje, mas montar fora de
+	 * sessao deixa o endpoint refem disso.
+	 */
+	@Override
+	@Transactional(readOnly = true)
+	public List<BandaDTO> buscarBandasDoUsuario() {
+		return Context.getUsuarioLogado().getBandas().stream().map(BandaDTO::new).toList();
+	}
+
 	@Override
 	@Transactional(readOnly = true)
 	public InfoPerfilUsuarioDTO buscarInformacoesDoPerfilPorId(Long idUsuario) {

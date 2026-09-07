@@ -47,6 +47,7 @@ public class NotificacaoServiceImpl implements NotificacaoService {
     private final EventoHelperService eventoHelperService;
     private final MusicoBandaService musicoBandaService;
     private final BandaDao bandaDao;
+    private final ConviteBandaService conviteBandaService;
     private final Map<String, Sinks.Many<NotificacaoDTO>> sinks = new ConcurrentHashMap<>();
 
     @Override
@@ -254,12 +255,17 @@ public class NotificacaoServiceImpl implements NotificacaoService {
                 // Quando a banda convida um usuário e ele aceita
                 if(acao.equals(AcaoResposta.ACEITAR)){
                     ConviteParaUsuarioIngressarBanda conviteBanda = (ConviteParaUsuarioIngressarBanda) notificacao;
+                    Usuario convidado = usuarioDao.findById(conviteBanda.getDestinatarioId())
+                            .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
+                    Banda bandaConvite = bandaDao.findById(conviteBanda.getRemetenteId())
+                            .orElseThrow(() -> new ResourceNotFoundException("Banda não encontrada. Ela pode ter sido deletada."));
                     musicoBandaService.cadastrarUsuarioEmBanda(
-                            usuarioDao.findById(conviteBanda.getDestinatarioId()).orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado.")),
-                            bandaDao.findById(conviteBanda.getRemetenteId()).orElseThrow(() -> new ResourceNotFoundException("Banda não encontrada. Ela pode ter sido deletada.")),
+                            convidado,
+                            bandaConvite,
                             conviteBanda.getInstrumento() != null ? conviteBanda.getInstrumento() : "",
                             List.of(PermissaoMusico.MEMBRO_REGULAR)
                     );
+                    conviteBandaService.incluirUsuarioNosEventos(convidado, bandaConvite, conviteBanda.getEventos());
                 }
                 return;
             case "CONVITE_PARA_EVENTO":

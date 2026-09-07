@@ -12,6 +12,7 @@ import com.baseapplication.core.dto.BuscaGlobalDTO;
 import com.baseapplication.core.dto.InstrumentoDTO;
 import com.baseapplication.core.enums.TipoContato;
 import com.baseapplication.core.model.Usuario;
+import com.baseapplication.core.model.dto.BandaDTO;
 
 import java.util.List;
 
@@ -38,6 +39,10 @@ public interface UsuarioService {
 
 
 	void enviarSolicitacaoParaIngressarBanda(Long idBanda, String instrumento);
+
+	InfoPerfilUsuarioDTO buscarInformacoesDoPerfil();
+
+	List<BandaDTO> buscarBandasDoUsuario();
 
 	InfoPerfilUsuarioDTO buscarInformacoesDoPerfilPorId(Long idUsuario);
 

@@ -132,7 +132,8 @@ public class NotificacaoListener {
     public void handleConviteParaUsuarioIngressarBanda(ConviteParaUsuarioIngressarBandaEvent event) {
         ConviteParaUsuarioIngressarBanda notificacao = new ConviteParaUsuarioIngressarBanda(
                 event.getIdUsuarioConvidado(),
-                event.getBanda()
+                event.getBanda(),
+                event.getEventos()
         );
         enviar(notificacao);
     }

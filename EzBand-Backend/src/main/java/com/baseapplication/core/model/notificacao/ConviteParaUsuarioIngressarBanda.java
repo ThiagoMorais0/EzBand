@@ -24,7 +24,15 @@ public class ConviteParaUsuarioIngressarBanda extends Notificacao {
     @Column(unique = true)
     private String linkToken;
 
+    /** Eventos em que o convidado entra ao aceitar, no formato "SHOW:12,ENSAIO:33". */
+    @Column(length = 1000)
+    private String eventos;
+
     public ConviteParaUsuarioIngressarBanda(Long idUsuario, Banda banda){
+        this(idUsuario, banda, null);
+    }
+
+    public ConviteParaUsuarioIngressarBanda(Long idUsuario, Banda banda, String eventos){
         super.setTitulo("Convite");
         super.setMensagem("Você está sendo convidado para ingressar a banda " + banda.getNome() + "!");
         super.setUrlImagem(banda.getUrlLogo());
@@ -37,6 +45,7 @@ public class ConviteParaUsuarioIngressarBanda extends Notificacao {
         super.setRemetenteTipo(TipoParticipante.BANDA);
         
         this.instrumento = ""; // Será definido pelo usuário ao aceitar
+        this.eventos = eventos;
     }
 
     @Override

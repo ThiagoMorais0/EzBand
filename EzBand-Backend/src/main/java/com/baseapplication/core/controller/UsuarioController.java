@@ -29,7 +29,7 @@ public class UsuarioController {
 
 	@GetMapping("/buscarInformacoesDoPerfil")
 	public InfoPerfilUsuarioDTO buscarInformacoesDoPerfil() {
-		return new InfoPerfilUsuarioDTO(Context.getUsuarioLogado());
+		return usuarioService.buscarInformacoesDoPerfil();
 	}
 
 	@PostMapping("/atualizarInformacoesPerfil")
@@ -139,7 +139,7 @@ public class UsuarioController {
     @GetMapping("/buscarBandasDoUsuario")
     public ResponseEntity<?> buscarBandasDoUsuario(){
         try{
-            return ResponseEntity.ok(Context.getUsuarioLogado().getBandas().stream().map(BandaDTO::new).toList());
+            return ResponseEntity.ok(usuarioService.buscarBandasDoUsuario());
         }catch (Exception e){
             return ResponseEntity.status(500).body(e.getMessage());
         }

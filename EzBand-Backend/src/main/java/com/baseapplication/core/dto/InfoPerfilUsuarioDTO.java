@@ -84,9 +84,16 @@ public class InfoPerfilUsuarioDTO {
     }
 
     public InfoPerfilUsuarioDTO(MusicoBanda musico){
-        BeanUtils.copyProperties(musico.getUsuario(), this);
-        this.nascimento = DateUtils.localDateToString(musico.getUsuario().getDataNascimento());
-        this.dataCriacao = DateUtils.localDateToString(musico.getUsuario().getDataCriacao());
+        Usuario usuario = musico.getUsuario();
+        BeanUtils.copyProperties(usuario, this);
+
+        // Usuarios vindos do login com Google nao tem data de nascimento.
+        if(usuario.getDataNascimento() != null)
+            this.nascimento = DateUtils.localDateToString(usuario.getDataNascimento());
+
+        if(usuario.getDataCriacao() != null)
+            this.dataCriacao = DateUtils.localDateToString(usuario.getDataCriacao());
+
         this.instrumentos = musico.getInstrumentos();
     }
 

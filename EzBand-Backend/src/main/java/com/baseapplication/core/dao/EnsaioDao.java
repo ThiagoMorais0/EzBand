@@ -32,6 +32,12 @@ public interface EnsaioDao extends JpaRepository<Ensaio, Long> {
             "order by e.\"data\", e.horario_inicio", nativeQuery = true)
     List<Ensaio> buscarEnsaiosPorStatusBandaEUsuarioOrdenadoPorData(Long idBanda, Long idUsuario, String status);
 
+    @Query("SELECT e FROM Ensaio e LEFT JOIN FETCH e.estudio " +
+            "WHERE e.banda.id = :idBanda AND e.data IS NOT NULL AND e.data >= CURRENT_DATE " +
+            "AND e.status IN ('PENDENTE', 'AGUARDANDO_APROVACAO') " +
+            "ORDER BY e.data, e.horarioInicio")
+    List<Ensaio> buscarFuturosNaoRealizadosPorBanda(@Param("idBanda") Long idBanda);
+
     @Query("SELECT e FROM Ensaio e INNER JOIN MusicoEvento me ON me.id.idEvento = e.id AND e.tipoEvento = 'ENSAIO' " +
             "WHERE me.usuario.id = :idUsuario AND e.data BETWEEN :inicio AND :fim " +
             "AND e.status IN ('PENDENTE', 'AGUARDANDO_APROVACAO') ORDER BY e.data, e.horarioInicio")

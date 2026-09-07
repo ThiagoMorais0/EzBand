@@ -60,6 +60,7 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.POST, "/auth/logout").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/teste").permitAll()
                         .requestMatchers(HttpMethod.GET, "/usuario/verificarEmailJaCadastrado").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/banda/convite-externo/preview").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/validacao-celular/validar-token").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/validacao-celular/status").permitAll()
                         // SWAGGER

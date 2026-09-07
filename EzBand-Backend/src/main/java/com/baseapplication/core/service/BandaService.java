@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.baseapplication.core.dto.BuscaBandaDTO;
 import com.baseapplication.core.dto.EditarMembroMusicoBandaDTO;
+import com.baseapplication.core.dto.EventoConviteDTO;
 import com.baseapplication.core.model.dto.EnsaioDTO;
 import com.baseapplication.core.model.dto.ShowDTO;
 import org.springframework.http.ResponseEntity;
@@ -58,7 +59,7 @@ public interface BandaService {
 
     List<String> getPermissoesMusico(Long idBanda, Long id);
 
-    void enviarConviteParaUsuarioIngressarBanda(Long idBanda, Long idUsuarioConvidado);
+    void enviarConviteParaUsuarioIngressarBanda(Long idBanda, Long idUsuarioConvidado, List<EventoConviteDTO> eventos);
 
     List<EnsaioDTO> buscarEnsaios(Long idBanda);
 
@@ -74,5 +75,4 @@ public interface BandaService {
 
     void atualizarOrdemRepertorio(Long idBanda, List<RepertorioBandaDTO> repertorio);
 
-    Long aceitarConvitePorLink(String token);
 }

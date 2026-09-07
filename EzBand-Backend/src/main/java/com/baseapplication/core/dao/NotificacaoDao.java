@@ -37,4 +37,9 @@ public interface NotificacaoDao extends JpaRepository<Notificacao, Long> {
 
     @Query("SELECT c FROM ConviteParaUsuarioIngressarBanda c WHERE c.linkToken = :token")
     Optional<ConviteParaUsuarioIngressarBanda> findConviteByLinkToken(@Param("token") String token);
+
+    @Query("SELECT c FROM ConviteParaUsuarioIngressarBanda c WHERE c.destinatarioId = :idUsuario " +
+            "AND c.remetenteId = :idBanda AND c.lida = false")
+    List<ConviteParaUsuarioIngressarBanda> buscarConvitesBandaNaoLidos(@Param("idBanda") Long idBanda,
+                                                                      @Param("idUsuario") Long idUsuario);
 }

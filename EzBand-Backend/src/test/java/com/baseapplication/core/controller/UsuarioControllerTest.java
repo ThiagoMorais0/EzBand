@@ -64,13 +64,12 @@ class UsuarioControllerTest {
     @Test
     @DisplayName("Deve buscar informações do perfil com sucesso")
     void deveBuscarInformacoesDoPerfilComSucesso() {
-        try (MockedStatic<Context> contextMock = mockStatic(Context.class)) {
-            contextMock.when(Context::getUsuarioLogado).thenReturn(usuarioMock);
+        when(usuarioService.buscarInformacoesDoPerfil()).thenReturn(infoPerfilUsuarioDTO);
 
-            InfoPerfilUsuarioDTO resultado = usuarioController.buscarInformacoesDoPerfil();
+        InfoPerfilUsuarioDTO resultado = usuarioController.buscarInformacoesDoPerfil();
 
-            assertNotNull(resultado);
-        }
+        assertNotNull(resultado);
+        verify(usuarioService, times(1)).buscarInformacoesDoPerfil();
     }
 
     @Test
@@ -276,25 +275,22 @@ class UsuarioControllerTest {
     @Test
     @DisplayName("Deve buscar bandas do usuário com sucesso")
     void deveBuscarBandasDoUsuarioComSucesso() {
-        try (MockedStatic<Context> contextMock = mockStatic(Context.class)) {
-            contextMock.when(Context::getUsuarioLogado).thenReturn(usuarioMock);
+        when(usuarioService.buscarBandasDoUsuario()).thenReturn(List.of());
 
-            ResponseEntity resposta = usuarioController.buscarBandasDoUsuario();
+        ResponseEntity resposta = usuarioController.buscarBandasDoUsuario();
 
-            assertEquals(HttpStatus.OK, resposta.getStatusCode());
-        }
+        assertEquals(HttpStatus.OK, resposta.getStatusCode());
+        verify(usuarioService, times(1)).buscarBandasDoUsuario();
     }
 
     @Test
     @DisplayName("Deve retornar erro ao buscar bandas do usuário com exceção")
     void deveRetornarErroAoBuscarBandasDoUsuarioComExcecao() {
-        try (MockedStatic<Context> contextMock = mockStatic(Context.class)) {
-            contextMock.when(Context::getUsuarioLogado).thenThrow(new RuntimeException("Erro"));
+        when(usuarioService.buscarBandasDoUsuario()).thenThrow(new RuntimeException("Erro"));
 
-            ResponseEntity resposta = usuarioController.buscarBandasDoUsuario();
+        ResponseEntity resposta = usuarioController.buscarBandasDoUsuario();
 
-            assertEquals(500, resposta.getStatusCodeValue());
-        }
+        assertEquals(500, resposta.getStatusCodeValue());
     }
 
     @Test

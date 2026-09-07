@@ -1,6 +1,7 @@
 package com.baseapplication.core.controller;
 
 import com.baseapplication.core.dto.*;
+import com.baseapplication.core.enums.TipoEvento;
 import com.baseapplication.core.model.Banda;
 import com.baseapplication.core.model.Usuario;
 import com.baseapplication.core.model.dto.BandaDTO;
@@ -342,12 +343,13 @@ class BandaControllerTest {
     void deveEnviarConviteParaUsuarioIngressarNaBandaComSucesso() {
         Long idBanda = 1L;
         Long idUsuarioConvidado = 2L;
-        doNothing().when(bandaService).enviarConviteParaUsuarioIngressarBanda(anyLong(), anyLong());
+        List<EventoConviteDTO> eventos = List.of(new EventoConviteDTO(10L, TipoEvento.SHOW));
+        doNothing().when(bandaService).enviarConviteParaUsuarioIngressarBanda(anyLong(), anyLong(), anyList());
 
-        ResponseEntity<?> resposta = bandaController.enviarConviteParaUsuarioIngressarBanda(idBanda, idUsuarioConvidado);
+        ResponseEntity<?> resposta = bandaController.enviarConviteParaUsuarioIngressarBanda(idBanda, idUsuarioConvidado, eventos);
 
         assertEquals(HttpStatus.OK, resposta.getStatusCode());
-        verify(bandaService, times(1)).enviarConviteParaUsuarioIngressarBanda(idBanda, idUsuarioConvidado);
+        verify(bandaService, times(1)).enviarConviteParaUsuarioIngressarBanda(idBanda, idUsuarioConvidado, eventos);
     }
 
     @Test

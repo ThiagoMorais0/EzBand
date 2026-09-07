@@ -7,6 +7,7 @@ import com.baseapplication.core.dao.SeguirBandaDao;
 import com.baseapplication.core.dto.*;
 import com.baseapplication.core.model.SeguirBanda;
 import com.baseapplication.core.model.SeguirBandaId;
+import com.baseapplication.core.service.ConviteBandaService;
 import com.baseapplication.core.service.MembroFantasmaService;
 import com.baseapplication.core.service.SugestaoRepertorioService;
 import lombok.extern.log4j.Log4j2;
@@ -31,6 +32,9 @@ public class BandaController {
 
     @Autowired
     private MembroFantasmaService membroFantasmaService;
+
+    @Autowired
+    private ConviteBandaService conviteBandaService;
 
     @Autowired
     private SugestaoRepertorioService sugestaoRepertorioService;
@@ -245,20 +249,52 @@ public class BandaController {
     @PostMapping("/enviarConviteParaUsuarioIngressarBanda")
     public ResponseEntity<?> enviarConviteParaUsuarioIngressarBanda(
             @RequestParam Long idBanda,
-            @RequestParam Long idUsuarioConvidado){
+            @RequestParam Long idUsuarioConvidado,
+            @RequestBody(required = false) List<EventoConviteDTO> eventos){
         try{
-            bandaService.enviarConviteParaUsuarioIngressarBanda(idBanda, idUsuarioConvidado);
+            bandaService.enviarConviteParaUsuarioIngressarBanda(idBanda, idUsuarioConvidado, eventos);
             return ResponseEntity.ok("Convite enviado com sucesso");
         }catch (Exception e){
+            log.error("Erro ao enviar convite para usuário ingressar banda", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
 
     }
 
+    @GetMapping("/eventosPendentesParaConvite")
+    public ResponseEntity<?> eventosPendentesParaConvite(@RequestParam Long idBanda) {
+        try {
+            return ResponseEntity.ok(conviteBandaService.buscarEventosPendentes(idBanda));
+        } catch (Exception e) {
+            log.error("Erro ao buscar eventos pendentes da banda", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PostMapping("/gerarConviteExterno")
+    public ResponseEntity<?> gerarConviteExterno(@RequestBody GerarConviteExternoDTO dto) {
+        try {
+            return ResponseEntity.ok(conviteBandaService.gerarConviteExterno(dto));
+        } catch (Exception e) {
+            log.error("Erro ao gerar convite externo", e);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/convite-externo/preview")
+    public ResponseEntity<?> previewConviteExterno(@RequestParam String token) {
+        try {
+            return ResponseEntity.ok(conviteBandaService.previewConviteExterno(token));
+        } catch (Exception e) {
+            log.error("Erro ao consultar convite externo", e);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
     @GetMapping("/aceitar-convite-link")
     public ResponseEntity<?> aceitarConvitePorLink(@RequestParam String token) {
         try {
-            Long idBanda = bandaService.aceitarConvitePorLink(token);
+            Long idBanda = conviteBandaService.aceitarConvitePorToken(token);
             return ResponseEntity.ok(idBanda);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());

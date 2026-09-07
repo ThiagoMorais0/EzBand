@@ -35,6 +35,7 @@ import com.baseapplication.core.dto.InfoMembroBandaDTO;
 import com.baseapplication.core.dto.RepertorioBandaDTO;
 import com.baseapplication.core.dto.ShowsFuturosDTO;
 import com.baseapplication.core.enums.Tonalidade;
+import com.baseapplication.core.dto.EventoConviteDTO;
 import com.baseapplication.core.exception.ConflictException;
 import com.baseapplication.core.exception.InternalException;
 import com.baseapplication.core.exception.ResourceNotFoundException;
@@ -46,6 +47,7 @@ import com.baseapplication.core.model.embedded.Musica;
 import com.baseapplication.core.service.BandaService;
 import com.baseapplication.core.service.EventoHelperService;
 import com.baseapplication.core.service.ImagemService;
+import com.baseapplication.core.service.ConviteBandaService;
 import com.baseapplication.core.service.MusicoBandaService;
 import com.baseapplication.core.service.RepertorioBandaService;
 import com.baseapplication.core.utils.Context;
@@ -65,6 +67,7 @@ public class BandaServiceImpl implements BandaService {
 	private final NotificacaoService notificacaoService;
 	private final MembroFantasmaService membroFantasmaService;
 	private final NotificacaoDao notificacaoDao;
+	private final ConviteBandaService conviteBandaService;
 
 	@Override
 	public List<Banda> buscarBandasPorUsuario(Long idUsuario) {
@@ -194,8 +197,18 @@ public class BandaServiceImpl implements BandaService {
 	}
 
 	@Override
-	public void enviarConviteParaUsuarioIngressarBanda(Long idBanda, Long idUsuarioConvidado) {
-		notificacaoService.enviarNotificacao(new ConviteParaUsuarioIngressarBandaEvent(idUsuarioConvidado, buscarPorId(idBanda)));
+	public void enviarConviteParaUsuarioIngressarBanda(Long idBanda, Long idUsuarioConvidado, List<EventoConviteDTO> eventos) {
+		Banda banda = buscarPorId(idBanda);
+		String eventosSerializados = conviteBandaService.serializarEventos(idBanda, eventos);
+
+		// Convite em aberto vira atualização: a notificação duplicada seria descartada e os
+		// eventos recém-escolhidos se perderiam.
+		if (conviteBandaService.atualizarConvitePendente(idBanda, idUsuarioConvidado, eventosSerializados)) {
+			return;
+		}
+
+		notificacaoService.enviarNotificacao(
+				new ConviteParaUsuarioIngressarBandaEvent(idUsuarioConvidado, banda, eventosSerializados));
 	}
 
 	@Override
@@ -510,33 +523,6 @@ public class BandaServiceImpl implements BandaService {
 		repertorio.forEach(repertorioBandaDTO ->
 			repertorioBandaService.updateIndice(repertorioBandaDTO.getId(), repertorioBandaDTO.getIndice())
 		);
-	}
-
-	@Override
-	@Transactional
-	public Long aceitarConvitePorLink(String token) {
-		ConviteParaUsuarioIngressarBanda convite = notificacaoDao.findConviteByLinkToken(token)
-				.orElseThrow(() -> new ResourceNotFoundException("Convite não encontrado ou expirado."));
-
-		Usuario usuarioLogado = Context.getUsuarioLogado();
-		if (!convite.getDestinatarioId().equals(usuarioLogado.getId())) {
-			throw new RestrictionException("Este convite não é para você.");
-		}
-
-		Long idBanda = convite.getRemetenteId();
-		Banda banda = buscarPorId(idBanda);
-
-		musicoBandaService.cadastrarUsuarioEmBanda(
-				usuarioLogado,
-				banda,
-				convite.getInstrumento() != null ? convite.getInstrumento() : "",
-				List.of(PermissaoMusico.MEMBRO_REGULAR)
-		);
-
-		convite.setLida(true);
-		notificacaoDao.save(convite);
-
-		return idBanda;
 	}
 
 }

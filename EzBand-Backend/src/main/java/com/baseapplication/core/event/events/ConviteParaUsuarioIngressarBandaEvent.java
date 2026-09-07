@@ -9,4 +9,10 @@ import lombok.Getter;
 public class ConviteParaUsuarioIngressarBandaEvent implements NotificacaoEvent {
     private Long idUsuarioConvidado;
     private Banda banda;
+    /** Eventos pendentes em que o convidado entra ao aceitar ("SHOW:12,ENSAIO:33"). */
+    private String eventos;
+
+    public ConviteParaUsuarioIngressarBandaEvent(Long idUsuarioConvidado, Banda banda) {
+        this(idUsuarioConvidado, banda, null);
+    }
 }
