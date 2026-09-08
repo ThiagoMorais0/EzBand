@@ -36,6 +36,14 @@ public class LiveUsuarioSessao implements Serializable {
     private String roomKey;
     private long conectadoEm;
 
+    /**
+     * Quem abriu a sessão pediu para avisar o resto da banda?
+     *
+     * <p>Vem do handshake e só importa para a conexão que cria a sessão. O padrão é
+     * verdadeiro: cliente antigo que não manda nada continua notificando como sempre.
+     */
+    private boolean notificarMembros = true;
+
     public LiveMembroPresenca toPresenca() {
         return new LiveMembroPresenca(idUsuario, nome, urlFotoPerfil, instrumentos, conectadoEm);
     }

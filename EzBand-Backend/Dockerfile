@@ -16,6 +16,11 @@ RUN mvn clean package -DskipTests -Dmaven.test.skip=true -Dfile.encoding=UTF-8
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
+# Fuso horario: a imagem base nao traz tzdata e a JVM cai em UTC, o que adianta
+# em 3h tudo que usa LocalDate/LocalTime.now() (ex.: job que conclui eventos).
+RUN apk add --no-cache tzdata
+ENV TZ=America/Sao_Paulo
+
 # Copia o JAR da etapa anterior
 COPY --from=builder /app/target/*.jar app.jar
 

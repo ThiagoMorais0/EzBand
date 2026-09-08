@@ -110,6 +110,7 @@ public class LiveSessionHandshakeInterceptor implements HandshakeInterceptor {
         sessao.setIdBanda(idBanda);
         sessao.setRoomKey(LiveUsuarioSessao.roomKey(tipoEvento, idEvento));
         sessao.setConectadoEm(System.currentTimeMillis());
+        sessao.setNotificarMembros(lerNotificarMembros(request.getURI().getQuery()));
 
         attributes.put(LiveUsuarioSessao.ATTR, sessao);
         return true;
@@ -119,6 +120,24 @@ public class LiveSessionHandshakeInterceptor implements HandshakeInterceptor {
     public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response,
                                WebSocketHandler wsHandler, Exception exception) {
         // nada a fazer
+    }
+
+    /**
+     * {@code ?notificar=0} — quem abriu o palco respondeu que NÃO quer avisar a banda.
+     *
+     * <p>Só um booleano, nada sensível: ao contrário do token, pode viajar na query string.
+     * Ausente ou ilegível vale verdadeiro, que é o comportamento de sempre.
+     */
+    private boolean lerNotificarMembros(String query) {
+        if (query == null || query.isBlank()) return true;
+        for (String par : query.split("&")) {
+            int igual = par.indexOf('=');
+            if (igual < 0) continue;
+            if (!"notificar".equals(par.substring(0, igual))) continue;
+            String valor = par.substring(igual + 1);
+            return !"0".equals(valor) && !"false".equalsIgnoreCase(valor);
+        }
+        return true;
     }
 
     private MusicoEvento buscarParticipacao(Long idEvento, TipoEvento tipoEvento, Long idUsuario) {

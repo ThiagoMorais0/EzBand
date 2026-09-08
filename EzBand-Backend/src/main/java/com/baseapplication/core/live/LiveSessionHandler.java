@@ -105,12 +105,17 @@ public class LiveSessionHandler extends TextWebSocketHandler {
 
         // Só depois de quem abriu já ter o próprio snapshot na tela: push/WhatsApp para o
         // resto da banda não pode atrasar a resposta de quem está esperando o palco abrir.
-        if (abertura.recemCriada()) {
+        // E só se quem abriu tiver respondido que sim: um ensaio de duas pessoas não precisa
+        // acordar o celular de mais ninguém.
+        if (abertura.recemCriada() && usuario.isNotificarMembros()) {
             notificarInicioSessao(usuario);
         }
     }
 
-    /** Dispara só na abertura de fato — nunca quando alguém apenas entra numa sessão já rolando. */
+    /**
+     * Dispara só na abertura de fato — nunca quando alguém apenas entra numa sessão já rolando,
+     * nem quando quem abriu escolheu não avisar a banda.
+     */
     private void notificarInicioSessao(LiveUsuarioSessao usuario) {
         try {
             notificacaoEventoService.notificarSessaoPalcoIniciada(
