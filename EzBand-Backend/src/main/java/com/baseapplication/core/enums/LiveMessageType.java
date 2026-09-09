@@ -36,6 +36,18 @@ public enum LiveMessageType {
     CUE,
     /** Controlador encerra a sessão e dispara a gravação do resumo pós-show. */
     END_SESSION,
+    /**
+     * Controlador acrescenta uma faixa que não estava no repertório do evento.
+     *
+     * <p>A faixa vai sempre para o <b>fim</b> da lista, nunca para o meio: {@code idxAtual},
+     * o log {@link #TRACK_CHANGED} e o conjunto de tocadas de cada cliente são todos por
+     * índice, e inserir no meio deslocaria tudo o que veio depois em toda a sala.
+     *
+     * <p>O conteúdo da faixa (título, artista, tom, BPM, letra) vem do cliente, que já tem o
+     * repertório da banda carregado. É o que mantém a promessa de que o socket não volta ao
+     * banco depois da abertura da sessão.
+     */
+    ADD_TRACK,
 
     // ── Servidor → cliente ──────────────────────────────────────────────
     /** Snapshot completo do estado + presença. Enviado ao conectar e em resposta a SYNC. */
@@ -44,6 +56,8 @@ public enum LiveMessageType {
     PRESENCE_CHANGED,
     CONTROLLER_CHANGED,
     TIMER_CHANGED,
+    /** Faixa nova no fim do repertório da sessão, com o conteúdo para o cliente exibir. */
+    TRACK_ADDED,
     SESSION_ENDED,
     ERROR
 }

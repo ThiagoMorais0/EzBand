@@ -39,6 +39,9 @@ public class LiveServerMessage {
 
     private LiveTimerState timer;
 
+    private LiveFaixaNova faixa;
+    private Integer totalFaixas;
+
     private String cueTipo;
     private String cueTexto;
     private String deNome;
@@ -94,6 +97,24 @@ public class LiveServerMessage {
         LiveServerMessage m = base(LiveMessageType.TIMER_CHANGED);
         m.seq = estado.getSeq();
         m.timer = estado.getTimer();
+        m.porIdUsuario = porIdUsuario;
+        return m;
+    }
+
+    /**
+     * Faixa nova no fim do repertório da sessão.
+     *
+     * <p>Carrega a faixa inteira (com letra) porque o cliente precisa poder abrir a música
+     * sem uma chamada REST — no palco, o round-trip que falta é o que trava a tela. O
+     * {@code totalFaixas} vem junto para o cliente conferir que anexou na posição certa
+     * depois de uma reconexão.
+     */
+    public static LiveServerMessage trackAdded(LiveSessionSnapshot estado, LiveFaixaNova faixa, Long porIdUsuario) {
+        LiveServerMessage m = base(LiveMessageType.TRACK_ADDED);
+        m.seq = estado.getSeq();
+        m.faixa = faixa;
+        m.idx = faixa.getIdx();
+        m.totalFaixas = estado.getTotalFaixas();
         m.porIdUsuario = porIdUsuario;
         return m;
     }

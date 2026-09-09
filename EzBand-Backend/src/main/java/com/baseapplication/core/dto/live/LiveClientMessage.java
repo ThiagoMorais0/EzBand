@@ -29,4 +29,7 @@ public class LiveClientMessage {
     /** CUE. */
     private String cueTipo;
     private String cueTexto;
+
+    /** ADD_TRACK. */
+    private LiveFaixaNova faixa;
 }

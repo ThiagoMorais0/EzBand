@@ -166,6 +166,15 @@ public class UsuarioController {
 		}
 	}
 	
+	@GetMapping("/tipoRelacionamento")
+	public ResponseEntity<?> buscarTipoRelacionamento(@RequestParam Long idUsuario) {
+		try {
+			return ResponseEntity.ok(Map.of("tipoRelacionamento", usuarioService.buscarTipoRelacionamento(idUsuario).name()));
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+		}
+	}
+
 	@GetMapping("/buscarAmigos")
 	public ResponseEntity<?> buscarAmigos(){
 		try{

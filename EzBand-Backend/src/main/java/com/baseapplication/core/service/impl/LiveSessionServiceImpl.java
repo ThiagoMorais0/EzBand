@@ -2,6 +2,7 @@ package com.baseapplication.core.service.impl;
 
 import com.baseapplication.core.dto.live.AberturaSessao;
 import com.baseapplication.core.dto.live.LiveFaixaInfo;
+import com.baseapplication.core.dto.live.LiveFaixaNova;
 import com.baseapplication.core.dto.live.LiveFaixaTocada;
 import com.baseapplication.core.dto.live.LiveSessionSnapshot;
 import com.baseapplication.core.dto.live.LiveTimerState;
@@ -101,6 +102,26 @@ public class LiveSessionServiceImpl implements LiveSessionService {
             int atual = snapshot.getIdxAtual() == null ? (delta > 0 ? -1 : snapshot.getTotalFaixas()) : snapshot.getIdxAtual();
             int alvo = Math.max(0, Math.min(snapshot.getTotalFaixas() - 1, atual + delta));
             return trocarFaixa(snapshot, alvo);
+        });
+    }
+
+    @Override
+    public LiveSessionSnapshot adicionarFaixa(LiveUsuarioSessao usuario, LiveFaixaNova faixa) {
+        if (faixa == null) throw LiveComandoInvalidoException.faixaSemTitulo();
+        faixa.normalizar();
+        if (!faixa.temTitulo()) throw LiveComandoInvalidoException.faixaSemTitulo();
+
+        return mutar(usuario, snapshot -> {
+            exigirControle(snapshot, usuario);
+
+            // Sempre no fim. Inserir no meio deslocaria idxAtual, o log de tocadas e o
+            // conjunto de já-tocadas de cada cliente conectado — um bug silencioso que só
+            // apareceria no resumo, depois do show, sem ninguém saber de onde veio.
+            int idx = snapshot.getTotalFaixas();
+            faixa.setIdx(idx);
+            snapshot.getFaixas().add(new LiveFaixaInfo(
+                    idx, faixa.getTitulo(), faixa.getArtista(), faixa.getDuracaoSegundos()));
+            return true;
         });
     }
 

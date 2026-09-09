@@ -31,6 +31,11 @@ public class LiveComandoInvalidoException extends RuntimeException {
                 "Esta sessão ao vivo não está mais ativa.");
     }
 
+    public static LiveComandoInvalidoException faixaSemTitulo() {
+        return new LiveComandoInvalidoException("FAIXA_SEM_TITULO",
+                "A música precisa de um título para entrar no setlist.");
+    }
+
     public static LiveComandoInvalidoException faixaInvalida() {
         return new LiveComandoInvalidoException("FAIXA_INVALIDA",
                 "Essa faixa não existe no repertório do evento.");

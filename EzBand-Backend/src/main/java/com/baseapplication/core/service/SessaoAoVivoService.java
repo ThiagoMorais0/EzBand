@@ -1,6 +1,7 @@
 package com.baseapplication.core.service;
 
 import com.baseapplication.core.dto.live.LiveSessionSnapshot;
+import com.baseapplication.core.dto.live.EdicaoResumoDTO;
 import com.baseapplication.core.dto.live.ResumoSessaoDTO;
 import com.baseapplication.core.enums.TipoEvento;
 
@@ -17,7 +18,10 @@ public interface SessaoAoVivoService {
      */
     Long persistir(LiveSessionSnapshot snapshot);
 
-    ResumoSessaoDTO buscarUltimoDoEvento(Long idEvento, TipoEvento tipoEvento);
+/** Aplica a versão corrigida do resumo. Só administrador ou fundador da banda. */
+    ResumoSessaoDTO editarResumo(Long idSessao, EdicaoResumoDTO edicao, Long idUsuario);
 
-    List<ResumoSessaoDTO> buscarDoEvento(Long idEvento, TipoEvento tipoEvento);
+    ResumoSessaoDTO buscarUltimoDoEvento(Long idEvento, TipoEvento tipoEvento, Long idUsuario);
+
+    List<ResumoSessaoDTO> buscarDoEvento(Long idEvento, TipoEvento tipoEvento, Long idUsuario);
 }

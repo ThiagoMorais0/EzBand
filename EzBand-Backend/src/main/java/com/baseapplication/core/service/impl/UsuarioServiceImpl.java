@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.baseapplication.core.dao.InstrumentoUsuarioDao;
 import com.baseapplication.core.dao.UsuarioDao;
 import com.baseapplication.core.enums.TipoContato;
+import com.baseapplication.core.enums.TipoRelacionamento;
 import com.baseapplication.core.exception.InternalException;
 import com.baseapplication.core.exception.InvalidParamException;
 import com.baseapplication.core.exception.ResourceNotFoundException;
@@ -329,6 +330,11 @@ public class UsuarioServiceImpl implements UsuarioService {
 	@Override
 	public void deixarDeSeguir(Long idUsuario) {
 		relacionamentoSeguidorService.deixarDeSeguir(idUsuario);
+	}
+
+	@Override
+	public TipoRelacionamento buscarTipoRelacionamento(Long idUsuario) {
+		return relacionamentoSeguidorService.buscarTipoRelacionamento(Context.getUsuarioLogado().getId(), idUsuario);
 	}
 
     @Override

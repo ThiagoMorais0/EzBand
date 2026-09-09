@@ -3,6 +3,7 @@ package com.baseapplication.core.live;
 import com.baseapplication.core.dto.live.AberturaSessao;
 import com.baseapplication.core.dto.live.LiveClientMessage;
 import com.baseapplication.core.dto.live.LiveMembroPresenca;
+import com.baseapplication.core.dto.live.LiveFaixaNova;
 import com.baseapplication.core.dto.live.LiveServerMessage;
 import com.baseapplication.core.dto.live.LiveSessionSnapshot;
 import com.baseapplication.core.service.LiveSessionService;
@@ -209,6 +210,8 @@ public class LiveSessionHandler extends TextWebSocketHandler {
             case TIMER_RESET -> transmitirTimer(liveSessionService.zerarTimer(usuario), usuario);
             case CUE -> registry.broadcast(roomKey, LiveServerMessage.cue(
                     usuario.getIdUsuario(), usuario.getNome(), comando.getCueTipo(), comando.getCueTexto()));
+            case ADD_TRACK -> transmitirFaixaAdicionada(
+                    liveSessionService.adicionarFaixa(usuario, comando.getFaixa()), comando.getFaixa(), usuario);
             case END_SESSION -> encerrar(usuario);
             default -> registry.enviar(sessao, LiveServerMessage.erro("COMANDO_DESCONHECIDO",
                     "Comando ainda não suportado nesta versão."));
@@ -226,6 +229,13 @@ public class LiveSessionHandler extends TextWebSocketHandler {
     private void transmitirTimer(LiveSessionSnapshot snapshot, LiveUsuarioSessao usuario) {
         if (snapshot == null) return;
         registry.broadcast(usuario.getRoomKey(), LiveServerMessage.timerChanged(snapshot, usuario.getIdUsuario()));
+    }
+
+    private void transmitirFaixaAdicionada(LiveSessionSnapshot snapshot, LiveFaixaNova faixa,
+                                           LiveUsuarioSessao usuario) {
+        if (snapshot == null) return;
+        registry.broadcast(usuario.getRoomKey(),
+                LiveServerMessage.trackAdded(snapshot, faixa, usuario.getIdUsuario()));
     }
 
     private void transmitirTroca(LiveSessionSnapshot snapshot, LiveUsuarioSessao usuario) {

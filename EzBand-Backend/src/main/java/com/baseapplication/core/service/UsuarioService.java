@@ -11,6 +11,7 @@ import com.baseapplication.core.dto.InfoUsuarioPainelDTO;
 import com.baseapplication.core.dto.BuscaGlobalDTO;
 import com.baseapplication.core.dto.InstrumentoDTO;
 import com.baseapplication.core.enums.TipoContato;
+import com.baseapplication.core.enums.TipoRelacionamento;
 import com.baseapplication.core.model.Usuario;
 import com.baseapplication.core.model.dto.BandaDTO;
 
@@ -61,6 +62,8 @@ public interface UsuarioService {
 	void seguirUsuario(Long idUsuario);
 
 	void deixarDeSeguir(Long idUsuario);
+
+	TipoRelacionamento buscarTipoRelacionamento(Long idUsuario);
 
     List<InfoPerfilUsuarioDTO> buscarAmigos();
 

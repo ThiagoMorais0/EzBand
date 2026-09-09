@@ -54,6 +54,20 @@ public class SessaoAoVivo {
     @Column(name = "total_faixas_repertorio")
     private Integer totalFaixasRepertorio;
 
+    /**
+     * Quando alguém corrigiu o resumo à mão, e quem.
+     *
+     * <p>Só o usuário sabe se o registro automático bate com o que aconteceu no palco — um
+     * clique errado para voltar uma música vira uma repetição que nunca houve. Por isso a
+     * edição existe; e por isso ela deixa rastro, para quem lê o histórico depois saber que
+     * está vendo uma versão corrigida.
+     */
+    @Column(name = "editado_em")
+    private LocalDateTime editadoEm;
+
+    @Column(name = "editado_por")
+    private Long editadoPor;
+
     @OneToMany(mappedBy = "sessao", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<SessaoAoVivoFaixa> faixas = new ArrayList<>();
 

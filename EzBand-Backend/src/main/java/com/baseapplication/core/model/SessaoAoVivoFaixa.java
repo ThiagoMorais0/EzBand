@@ -36,6 +36,25 @@ public class SessaoAoVivoFaixa {
     private String titulo;
     private String artista;
 
+    /**
+     * Posição no resumo, editável pela banda.
+     *
+     * <p>Separada de {@link #iniciadaEm} de propósito: reordenar o resumo não pode reescrever
+     * a hora em que a música de fato aconteceu. Nula em sessões gravadas antes deste campo
+     * existir — nesse caso a ordem cai de volta para o horário de início.
+     */
+    private Integer ordem;
+
+    /**
+     * Faixa que a banda tocou mas o app não registrou, acrescentada à mão depois do show.
+     *
+     * <p>Não tem {@code iniciadaEm} nem duração medida: ninguém abriu ela na tela. Existe
+     * para o resumo poder contar a verdade, e é marcada para que a métrica de desvio não
+     * confunda uma estimativa humana com um tempo cronometrado.
+     */
+    @Column(name = "adicionada_manualmente")
+    private Boolean adicionadaManualmente;
+
     @Column(name = "iniciada_em")
     private LocalDateTime iniciadaEm;
 

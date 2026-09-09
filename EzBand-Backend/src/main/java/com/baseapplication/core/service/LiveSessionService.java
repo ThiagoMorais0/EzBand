@@ -1,6 +1,7 @@
 package com.baseapplication.core.service;
 
 import com.baseapplication.core.dto.live.AberturaSessao;
+import com.baseapplication.core.dto.live.LiveFaixaNova;
 import com.baseapplication.core.dto.live.LiveSessionSnapshot;
 import com.baseapplication.core.live.LiveUsuarioSessao;
 
@@ -25,6 +26,14 @@ public interface LiveSessionService {
 
     /** Avança ({@code delta = 1}) ou volta ({@code delta = -1}) a partir do estado do servidor. */
     LiveSessionSnapshot moverFaixa(LiveUsuarioSessao usuario, int delta);
+
+    /**
+     * Acrescenta uma faixa ao fim do repertório da sessão e devolve o snapshot mutado.
+     *
+     * <p>Preenche {@code faixa.idx} com a posição atribuída — é o que o handler usa para
+     * transmitir o {@code TRACK_ADDED}.
+     */
+    LiveSessionSnapshot adicionarFaixa(LiveUsuarioSessao usuario, LiveFaixaNova faixa);
 
     LiveSessionSnapshot voltarAoSetlist(LiveUsuarioSessao usuario);
 

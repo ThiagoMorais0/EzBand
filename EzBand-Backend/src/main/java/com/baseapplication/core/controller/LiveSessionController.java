@@ -1,6 +1,7 @@
 package com.baseapplication.core.controller;
 
 import com.baseapplication.core.dao.MusicoEventoDao;
+import com.baseapplication.core.dto.live.EdicaoResumoDTO;
 import com.baseapplication.core.dto.live.LiveSessionStatusDTO;
 import com.baseapplication.core.dto.live.LiveSessionSnapshot;
 import com.baseapplication.core.dto.live.ResumoSessaoDTO;
@@ -14,6 +15,9 @@ import com.baseapplication.core.utils.Context;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -70,7 +74,7 @@ public class LiveSessionController {
         if (idUsuario == null || !participaDoEvento(idEvento, tipoEvento, idUsuario)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-        ResumoSessaoDTO resumo = sessaoAoVivoService.buscarUltimoDoEvento(idEvento, tipoEvento);
+        ResumoSessaoDTO resumo = sessaoAoVivoService.buscarUltimoDoEvento(idEvento, tipoEvento, idUsuario);
         return resumo == null ? ResponseEntity.noContent().build() : ResponseEntity.ok(resumo);
     }
 
@@ -81,7 +85,23 @@ public class LiveSessionController {
         if (idUsuario == null || !participaDoEvento(idEvento, tipoEvento, idUsuario)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-        return ResponseEntity.ok(sessaoAoVivoService.buscarDoEvento(idEvento, tipoEvento));
+        return ResponseEntity.ok(sessaoAoVivoService.buscarDoEvento(idEvento, tipoEvento, idUsuario));
+    }
+
+    /**
+     * Corrige o resumo de uma sessão já encerrada.
+     *
+     * <p>Existe porque o registro automático não sabe distinguir um clique errado de uma
+     * música tocada duas vezes — só quem estava no palco sabe. A permissão é checada no
+     * serviço, contra a banda dona da sessão.
+     */
+    @PutMapping("/resumo/{idSessao}")
+    public ResponseEntity<?> editarResumo(@PathVariable Long idSessao, @RequestBody EdicaoResumoDTO edicao) {
+        Long idUsuario = Context.getUsuarioLogado().getId();
+        if (idUsuario == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        return ResponseEntity.ok(sessaoAoVivoService.editarResumo(idSessao, edicao, idUsuario));
     }
 
     private boolean participaDoEvento(Long idEvento, TipoEvento tipoEvento, Long idUsuario) {
