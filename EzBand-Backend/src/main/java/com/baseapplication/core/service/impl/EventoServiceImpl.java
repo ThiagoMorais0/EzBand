@@ -543,6 +543,9 @@ public class EventoServiceImpl implements EventoService {
 		show.setIsPortaria(novoShowDTO.getIsPortaria());
 		show.setConsumacaoPorMusico(novoShowDTO.getConsumacaoPorMusico());
 		show.setLinkIngresso(novoShowDTO.getLinkIngresso());
+		// Payload sem a flag (clientes antigos, edicoes parciais) preserva o valor atual.
+		if (novoShowDTO.getConfirmado() != null)
+			show.setConfirmado(novoShowDTO.getConfirmado());
 	}
 
 	private static void VerificarHorariosNulos(NovoShowDTO novoShowDTO, Show show) {
@@ -643,6 +646,9 @@ public class EventoServiceImpl implements EventoService {
 		ensaio.setHorarioInicio(novoEnsaioDTO.getHorarioInicio());
 		ensaio.setDuracao(novoEnsaioDTO.getDuracao());
 		ensaio.setValor(novoEnsaioDTO.getValor());
+		// Payload sem a flag (clientes antigos, edicoes parciais) preserva o valor atual.
+		if (novoEnsaioDTO.getConfirmado() != null)
+			ensaio.setConfirmado(novoEnsaioDTO.getConfirmado());
 		atualizarMusicosEventoComVerificacao(idEnsaio, TipoEvento.ENSAIO, novoEnsaioDTO.getMusicos(), musicosAntigos, banda, ensaio);
 		atualizarMembrosFantasmaEvento(idEnsaio, TipoEvento.ENSAIO, novoEnsaioDTO.getMembrosFantasma(), membrosFantasmaAntigos);
 		VerificarHorariosNulos(novoEnsaioDTO, ensaio);

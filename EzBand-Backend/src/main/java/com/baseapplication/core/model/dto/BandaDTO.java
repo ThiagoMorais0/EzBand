@@ -25,6 +25,7 @@ public class BandaDTO {
     private String nome;
     private String descricao;
     private String categoria;
+    private String nacionalidade;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy", locale = "pt-BR", timezone = "Brazil/East")
     private LocalDate dataInclusao;
     private String urlLogo;

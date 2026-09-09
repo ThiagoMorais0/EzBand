@@ -18,6 +18,7 @@ public class CadastroBandaDTO {
     private String nome;
     private String descricao;
     private String categoria;
+    private String nacionalidade;
     private String instrumento;
     private String instagramUrl;
     private String facebookUrl;

@@ -10,6 +10,7 @@ public class EdicaoBandaDTO {
     private String nome;
     private String descricao;
     private String categoria;
+    private String nacionalidade;
     private Boolean permiteEntradaPorConvite;
     private Boolean exigirAprovacaoCompromissos;
     private String instagramUrl;

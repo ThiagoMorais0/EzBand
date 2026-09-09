@@ -37,6 +37,7 @@ public class NovoShowDTO {
 	private Boolean isPortaria;
 	private BigDecimal consumacaoPorMusico;
 	private String linkIngresso;
+	private Boolean confirmado;
 	private List<MusicoEventoDTO> musicos = new ArrayList<>();
 	private List<MembroFantasmaEventoDTO> membrosFantasma = new ArrayList<>();
 
@@ -49,6 +50,8 @@ public class NovoShowDTO {
 		show.setDataInclusao(LocalDate.now());
 		show.setConsumacaoPorMusico(this.consumacaoPorMusico);
 		show.setLinkIngresso(this.linkIngresso);
+		// Ausente no payload (clientes antigos) significa show confirmado.
+		show.setConfirmado(this.confirmado == null || this.confirmado);
 		verificarHorariosNulos(show);
 
 		return show;

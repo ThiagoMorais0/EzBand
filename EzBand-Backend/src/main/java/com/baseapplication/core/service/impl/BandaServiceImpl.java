@@ -271,6 +271,11 @@ public class BandaServiceImpl implements BandaService {
 		banda.setNome(bandaDTO.getNome());
 		banda.setDescricao(bandaDTO.getDescricao());
 		banda.setCategoria(bandaDTO.getCategoria());
+		if (bandaDTO.getNacionalidade() != null && !bandaDTO.getNacionalidade().isBlank()) {
+			banda.setNacionalidade(normalizarNacionalidade(bandaDTO.getNacionalidade()));
+		} else if (banda.getNacionalidade() == null) {
+			banda.setNacionalidade("BR");
+		}
 		banda.setUrlLogo(urlLogo);
 		banda.setUrlBanner(urlBanner);
 		banda.setInstagramUrl(bandaDTO.getInstagramUrl());
@@ -278,6 +283,14 @@ public class BandaServiceImpl implements BandaService {
 		banda.setYoutubeUrl(bandaDTO.getYoutubeUrl());
 		banda.getParametros().setPermiteEntradaPorConvite(bandaDTO.getPermiteEntradaPorConvite());
 		banda.getParametros().setExigirAprovacaoCompromissos(bandaDTO.getExigirAprovacaoCompromissos());
+	}
+
+	/** Nacionalidade e um ISO 3166-1 alpha-2 maiusculo; sem valor, assume Brasil. */
+	private String normalizarNacionalidade(String nacionalidade) {
+		if (nacionalidade == null || nacionalidade.isBlank()) {
+			return "BR";
+		}
+		return nacionalidade.trim().toUpperCase();
 	}
 
 	private void cadastrarUsuarioEmBanda(CadastroBandaDTO bandaDTO, Banda novaBanda, List<PermissaoMusico> permissoes) {
@@ -480,6 +493,7 @@ public class BandaServiceImpl implements BandaService {
 		banda.setCategoria(bandaDTO.getCategoria());
 		banda.setNome(bandaDTO.getNome());
 		banda.setDescricao(bandaDTO.getDescricao());
+		banda.setNacionalidade(normalizarNacionalidade(bandaDTO.getNacionalidade()));
 		banda.setUrlLogo(urlLogo);
 		banda.setUrlBanner(urlBanner);
 		banda.setInstagramUrl(bandaDTO.getInstagramUrl());

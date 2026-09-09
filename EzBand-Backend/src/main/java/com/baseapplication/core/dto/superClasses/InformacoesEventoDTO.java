@@ -44,6 +44,7 @@ public abstract class InformacoesEventoDTO {
     private String local;
     private String observacoes;
     private String status;
+    private Boolean confirmado;
     private String instrumentos;
     private Boolean usuarioPertenceAoEvento = true;
 

@@ -28,6 +28,7 @@ public class NovoEnsaioDTO {
     @JsonFormat(pattern = "HH:mm:ss")
     private Time duracao;
     private BigDecimal valor;
+    private Boolean confirmado;
     private List<MusicoEventoDTO> musicos;
     private List<MembroFantasmaEventoDTO> membrosFantasma;
 
@@ -39,6 +40,8 @@ public class NovoEnsaioDTO {
         }
         ensaio.setData(DateUtils.stringToLocalDate(this.dataEnsaio));
         ensaio.setDataInclusao(LocalDate.now());
+        // Ausente no payload (clientes antigos) significa ensaio confirmado.
+        ensaio.setConfirmado(this.confirmado == null || this.confirmado);
         verificarHorariosNulos(ensaio);
         return ensaio;
     }

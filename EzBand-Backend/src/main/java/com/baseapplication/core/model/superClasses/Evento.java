@@ -47,6 +47,12 @@ public abstract class Evento {
 	private String observacoes;
 	@Enumerated(EnumType.STRING)
 	private StatusEvento status;
+	/**
+	 * Data confirmada com o contratante. Um evento nao confirmado apenas "segura"
+	 * a data enquanto a negociacao acontece. Nulo (registros antigos) vale como true.
+	 */
+	@Column(name = "CONFIRMADO")
+	private Boolean confirmado = Boolean.TRUE;
 
 	@Enumerated(EnumType.STRING)
 	private TipoEvento tipoEvento;

@@ -31,6 +31,7 @@ public class EventoDTO {
     private EnderecoDTO endereco = new EnderecoDTO();
     private String observacoes;
     private String status;
+    private Boolean confirmado;
     private BandaDTO banda;
 
     public EventoDTO(Evento evento){

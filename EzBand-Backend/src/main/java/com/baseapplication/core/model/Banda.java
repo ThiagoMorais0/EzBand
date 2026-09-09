@@ -35,6 +35,9 @@ public class Banda implements Serializable {
     private String urlLogo;
     @Column(length = 1000)
     private String urlBanner;
+    // Pais de origem da banda em ISO 3166-1 alpha-2 (ex: BR). Nao confundir com endereco.pais.
+    @Column(length = 2)
+    private String nacionalidade;
     @Column(length = 500)
     private String instagramUrl;
     @Column(length = 500)
