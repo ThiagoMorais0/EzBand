@@ -16,6 +16,8 @@ public interface MusicoBandaService {
 
     void atualizarCorHex(Long idBanda, String corHex);
 
+    void definirInatividade(Long idBanda, Long idUsuario, Boolean inativa);
+
     void expulsar(Long idBanda, Long idUsuario);
 
     List<MusicoBanda> buscarMembrosPorIdBanda(Long idBanda);

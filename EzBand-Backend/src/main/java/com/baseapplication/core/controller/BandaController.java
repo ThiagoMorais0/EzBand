@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.baseapplication.core.dao.SeguirBandaDao;
 import com.baseapplication.core.dto.*;
+import com.baseapplication.core.exception.InvalidParamException;
 import com.baseapplication.core.model.SeguirBanda;
 import com.baseapplication.core.model.SeguirBandaId;
 import com.baseapplication.core.service.ConviteBandaService;
@@ -67,6 +68,9 @@ public class BandaController {
         try {
             Long idBanda = bandaService.novaBanda(bandaJson, logo, banner);
             return ResponseEntity.ok(idBanda);
+        } catch (InvalidParamException e) {
+            // Dado invalido tem mensagem propria: o catch generico abaixo a esconderia atras de um 500.
+            throw e;
         } catch (Exception e) {
             log.error("Erro ao criar banda", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -229,6 +233,16 @@ public class BandaController {
         }
     }
 
+    /**
+     * Inativar/reativar e por musico: esconde a banda apenas no painel de quem chamou,
+     * sem alterar nada para os outros membros.
+     */
+    @PatchMapping("/definirInatividade")
+    public ResponseEntity<?> definirInatividade(@RequestParam Long idBanda, @RequestParam Boolean inativa) {
+        musicoBandaService.definirInatividade(idBanda, Context.getUsuarioLogado().getId(), inativa);
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping("/editarBanda")
     public ResponseEntity<?> editarBanda(
             @RequestParam("banda") String bandaJson,
@@ -239,6 +253,9 @@ public class BandaController {
         try {
             bandaService.editarBanda(bandaJson, imagem, removerLogo, banner, removerBanner);
             return ResponseEntity.ok("Banda editada com sucesso");
+        } catch (InvalidParamException e) {
+            // Dado invalido tem mensagem propria: o catch generico abaixo a esconderia atras de um 500.
+            throw e;
         } catch (Exception e) {
             log.error("Erro ao editar banda", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

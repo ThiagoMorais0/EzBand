@@ -26,6 +26,10 @@ public class BandaDTO {
     private String descricao;
     private String categoria;
     private String nacionalidade;
+    // Nulos quando a banda nao informou: o front omite o campo em vez de mostrar placeholder.
+    private Integer anoFundacao;
+    private String tipoRepertorio;
+    private String tipoRepertorioDescricao;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy", locale = "pt-BR", timezone = "Brazil/East")
     private LocalDate dataInclusao;
     private String urlLogo;
@@ -42,12 +46,20 @@ public class BandaDTO {
     private Integer quantidadeMembros;
     private Long quantidadeSeguidores;
     private Boolean estouSeguindo;
+    // Preferencia do usuario logado: banda oculta no painel dele (nao afeta os outros membros)
+    private Boolean inativa;
     private List<InfoPerfilUsuarioDTO> membros;
     private List<PublicacaoDTO> publicacoes;
 
 
     public BandaDTO(Banda banda){
         BeanUtils.copyProperties(banda, this);
+        // O enum nao e copiado pelo BeanUtils (tipos diferentes): o nome alimenta os formularios
+        // e a descricao a exibicao.
+        if (banda.getTipoRepertorio() != null) {
+            this.tipoRepertorio = banda.getTipoRepertorio().name();
+            this.tipoRepertorioDescricao = banda.getTipoRepertorio().getDescricao();
+        }
         this.permiteEntradaPorConvite = banda.getParametros().getPermiteEntradaPorConvite();
         this.exigirAprovacaoCompromissos = banda.getParametros().getExigirAprovacaoCompromissos();
         this.listarObservacaoRepertorio = banda.getParametros().getListarObservacaoRepertorio();
@@ -70,5 +82,19 @@ public class BandaDTO {
         //ORDENAR por data de publicação
         this.publicacoes = banda.getPublicacoes().stream().map(PublicacaoDTO::new)
                 .sorted(Comparator.comparing(PublicacaoDTO::getDataPublicacao).reversed()).toList();
+        this.inativa = false;
+    }
+
+    /**
+     * O painel e montado em threads do CompletableFuture, onde o SecurityContext nao esta
+     * propagado — por isso o id do usuario precisa vir explicito para resolver a inatividade.
+     */
+    public BandaDTO(Banda banda, Long idUsuario) {
+        this(banda);
+        this.inativa = banda.getMusicos().stream()
+                .filter(musico -> musico.getId() != null && musico.getId().getIdUsuario().equals(idUsuario))
+                .findFirst()
+                .map(musico -> Boolean.TRUE.equals(musico.getInativa()))
+                .orElse(false);
     }
 }

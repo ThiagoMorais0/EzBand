@@ -11,6 +11,7 @@ import com.baseapplication.core.dto.BuscaBandaDTO;
 import com.baseapplication.core.dto.EditarMembroMusicoBandaDTO;
 import com.baseapplication.core.enums.PermissaoMusico;
 import com.baseapplication.core.enums.StatusEvento;
+import com.baseapplication.core.enums.TipoRepertorio;
 import com.baseapplication.core.event.events.ConviteParaUsuarioIngressarBandaEvent;
 import com.baseapplication.core.event.events.UsuarioExpulsoDeBandaEvent;
 import com.baseapplication.core.model.*;
@@ -38,6 +39,7 @@ import com.baseapplication.core.enums.Tonalidade;
 import com.baseapplication.core.dto.EventoConviteDTO;
 import com.baseapplication.core.exception.ConflictException;
 import com.baseapplication.core.exception.InternalException;
+import com.baseapplication.core.exception.InvalidParamException;
 import com.baseapplication.core.exception.ResourceNotFoundException;
 import com.baseapplication.core.exception.RestrictionException;
 import com.baseapplication.core.model.dto.BandaDTO;
@@ -69,6 +71,9 @@ public class BandaServiceImpl implements BandaService {
 	private final NotificacaoDao notificacaoDao;
 	private final ConviteBandaService conviteBandaService;
 
+	/** Nenhuma banda de verdade foi fundada antes disso; abaixo daqui e erro de digitacao. */
+	private static final int ANO_FUNDACAO_MINIMO = 1900;
+
 	@Override
 	public List<Banda> buscarBandasPorUsuario(Long idUsuario) {
 		return bandaDao.buscarBandasPorUsuario(idUsuario).orElse(new ArrayList<Banda>());
@@ -82,7 +87,8 @@ public class BandaServiceImpl implements BandaService {
 	@Override
 	public BandaDTO getInfo(Long idBanda) {
 		return new BandaDTO(
-				bandaDao.findById(idBanda).orElseThrow(() -> new ResourceNotFoundException("Banda não encontrada")));
+				bandaDao.findById(idBanda).orElseThrow(() -> new ResourceNotFoundException("Banda não encontrada")),
+				Context.getUsuarioLogado().getId());
 	}
 
 	@Override
@@ -276,6 +282,8 @@ public class BandaServiceImpl implements BandaService {
 		} else if (banda.getNacionalidade() == null) {
 			banda.setNacionalidade("BR");
 		}
+		banda.setAnoFundacao(validarAnoFundacao(bandaDTO.getAnoFundacao()));
+		banda.setTipoRepertorio(converterTipoRepertorio(bandaDTO.getTipoRepertorio()));
 		banda.setUrlLogo(urlLogo);
 		banda.setUrlBanner(urlBanner);
 		banda.setInstagramUrl(bandaDTO.getInstagramUrl());
@@ -283,6 +291,34 @@ public class BandaServiceImpl implements BandaService {
 		banda.setYoutubeUrl(bandaDTO.getYoutubeUrl());
 		banda.getParametros().setPermiteEntradaPorConvite(bandaDTO.getPermiteEntradaPorConvite());
 		banda.getParametros().setExigirAprovacaoCompromissos(bandaDTO.getExigirAprovacaoCompromissos());
+	}
+
+	/**
+	 * Ano de fundacao e opcional; quando vem preenchido tem que ser plausivel, senao o perfil
+	 * mostraria "desde 12" ou um ano no futuro.
+	 */
+	private Integer validarAnoFundacao(Integer anoFundacao) {
+		if (anoFundacao == null) {
+			return null;
+		}
+		int anoAtual = LocalDate.now().getYear();
+		if (anoFundacao < ANO_FUNDACAO_MINIMO || anoFundacao > anoAtual) {
+			throw new InvalidParamException(
+					"Ano de fundação deve estar entre " + ANO_FUNDACAO_MINIMO + " e " + anoAtual);
+		}
+		return anoFundacao;
+	}
+
+	/** Tipo de repertorio e opcional; string vazia equivale a "nao informado". */
+	private TipoRepertorio converterTipoRepertorio(String tipoRepertorio) {
+		if (tipoRepertorio == null || tipoRepertorio.isBlank()) {
+			return null;
+		}
+		try {
+			return TipoRepertorio.valueOf(tipoRepertorio.trim().toUpperCase());
+		} catch (IllegalArgumentException e) {
+			throw new InvalidParamException("Tipo de repertório inválido: " + tipoRepertorio);
+		}
 	}
 
 	/** Nacionalidade e um ISO 3166-1 alpha-2 maiusculo; sem valor, assume Brasil. */
@@ -494,6 +530,8 @@ public class BandaServiceImpl implements BandaService {
 		banda.setNome(bandaDTO.getNome());
 		banda.setDescricao(bandaDTO.getDescricao());
 		banda.setNacionalidade(normalizarNacionalidade(bandaDTO.getNacionalidade()));
+		banda.setAnoFundacao(validarAnoFundacao(bandaDTO.getAnoFundacao()));
+		banda.setTipoRepertorio(converterTipoRepertorio(bandaDTO.getTipoRepertorio()));
 		banda.setUrlLogo(urlLogo);
 		banda.setUrlBanner(urlBanner);
 		banda.setInstagramUrl(bandaDTO.getInstagramUrl());

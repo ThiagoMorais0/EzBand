@@ -1,5 +1,6 @@
 package com.baseapplication.core.model;
 
+import com.baseapplication.core.enums.TipoRepertorio;
 import com.baseapplication.core.model.embedded.Endereco;
 import com.baseapplication.core.model.embedded.ParametrosBanda;
 import com.baseapplication.core.model.publicacao.PublicacaoBanda;
@@ -38,6 +39,12 @@ public class Banda implements Serializable {
     // Pais de origem da banda em ISO 3166-1 alpha-2 (ex: BR). Nao confundir com endereco.pais.
     @Column(length = 2)
     private String nacionalidade;
+    // Ano em que a banda foi fundada. Opcional: nao confundir com dataInclusao (entrada no EzBand).
+    private Integer anoFundacao;
+    // Opcional: quando nulo, o perfil simplesmente nao exibe o tipo de repertorio.
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
+    private TipoRepertorio tipoRepertorio;
     @Column(length = 500)
     private String instagramUrl;
     @Column(length = 500)

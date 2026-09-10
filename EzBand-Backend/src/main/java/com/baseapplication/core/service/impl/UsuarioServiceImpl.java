@@ -227,7 +227,8 @@ public class UsuarioServiceImpl implements UsuarioService {
 	@Override
 	@Transactional(readOnly = true)
 	public List<BandaDTO> buscarBandasDoUsuario() {
-		return Context.getUsuarioLogado().getBandas().stream().map(BandaDTO::new).toList();
+		Long idUsuario = Context.getUsuarioLogado().getId();
+		return Context.getUsuarioLogado().getBandas().stream().map(banda -> new BandaDTO(banda, idUsuario)).toList();
 	}
 
 	@Override
@@ -300,7 +301,8 @@ public class UsuarioServiceImpl implements UsuarioService {
 
 	private CompletableFuture<List<BandaDTO>> buscarBandasDoUsuarioAsync(Long idUsuario) {
 		return CompletableFuture
-				.supplyAsync(() -> bandaService.buscarBandasPorUsuario(idUsuario).stream().map(BandaDTO::new).toList());
+				.supplyAsync(() -> bandaService.buscarBandasPorUsuario(idUsuario).stream()
+						.map(banda -> new BandaDTO(banda, idUsuario)).toList());
 	}
 
 	@Override

@@ -22,6 +22,13 @@ public class MusicoBanda implements Serializable {
     private String instrumentos;
     private String corHex;
 
+    /**
+     * Inatividade e por musico, nao pela banda: cada membro escolhe se a banda
+     * aparece ou nao no seu painel. Null equivale a false (banda ativa).
+     */
+    @Column(name = "INATIVA")
+    private Boolean inativa;
+
     @ElementCollection(targetClass = PermissaoMusico.class)
     @CollectionTable(
             name = "permissao_musico_banda",

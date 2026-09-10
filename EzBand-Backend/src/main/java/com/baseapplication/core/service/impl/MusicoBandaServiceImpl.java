@@ -1,6 +1,7 @@
 package com.baseapplication.core.service.impl;
 
 import com.baseapplication.core.dao.MusicoBandaDao;
+import com.baseapplication.core.exception.ResourceNotFoundException;
 import com.baseapplication.core.enums.PermissaoMusico;
 import com.baseapplication.core.model.Banda;
 import com.baseapplication.core.model.MusicoBanda;
@@ -46,6 +47,14 @@ public class MusicoBandaServiceImpl implements MusicoBandaService {
         Long idUsuario = com.baseapplication.core.utils.Context.getUsuarioLogado().getId();
         MusicoBanda musicoBanda = musicoBandaDao.findById(new MusicoBandaId(idUsuario, idBanda)).orElseThrow();
         musicoBanda.setCorHex(corHex);
+        musicoBandaDao.save(musicoBanda);
+    }
+
+    @Override
+    public void definirInatividade(Long idBanda, Long idUsuario, Boolean inativa) {
+        MusicoBanda musicoBanda = musicoBandaDao.findById(new MusicoBandaId(idUsuario, idBanda))
+                .orElseThrow(() -> new ResourceNotFoundException("Você não é membro desta banda"));
+        musicoBanda.setInativa(Boolean.TRUE.equals(inativa));
         musicoBandaDao.save(musicoBanda);
     }
 
