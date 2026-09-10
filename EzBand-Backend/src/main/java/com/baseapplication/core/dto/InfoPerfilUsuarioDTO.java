@@ -15,7 +15,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Collections;
 
@@ -62,7 +61,7 @@ public class InfoPerfilUsuarioDTO {
 
 
         this.setBandas(usuario.getBandas().stream().map(BandaDTO::new).toList());
-        this.setPublicacoes(usuario.getPublicacoes().stream().map(PublicacaoDTO::new).sorted(Comparator.comparing(PublicacaoDTO::getDataPublicacao).reversed()).toList());
+        this.setPublicacoes(PublicacaoDTO.maisRecentesPrimeiro(usuario.getPublicacoes()));
     }
 
     /**

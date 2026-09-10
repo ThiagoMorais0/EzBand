@@ -13,7 +13,6 @@ import lombok.Setter;
 import org.springframework.beans.BeanUtils;
 
 import java.time.LocalDate;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -79,9 +78,7 @@ public class BandaDTO {
         //Em membros, somar membros normais com membros fantasma
         this.membros = banda.getMusicos().stream().map(InfoPerfilUsuarioDTO::new).collect(Collectors.toList());
         this.membros.addAll(banda.getMembrosFantasma().stream().map(InfoPerfilUsuarioDTO::new).collect(Collectors.toList()));
-        //ORDENAR por data de publicação
-        this.publicacoes = banda.getPublicacoes().stream().map(PublicacaoDTO::new)
-                .sorted(Comparator.comparing(PublicacaoDTO::getDataPublicacao).reversed()).toList();
+        this.publicacoes = PublicacaoDTO.maisRecentesPrimeiro(banda.getPublicacoes());
         this.inativa = false;
     }
 
