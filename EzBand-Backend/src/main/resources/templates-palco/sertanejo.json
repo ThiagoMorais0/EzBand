@@ -2,84 +2,280 @@
   "chave": "sertanejo",
   "nome": "Sertanejo",
   "descricao": "Dupla de voz e violão, guitarra, baixo, bateria e sanfona.",
-  "gradeColunas": 12,
-  "gradeLinhas": 6,
+  "larguraM": 9.0,
+  "profundidadeM": 6.0,
+  "gradeLinhas": 4,
   "posicoes": [
     {
       "rotulo": "Bateria",
       "instrumento": "Bateria",
-      "coluna": 5, "linha": 0, "larguraCel": 3, "alturaCel": 2,
-      "backingVocal": false, "ordemCanal": 10,
+      "posX": 50,
+      "linha": 0,
+      "escala": 1,
+      "backingVocal": false,
+      "ordemCanal": 10,
       "itens": [
-        { "tipo": "INSTRUMENTO", "origem": "PROPRIO", "quantidade": 1, "canais": 8, "rotulo": "Bateria completa", "ordem": 0 },
-        { "tipo": "MICROFONE", "origem": "CASA", "quantidade": 8, "canais": 0, "observacao": "Microfonação de bateria", "ordem": 1 },
-        { "tipo": "PRATICAVEL", "origem": "CASA", "quantidade": 1, "rotulo": "Praticável 2x2m", "ordem": 2 },
-        { "tipo": "MONITOR_WEDGE", "origem": "CASA", "quantidade": 1, "vias": 1, "mixIndependente": true, "ordem": 3 },
-        { "tipo": "TOMADA", "origem": "CASA", "quantidade": 1, "voltagem": 220, "ponto": "fundo do palco", "ordem": 4 }
+        {
+          "tipo": "BATERIA",
+          "origem": "PROPRIO",
+          "quantidade": 1,
+          "canais": 8,
+          "rotulo": "Bateria completa",
+          "ordem": 0
+        },
+        {
+          "tipo": "MICROFONE",
+          "origem": "CASA",
+          "quantidade": 8,
+          "canais": 0,
+          "observacao": "Microfonação de bateria",
+          "ordem": 1
+        },
+        {
+          "tipo": "PRATICAVEL",
+          "origem": "CASA",
+          "quantidade": 1,
+          "rotulo": "Praticável 2x2m",
+          "ordem": 2
+        },
+        {
+          "tipo": "MONITOR_WEDGE",
+          "origem": "CASA",
+          "quantidade": 1,
+          "vias": 1,
+          "mixIndependente": true,
+          "ordem": 3
+        },
+        {
+          "tipo": "TOMADA",
+          "origem": "CASA",
+          "quantidade": 1,
+          "voltagem": 220,
+          "ponto": "fundo do palco",
+          "ordem": 4
+        }
       ]
     },
     {
       "rotulo": "Sanfona",
       "instrumento": "Sanfona",
-      "coluna": 9, "linha": 1, "larguraCel": 2, "alturaCel": 1,
-      "backingVocal": false, "ordemCanal": 60,
+      "posX": 80,
+      "linha": 1,
+      "escala": 1,
+      "backingVocal": false,
+      "ordemCanal": 60,
       "itens": [
-        { "tipo": "INSTRUMENTO", "origem": "PROPRIO", "quantidade": 1, "canais": 1, "rotulo": "Sanfona", "ordem": 0 },
-        { "tipo": "DI", "origem": "CASA", "quantidade": 1, "canais": 0, "ordem": 1 },
-        { "tipo": "MONITOR_WEDGE", "origem": "CASA", "quantidade": 1, "vias": 1, "mixIndependente": false, "ordem": 2 },
-        { "tipo": "TOMADA", "origem": "CASA", "quantidade": 1, "voltagem": 220, "ponto": "lateral direita", "ordem": 3 }
+        {
+          "tipo": "INSTRUMENTO",
+          "origem": "PROPRIO",
+          "quantidade": 1,
+          "canais": 1,
+          "rotulo": "Sanfona",
+          "ordem": 0
+        },
+        {
+          "tipo": "DI",
+          "origem": "CASA",
+          "quantidade": 1,
+          "canais": 0,
+          "ordem": 1
+        },
+        {
+          "tipo": "MONITOR_WEDGE",
+          "origem": "CASA",
+          "quantidade": 1,
+          "vias": 1,
+          "mixIndependente": false,
+          "ordem": 2
+        },
+        {
+          "tipo": "TOMADA",
+          "origem": "CASA",
+          "quantidade": 1,
+          "voltagem": 220,
+          "ponto": "lateral direita",
+          "ordem": 3
+        }
       ]
     },
     {
       "rotulo": "Guitarra",
       "instrumento": "Guitarra",
-      "coluna": 1, "linha": 1, "larguraCel": 2, "alturaCel": 1,
-      "backingVocal": false, "ordemCanal": 40,
+      "posX": 20,
+      "linha": 1,
+      "escala": 1,
+      "backingVocal": false,
+      "ordemCanal": 40,
       "itens": [
-        { "tipo": "AMPLIFICADOR", "origem": "PROPRIO", "quantidade": 1, "canais": 1, "observacao": "Microfonado com SM57", "ordem": 0 },
-        { "tipo": "MICROFONE", "origem": "CASA", "quantidade": 1, "canais": 0, "observacao": "Captação do amplificador", "ordem": 1 },
-        { "tipo": "MONITOR_WEDGE", "origem": "CASA", "quantidade": 1, "vias": 1, "mixIndependente": false, "ordem": 2 },
-        { "tipo": "TOMADA", "origem": "CASA", "quantidade": 2, "voltagem": 220, "ponto": "amplificador e pedais", "ordem": 3 }
+        {
+          "tipo": "AMPLIFICADOR",
+          "origem": "PROPRIO",
+          "quantidade": 1,
+          "canais": 1,
+          "observacao": "Microfonado com SM57",
+          "ordem": 0
+        },
+        {
+          "tipo": "MICROFONE",
+          "origem": "CASA",
+          "quantidade": 1,
+          "canais": 0,
+          "observacao": "Captação do amplificador",
+          "ordem": 1
+        },
+        {
+          "tipo": "MONITOR_WEDGE",
+          "origem": "CASA",
+          "quantidade": 1,
+          "vias": 1,
+          "mixIndependente": false,
+          "ordem": 2
+        },
+        {
+          "tipo": "TOMADA",
+          "origem": "CASA",
+          "quantidade": 2,
+          "voltagem": 220,
+          "ponto": "amplificador e pedais",
+          "ordem": 3
+        }
       ]
     },
     {
       "rotulo": "Baixo",
       "instrumento": "Baixo",
-      "coluna": 1, "linha": 3, "larguraCel": 2, "alturaCel": 1,
-      "backingVocal": false, "ordemCanal": 30,
+      "posX": 28,
+      "linha": 2,
+      "escala": 1,
+      "backingVocal": false,
+      "ordemCanal": 30,
       "itens": [
-        { "tipo": "AMPLIFICADOR", "origem": "PROPRIO", "quantidade": 1, "canais": 0, "ordem": 0 },
-        { "tipo": "DI", "origem": "CASA", "quantidade": 1, "canais": 1, "ordem": 1 },
-        { "tipo": "MONITOR_WEDGE", "origem": "CASA", "quantidade": 1, "vias": 1, "mixIndependente": false, "ordem": 2 },
-        { "tipo": "TOMADA", "origem": "CASA", "quantidade": 1, "voltagem": 220, "ponto": "amplificador", "ordem": 3 }
+        {
+          "tipo": "AMPLIFICADOR",
+          "origem": "PROPRIO",
+          "quantidade": 1,
+          "canais": 0,
+          "ordem": 0
+        },
+        {
+          "tipo": "DI",
+          "origem": "CASA",
+          "quantidade": 1,
+          "canais": 1,
+          "ordem": 1
+        },
+        {
+          "tipo": "MONITOR_WEDGE",
+          "origem": "CASA",
+          "quantidade": 1,
+          "vias": 1,
+          "mixIndependente": false,
+          "ordem": 2
+        },
+        {
+          "tipo": "TOMADA",
+          "origem": "CASA",
+          "quantidade": 1,
+          "voltagem": 220,
+          "ponto": "amplificador",
+          "ordem": 3
+        }
       ]
     },
     {
       "rotulo": "Voz 1 / Violão",
       "instrumento": "Voz e violão",
-      "coluna": 3, "linha": 4, "larguraCel": 3, "alturaCel": 1,
-      "backingVocal": false, "ordemCanal": 70,
+      "posX": 40,
+      "linha": 3,
+      "escala": 1,
+      "backingVocal": false,
+      "ordemCanal": 70,
       "itens": [
-        { "tipo": "MICROFONE", "origem": "PROPRIO", "quantidade": 1, "canais": 1, "rotulo": "Microfone sem fio", "ordem": 0 },
-        { "tipo": "INSTRUMENTO", "origem": "PROPRIO", "quantidade": 1, "canais": 1, "rotulo": "Violão eletroacústico", "ordem": 1 },
-        { "tipo": "DI", "origem": "CASA", "quantidade": 1, "canais": 0, "observacao": "Para o violão", "ordem": 2 },
-        { "tipo": "MONITOR_WEDGE", "origem": "CASA", "quantidade": 2, "vias": 1, "mixIndependente": true, "observacao": "Dois wedges no mesmo mix", "ordem": 3 }
+        {
+          "tipo": "MICROFONE",
+          "origem": "PROPRIO",
+          "quantidade": 1,
+          "canais": 1,
+          "rotulo": "Microfone sem fio",
+          "ordem": 0
+        },
+        {
+          "tipo": "INSTRUMENTO",
+          "origem": "PROPRIO",
+          "quantidade": 1,
+          "canais": 1,
+          "rotulo": "Violão eletroacústico",
+          "ordem": 1
+        },
+        {
+          "tipo": "DI",
+          "origem": "CASA",
+          "quantidade": 1,
+          "canais": 0,
+          "observacao": "Para o violão",
+          "ordem": 2
+        },
+        {
+          "tipo": "MONITOR_WEDGE",
+          "origem": "CASA",
+          "quantidade": 2,
+          "vias": 1,
+          "mixIndependente": true,
+          "observacao": "Dois wedges no mesmo mix",
+          "ordem": 3
+        }
       ]
     },
     {
       "rotulo": "Voz 2",
       "instrumento": "Voz",
-      "coluna": 7, "linha": 4, "larguraCel": 3, "alturaCel": 1,
-      "backingVocal": false, "ordemCanal": 71,
+      "posX": 60,
+      "linha": 3,
+      "escala": 1,
+      "backingVocal": false,
+      "ordemCanal": 71,
       "itens": [
-        { "tipo": "MICROFONE", "origem": "PROPRIO", "quantidade": 1, "canais": 1, "rotulo": "Microfone sem fio", "ordem": 0 },
-        { "tipo": "MONITOR_WEDGE", "origem": "CASA", "quantidade": 2, "vias": 1, "mixIndependente": true, "observacao": "Dois wedges no mesmo mix", "ordem": 1 }
+        {
+          "tipo": "MICROFONE",
+          "origem": "PROPRIO",
+          "quantidade": 1,
+          "canais": 1,
+          "rotulo": "Microfone sem fio",
+          "ordem": 0
+        },
+        {
+          "tipo": "MONITOR_WEDGE",
+          "origem": "CASA",
+          "quantidade": 2,
+          "vias": 1,
+          "mixIndependente": true,
+          "observacao": "Dois wedges no mesmo mix",
+          "ordem": 1
+        }
       ]
     }
   ],
   "itensGerais": [
-    { "tipo": "PA", "origem": "CASA", "quantidade": 1, "rotulo": "Sistema de PA compatível com o espaço", "ordem": 0 },
-    { "tipo": "MESA_SOM", "origem": "CASA", "quantidade": 1, "canais": 0, "ordem": 1 },
-    { "tipo": "ILUMINACAO", "origem": "CASA", "quantidade": 1, "rotulo": "Iluminação básica de palco", "ordem": 2 }
+    {
+      "tipo": "PA",
+      "origem": "CASA",
+      "quantidade": 1,
+      "rotulo": "Sistema de PA compatível com o espaço",
+      "ordem": 0
+    },
+    {
+      "tipo": "MESA_SOM",
+      "origem": "CASA",
+      "quantidade": 1,
+      "canais": 0,
+      "ordem": 1
+    },
+    {
+      "tipo": "ILUMINACAO",
+      "origem": "CASA",
+      "quantidade": 1,
+      "rotulo": "Iluminação básica de palco",
+      "ordem": 2
+    }
   ]
 }

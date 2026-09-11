@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -36,11 +37,20 @@ public class MapaPalco {
     @Column(name = "ID_DERIVADO_DE")
     private Long idDerivadoDe;
 
-    @Column(name = "GRADE_COLUNAS", nullable = false)
-    private Integer gradeColunas = 12;
+    /**
+     * Dimensoes reais do palco. O desenho e em escala: mudar o tamanho do palco
+     * da espaco para mais gente sem encolher os simbolos, que e o que permite o
+     * mesmo editor servir um trio e um naipe de metais com backing vocals.
+     */
+    @Column(name = "LARGURA_M", nullable = false, precision = 5, scale = 2)
+    private BigDecimal larguraM = new BigDecimal("8.00");
 
+    @Column(name = "PROFUNDIDADE_M", nullable = false, precision = 5, scale = 2)
+    private BigDecimal profundidadeM = new BigDecimal("6.00");
+
+    /** Faixas horizontais onde os musicos se organizam ("linha de tras"). */
     @Column(name = "GRADE_LINHAS", nullable = false)
-    private Integer gradeLinhas = 6;
+    private Integer gradeLinhas = 4;
 
     @Column(columnDefinition = "TEXT")
     private String observacoes;

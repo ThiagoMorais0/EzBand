@@ -75,6 +75,7 @@ public class RiderCalculoService {
         rider.setDescricaoMapa(mapa.getDescricao());
         rider.setDataAtualizacao(mapa.getDataAtualizacao());
         rider.setObservacoes(mapa.getObservacoes());
+        rider.setPalcoMinimo(formatarPalco(mapa.getLarguraM(), mapa.getProfundidadeM()));
         rider.setMapa(mapa);
         rider.setResumo(resumo);
 
@@ -330,9 +331,11 @@ public class RiderCalculoService {
 
     private List<PosicaoPalcoDTO> ordenadasPorCanal(List<PosicaoPalcoDTO> posicoes) {
         return posicoes.stream()
+                // Desempate por linha e depois da esquerda para a direita, que e
+                // a ordem em que o tecnico varre o palco.
                 .sorted(Comparator.comparing((PosicaoPalcoDTO p) -> nz(p.getOrdemCanal()))
                         .thenComparing(p -> nz(p.getLinha()))
-                        .thenComparing(p -> nz(p.getColuna())))
+                        .thenComparing(p -> p.getPosX() == null ? 0d : p.getPosX()))
                 .collect(Collectors.toList());
     }
 
@@ -353,6 +356,14 @@ public class RiderCalculoService {
 
     private CategoriaItemPalco categoria(ItemMapaPalcoDTO item) {
         return item.getTipo() != null ? item.getTipo().getCategoria() : CategoriaItemPalco.ESTRUTURA;
+    }
+
+    /** O desenho e em escala, entao a dimensao do palco e um dado do rider. */
+    private String formatarPalco(Double largura, Double profundidade) {
+        if (largura == null || profundidade == null) {
+            return null;
+        }
+        return String.format(new Locale("pt", "BR"), "%.1f × %.1f m", largura, profundidade);
     }
 
     private int nz(Integer valor) {

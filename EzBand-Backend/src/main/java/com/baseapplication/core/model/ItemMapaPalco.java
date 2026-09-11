@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 /**
  * Item tecnico do mapa. Tabela unica de proposito: a diferenca entre o wedge do
  * guitarrista e o praticavel solto do palco e apenas de quem ele e --
@@ -65,8 +67,17 @@ public class ItemMapaPalco {
     @Column(length = 100)
     private String ponto;
 
-    /** Nulos = desenha derivado da posicao. Preenchidos = usuario ajustou a mao. */
-    private Integer coluna;
+    /**
+     * Nulos = "desenhe onde faz sentido" (amplificador atras do dono, pedaleira
+     * nos pes, microfone a frente). Preenchidos = ajuste manual. E o que faz o
+     * palco nascer montado sem tirar o controle fino de quem quer usar.
+     */
+    @Column(name = "POS_X", precision = 6, scale = 2)
+    private BigDecimal posX;
 
-    private Integer linha;
+    @Column(name = "POS_Y", precision = 6, scale = 2)
+    private BigDecimal posY;
+
+    @Column(precision = 4, scale = 2)
+    private BigDecimal escala;
 }

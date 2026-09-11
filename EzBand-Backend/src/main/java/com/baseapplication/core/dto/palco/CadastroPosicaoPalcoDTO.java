@@ -11,10 +11,9 @@ public class CadastroPosicaoPalcoDTO {
 
     private String rotulo;
     private String instrumento;
-    private Integer coluna;
+    private Double posX;
     private Integer linha;
-    private Integer larguraCel;
-    private Integer alturaCel;
+    private Double escala;
     private Long idUsuario;
     private Long idMembroFantasma;
     private Boolean backingVocal;

@@ -23,6 +23,7 @@ public class CadastroItemMapaPalcoDTO {
     private Integer vias;
     private Boolean mixIndependente;
     private String ponto;
-    private Integer coluna;
-    private Integer linha;
+    private Double posX;
+    private Double posY;
+    private Double escala;
 }

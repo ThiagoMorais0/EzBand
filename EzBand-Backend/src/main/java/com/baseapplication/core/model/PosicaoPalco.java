@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -31,17 +32,16 @@ public class PosicaoPalco {
     @Column(length = 100)
     private String instrumento;
 
-    @Column(nullable = false)
-    private Integer coluna = 0;
+    /** Percentual da largura do palco (0 = coxia esquerda, 100 = direita). */
+    @Column(name = "POS_X", nullable = false, precision = 6, scale = 2)
+    private BigDecimal posX = new BigDecimal("50.00");
 
+    /** Faixa horizontal. 0 e o fundo do palco. */
     @Column(nullable = false)
     private Integer linha = 0;
 
-    @Column(name = "LARGURA_CEL", nullable = false)
-    private Integer larguraCel = 1;
-
-    @Column(name = "ALTURA_CEL", nullable = false)
-    private Integer alturaCel = 1;
+    @Column(nullable = false, precision = 4, scale = 2)
+    private BigDecimal escala = BigDecimal.ONE;
 
     @Column(name = "ID_USUARIO")
     private Long idUsuario;

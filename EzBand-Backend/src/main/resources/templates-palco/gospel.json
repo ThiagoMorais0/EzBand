@@ -2,93 +2,301 @@
   "chave": "gospel",
   "nome": "Gospel / Louvor",
   "descricao": "Ministro de louvor, dois backing vocals, teclado, guitarra, baixo e bateria. Monitoração em in-ear.",
-  "gradeColunas": 12,
-  "gradeLinhas": 6,
+  "larguraM": 10.0,
+  "profundidadeM": 6.0,
+  "gradeLinhas": 4,
   "posicoes": [
     {
       "rotulo": "Bateria",
       "instrumento": "Bateria",
-      "coluna": 5, "linha": 0, "larguraCel": 3, "alturaCel": 2,
-      "backingVocal": false, "ordemCanal": 10,
+      "posX": 50,
+      "linha": 0,
+      "escala": 1,
+      "backingVocal": false,
+      "ordemCanal": 10,
       "itens": [
-        { "tipo": "INSTRUMENTO", "origem": "CASA", "quantidade": 1, "canais": 8, "rotulo": "Bateria completa", "observacao": "Usamos a bateria do local; levamos pratos e caixa", "ordem": 0 },
-        { "tipo": "MICROFONE", "origem": "CASA", "quantidade": 8, "canais": 0, "observacao": "Microfonação de bateria", "ordem": 1 },
-        { "tipo": "IN_EAR", "origem": "PROPRIO", "quantidade": 1, "vias": 1, "mixIndependente": true, "ordem": 2 },
-        { "tipo": "TOMADA", "origem": "CASA", "quantidade": 1, "voltagem": 220, "ponto": "fundo do palco", "ordem": 3 }
+        {
+          "tipo": "BATERIA",
+          "origem": "CASA",
+          "quantidade": 1,
+          "canais": 8,
+          "rotulo": "Bateria completa",
+          "observacao": "Usamos a bateria do local; levamos pratos e caixa",
+          "ordem": 0
+        },
+        {
+          "tipo": "MICROFONE",
+          "origem": "CASA",
+          "quantidade": 8,
+          "canais": 0,
+          "observacao": "Microfonação de bateria",
+          "ordem": 1
+        },
+        {
+          "tipo": "IN_EAR",
+          "origem": "PROPRIO",
+          "quantidade": 1,
+          "vias": 1,
+          "mixIndependente": true,
+          "ordem": 2
+        },
+        {
+          "tipo": "TOMADA",
+          "origem": "CASA",
+          "quantidade": 1,
+          "voltagem": 220,
+          "ponto": "fundo do palco",
+          "ordem": 3
+        }
       ]
     },
     {
       "rotulo": "Teclado",
       "instrumento": "Teclado",
-      "coluna": 0, "linha": 2, "larguraCel": 2, "alturaCel": 1,
-      "backingVocal": true, "ordemCanal": 50,
+      "posX": 16,
+      "linha": 1,
+      "escala": 1,
+      "backingVocal": true,
+      "ordemCanal": 50,
       "itens": [
-        { "tipo": "INSTRUMENTO", "origem": "PROPRIO", "quantidade": 1, "canais": 2, "rotulo": "Teclado", "observacao": "Saída estéreo L/R", "ordem": 0 },
-        { "tipo": "DI", "origem": "CASA", "quantidade": 2, "canais": 0, "observacao": "Um par para a saída estéreo", "ordem": 1 },
-        { "tipo": "SUPORTE", "origem": "PROPRIO", "quantidade": 1, "rotulo": "Suporte de teclado", "ordem": 2 },
-        { "tipo": "MICROFONE", "origem": "CASA", "quantidade": 1, "canais": 1, "rotulo": "Microfone de backing vocal", "ordem": 3 },
-        { "tipo": "IN_EAR", "origem": "PROPRIO", "quantidade": 1, "vias": 1, "mixIndependente": true, "ordem": 4 },
-        { "tipo": "TOMADA", "origem": "CASA", "quantidade": 2, "voltagem": 220, "ponto": "suporte de teclado", "ordem": 5 }
+        {
+          "tipo": "TECLADO",
+          "origem": "PROPRIO",
+          "quantidade": 1,
+          "canais": 2,
+          "rotulo": "Teclado",
+          "observacao": "Saída estéreo L/R",
+          "ordem": 0
+        },
+        {
+          "tipo": "DI",
+          "origem": "CASA",
+          "quantidade": 2,
+          "canais": 0,
+          "observacao": "Um par para a saída estéreo",
+          "ordem": 1
+        },
+        {
+          "tipo": "SUPORTE",
+          "origem": "PROPRIO",
+          "quantidade": 1,
+          "rotulo": "Suporte de teclado",
+          "ordem": 2
+        },
+        {
+          "tipo": "MICROFONE",
+          "origem": "CASA",
+          "quantidade": 1,
+          "canais": 1,
+          "rotulo": "Microfone de backing vocal",
+          "ordem": 3
+        },
+        {
+          "tipo": "IN_EAR",
+          "origem": "PROPRIO",
+          "quantidade": 1,
+          "vias": 1,
+          "mixIndependente": true,
+          "ordem": 4
+        },
+        {
+          "tipo": "TOMADA",
+          "origem": "CASA",
+          "quantidade": 2,
+          "voltagem": 220,
+          "ponto": "suporte de teclado",
+          "ordem": 5
+        }
       ]
     },
     {
       "rotulo": "Guitarra",
       "instrumento": "Guitarra",
-      "coluna": 10, "linha": 2, "larguraCel": 2, "alturaCel": 1,
-      "backingVocal": false, "ordemCanal": 40,
+      "posX": 84,
+      "linha": 1,
+      "escala": 1,
+      "backingVocal": false,
+      "ordemCanal": 40,
       "itens": [
-        { "tipo": "PEDALEIRA", "origem": "PROPRIO", "quantidade": 1, "canais": 2, "observacao": "Saída XLR balanceada estéreo, direto para a mesa", "ordem": 0 },
-        { "tipo": "IN_EAR", "origem": "PROPRIO", "quantidade": 1, "vias": 1, "mixIndependente": false, "ordem": 1 },
-        { "tipo": "TOMADA", "origem": "CASA", "quantidade": 2, "voltagem": 220, "ponto": "pedalboard", "ordem": 2 }
+        {
+          "tipo": "PEDALEIRA",
+          "origem": "PROPRIO",
+          "quantidade": 1,
+          "canais": 2,
+          "observacao": "Saída XLR balanceada estéreo, direto para a mesa",
+          "ordem": 0
+        },
+        {
+          "tipo": "IN_EAR",
+          "origem": "PROPRIO",
+          "quantidade": 1,
+          "vias": 1,
+          "mixIndependente": false,
+          "ordem": 1
+        },
+        {
+          "tipo": "TOMADA",
+          "origem": "CASA",
+          "quantidade": 2,
+          "voltagem": 220,
+          "ponto": "pedalboard",
+          "ordem": 2
+        }
       ]
     },
     {
       "rotulo": "Baixo",
       "instrumento": "Baixo",
-      "coluna": 0, "linha": 4, "larguraCel": 2, "alturaCel": 1,
-      "backingVocal": false, "ordemCanal": 30,
+      "posX": 28,
+      "linha": 2,
+      "escala": 1,
+      "backingVocal": false,
+      "ordemCanal": 30,
       "itens": [
-        { "tipo": "DI", "origem": "PROPRIO", "quantidade": 1, "canais": 1, "observacao": "DI ativo próprio", "ordem": 0 },
-        { "tipo": "IN_EAR", "origem": "PROPRIO", "quantidade": 1, "vias": 1, "mixIndependente": false, "ordem": 1 },
-        { "tipo": "TOMADA", "origem": "CASA", "quantidade": 1, "voltagem": 220, "ponto": "pedalboard", "ordem": 2 }
+        {
+          "tipo": "DI",
+          "origem": "PROPRIO",
+          "quantidade": 1,
+          "canais": 1,
+          "observacao": "DI ativo próprio",
+          "ordem": 0
+        },
+        {
+          "tipo": "IN_EAR",
+          "origem": "PROPRIO",
+          "quantidade": 1,
+          "vias": 1,
+          "mixIndependente": false,
+          "ordem": 1
+        },
+        {
+          "tipo": "TOMADA",
+          "origem": "CASA",
+          "quantidade": 1,
+          "voltagem": 220,
+          "ponto": "pedalboard",
+          "ordem": 2
+        }
       ]
     },
     {
       "rotulo": "Ministro de louvor",
       "instrumento": "Voz",
-      "coluna": 5, "linha": 4, "larguraCel": 3, "alturaCel": 1,
-      "backingVocal": false, "ordemCanal": 70,
+      "posX": 50,
+      "linha": 3,
+      "escala": 1,
+      "backingVocal": false,
+      "ordemCanal": 70,
       "itens": [
-        { "tipo": "MICROFONE", "origem": "CASA", "quantidade": 1, "canais": 1, "rotulo": "Microfone sem fio", "observacao": "Preferência por microfone sem fio", "ordem": 0 },
-        { "tipo": "IN_EAR", "origem": "PROPRIO", "quantidade": 1, "vias": 1, "mixIndependente": true, "ordem": 1 }
+        {
+          "tipo": "MICROFONE",
+          "origem": "CASA",
+          "quantidade": 1,
+          "canais": 1,
+          "rotulo": "Microfone sem fio",
+          "observacao": "Preferência por microfone sem fio",
+          "ordem": 0
+        },
+        {
+          "tipo": "IN_EAR",
+          "origem": "PROPRIO",
+          "quantidade": 1,
+          "vias": 1,
+          "mixIndependente": true,
+          "ordem": 1
+        }
       ]
     },
     {
       "rotulo": "Backing vocal 1",
       "instrumento": "Voz",
-      "coluna": 2, "linha": 3, "larguraCel": 2, "alturaCel": 1,
-      "backingVocal": true, "ordemCanal": 71,
+      "posX": 30,
+      "linha": 3,
+      "escala": 1,
+      "backingVocal": true,
+      "ordemCanal": 71,
       "itens": [
-        { "tipo": "MICROFONE", "origem": "CASA", "quantidade": 1, "canais": 1, "ordem": 0 },
-        { "tipo": "SUPORTE", "origem": "CASA", "quantidade": 1, "rotulo": "Pedestal girafa", "ordem": 1 },
-        { "tipo": "IN_EAR", "origem": "PROPRIO", "quantidade": 1, "vias": 1, "mixIndependente": false, "ordem": 2 }
+        {
+          "tipo": "MICROFONE",
+          "origem": "CASA",
+          "quantidade": 1,
+          "canais": 1,
+          "ordem": 0
+        },
+        {
+          "tipo": "SUPORTE",
+          "origem": "CASA",
+          "quantidade": 1,
+          "rotulo": "Pedestal girafa",
+          "ordem": 1
+        },
+        {
+          "tipo": "IN_EAR",
+          "origem": "PROPRIO",
+          "quantidade": 1,
+          "vias": 1,
+          "mixIndependente": false,
+          "ordem": 2
+        }
       ]
     },
     {
       "rotulo": "Backing vocal 2",
       "instrumento": "Voz",
-      "coluna": 8, "linha": 3, "larguraCel": 2, "alturaCel": 1,
-      "backingVocal": true, "ordemCanal": 72,
+      "posX": 70,
+      "linha": 3,
+      "escala": 1,
+      "backingVocal": true,
+      "ordemCanal": 72,
       "itens": [
-        { "tipo": "MICROFONE", "origem": "CASA", "quantidade": 1, "canais": 1, "ordem": 0 },
-        { "tipo": "SUPORTE", "origem": "CASA", "quantidade": 1, "rotulo": "Pedestal girafa", "ordem": 1 },
-        { "tipo": "IN_EAR", "origem": "PROPRIO", "quantidade": 1, "vias": 1, "mixIndependente": false, "ordem": 2 }
+        {
+          "tipo": "MICROFONE",
+          "origem": "CASA",
+          "quantidade": 1,
+          "canais": 1,
+          "ordem": 0
+        },
+        {
+          "tipo": "SUPORTE",
+          "origem": "CASA",
+          "quantidade": 1,
+          "rotulo": "Pedestal girafa",
+          "ordem": 1
+        },
+        {
+          "tipo": "IN_EAR",
+          "origem": "PROPRIO",
+          "quantidade": 1,
+          "vias": 1,
+          "mixIndependente": false,
+          "ordem": 2
+        }
       ]
     }
   ],
   "itensGerais": [
-    { "tipo": "PA", "origem": "CASA", "quantidade": 1, "rotulo": "Sistema de PA compatível com o espaço", "ordem": 0 },
-    { "tipo": "MESA_SOM", "origem": "CASA", "quantidade": 1, "canais": 0, "ordem": 1 },
-    { "tipo": "OUTRO", "origem": "PROPRIO", "quantidade": 1, "rotulo": "Rack de in-ear", "observacao": "Distribuição própria de fones; precisamos de envio de mixes da mesa", "canais": 0, "ordem": 2 }
+    {
+      "tipo": "PA",
+      "origem": "CASA",
+      "quantidade": 1,
+      "rotulo": "Sistema de PA compatível com o espaço",
+      "ordem": 0
+    },
+    {
+      "tipo": "MESA_SOM",
+      "origem": "CASA",
+      "quantidade": 1,
+      "canais": 0,
+      "ordem": 1
+    },
+    {
+      "tipo": "OUTRO",
+      "origem": "PROPRIO",
+      "quantidade": 1,
+      "rotulo": "Rack de in-ear",
+      "observacao": "Distribuição própria de fones; precisamos de envio de mixes da mesa",
+      "canais": 0,
+      "ordem": 2
+    }
   ]
 }

@@ -20,7 +20,8 @@ public class TemplateMapaPalcoDTO {
     private String chave;
     private String nome;
     private String descricao;
-    private Integer gradeColunas;
+    private Double larguraM;
+    private Double profundidadeM;
     private Integer gradeLinhas;
     private List<PosicaoTemplateDTO> posicoes = new ArrayList<>();
     private List<CadastroItemMapaPalcoDTO> itensGerais = new ArrayList<>();
@@ -31,10 +32,9 @@ public class TemplateMapaPalcoDTO {
     public static class PosicaoTemplateDTO {
         private String rotulo;
         private String instrumento;
-        private Integer coluna;
+        private Double posX;
         private Integer linha;
-        private Integer larguraCel;
-        private Integer alturaCel;
+        private Double escala;
         private Boolean backingVocal;
         private Integer ordemCanal;
         private List<CadastroItemMapaPalcoDTO> itens = new ArrayList<>();

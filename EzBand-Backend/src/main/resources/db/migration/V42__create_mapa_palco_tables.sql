@@ -1,6 +1,11 @@
 -- Mapa de palco: cada registro e uma variacao completa da banda no palco
 -- (formacao + layout + equipamentos). Variacoes nascem por duplicacao;
 -- id_derivado_de guarda a origem apenas para rastreio, sem vinculo funcional.
+--
+-- O palco e um desenho em escala real, nao uma grade abstrata: largura e
+-- profundidade em metros. E o que permite o mesmo editor servir um power trio
+-- num bar e um naipe de metais com backing vocals -- muda o tamanho do palco,
+-- nao o tamanho dos simbolos. Tambem vira uma linha do rider ("palco minimo").
 CREATE TABLE IF NOT EXISTS mapa_palco (
     id BIGSERIAL PRIMARY KEY,
     id_banda BIGINT NOT NULL,
@@ -8,8 +13,10 @@ CREATE TABLE IF NOT EXISTS mapa_palco (
     descricao VARCHAR(500),
     padrao BOOLEAN NOT NULL DEFAULT FALSE,
     id_derivado_de BIGINT,
-    grade_colunas INTEGER NOT NULL DEFAULT 12,
-    grade_linhas INTEGER NOT NULL DEFAULT 6,
+    largura_m NUMERIC(5,2) NOT NULL DEFAULT 8,
+    profundidade_m NUMERIC(5,2) NOT NULL DEFAULT 6,
+    -- Faixas horizontais onde os musicos se organizam ("linha de tras").
+    grade_linhas INTEGER NOT NULL DEFAULT 4,
     observacoes TEXT,
     ativo BOOLEAN NOT NULL DEFAULT TRUE,
     data_criacao TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -28,16 +35,19 @@ CREATE UNIQUE INDEX IF NOT EXISTS uk_mapa_palco_padrao
 
 -- Posicao: um lugar no palco ("Guitarra 1"), nao uma pessoa. O vinculo com
 -- usuario ou membro fantasma e opcional, para o mapa sobreviver a troca de
--- integrante e servir a musico substituto.
+-- integrante e servir a um musico substituto.
+--
+-- pos_x e percentual da largura do palco (0 = coxia esquerda, 100 = direita):
+-- horizontal totalmente livre. A vertical continua em linhas, que e o jeito
+-- como banda pensa a disposicao ("quem fica na linha de tras").
 CREATE TABLE IF NOT EXISTS posicao_palco (
     id BIGSERIAL PRIMARY KEY,
     id_mapa_palco BIGINT NOT NULL,
     rotulo VARCHAR(80) NOT NULL,
     instrumento VARCHAR(100),
-    coluna INTEGER NOT NULL DEFAULT 0,
+    pos_x NUMERIC(6,2) NOT NULL DEFAULT 50,
     linha INTEGER NOT NULL DEFAULT 0,
-    largura_cel INTEGER NOT NULL DEFAULT 1,
-    altura_cel INTEGER NOT NULL DEFAULT 1,
+    escala NUMERIC(4,2) NOT NULL DEFAULT 1,
     id_usuario BIGINT,
     id_membro_fantasma BIGINT,
     backing_vocal BOOLEAN NOT NULL DEFAULT FALSE,
@@ -56,10 +66,15 @@ CREATE INDEX IF NOT EXISTS idx_posicao_palco_usuario ON posicao_palco(id_usuario
 
 
 -- Item tecnico. Tabela unica de proposito: a diferenca entre o wedge do
--- guitarrista e o praticavel da bateria e apenas de quem ele e --
+-- guitarrista e o praticavel solto do palco e apenas de quem ele e --
 -- id_posicao NULL significa item geral do palco (PA, mesa, tomada avulsa).
 -- voltagem/vias/mix_independente/ponto sao tipados porque sao exatamente os
--- campos que o rider soma; o resto da variacao cabe em marca_modelo/observacao.
+-- campos que o rider soma.
+--
+-- pos_x/pos_y NULOS significam "desenhe onde faz sentido": o amplificador
+-- atras do dono, a pedaleira nos pes dele, o microfone a frente. Preenchidos,
+-- valem como ajuste manual. Assim o palco nasce montado e mesmo assim cada
+-- peca pode ser colocada no lugar exato.
 CREATE TABLE IF NOT EXISTS item_mapa_palco (
     id BIGSERIAL PRIMARY KEY,
     id_mapa_palco BIGINT NOT NULL,
@@ -79,9 +94,9 @@ CREATE TABLE IF NOT EXISTS item_mapa_palco (
     vias INTEGER,
     mix_independente BOOLEAN,
     ponto VARCHAR(100),
-    -- Nulos = desenha derivado da posicao. Preenchidos = usuario ajustou a mao.
-    coluna INTEGER,
-    linha INTEGER,
+    pos_x NUMERIC(6,2),
+    pos_y NUMERIC(6,2),
+    escala NUMERIC(4,2),
     CONSTRAINT fk_item_mapa_palco_mapa FOREIGN KEY (id_mapa_palco) REFERENCES mapa_palco(id) ON DELETE CASCADE,
     CONSTRAINT fk_item_mapa_palco_posicao FOREIGN KEY (id_posicao) REFERENCES posicao_palco(id) ON DELETE CASCADE,
     CONSTRAINT ck_item_mapa_palco_quantidade CHECK (quantidade > 0)

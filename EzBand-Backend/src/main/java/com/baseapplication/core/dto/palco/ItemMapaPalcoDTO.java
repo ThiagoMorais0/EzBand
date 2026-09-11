@@ -31,8 +31,9 @@ public class ItemMapaPalcoDTO {
     private Integer vias;
     private Boolean mixIndependente;
     private String ponto;
-    private Integer coluna;
-    private Integer linha;
+    private Double posX;
+    private Double posY;
+    private Double escala;
 
     public ItemMapaPalcoDTO(ItemMapaPalco item) {
         this.id = item.getId();
@@ -54,8 +55,9 @@ public class ItemMapaPalcoDTO {
         this.vias = item.getVias();
         this.mixIndependente = item.getMixIndependente();
         this.ponto = item.getPonto();
-        this.coluna = item.getColuna();
-        this.linha = item.getLinha();
+        this.posX = item.getPosX() != null ? item.getPosX().doubleValue() : null;
+        this.posY = item.getPosY() != null ? item.getPosY().doubleValue() : null;
+        this.escala = item.getEscala() != null ? item.getEscala().doubleValue() : null;
     }
 
     /** Nome curto para listas do rider: prioriza o rotulo livre, cai no tipo. */

@@ -9,7 +9,7 @@ import java.util.List;
 
 /**
  * Salva metadados e o layout inteiro numa requisicao so -- o editor faz
- * autosave com debounce, entao arrastar tres blocos nao vira tres chamadas.
+ * autosave com debounce, entao arrastar tres pecas nao vira tres chamadas.
  */
 @Data
 @NoArgsConstructor
@@ -19,9 +19,12 @@ public class AtualizacaoMapaPalcoDTO {
     private String nome;
     private String descricao;
     private String observacoes;
-    private Integer gradeColunas;
+    private Double larguraM;
+    private Double profundidadeM;
     private Integer gradeLinhas;
     private List<LayoutPosicaoDTO> posicoes = new ArrayList<>();
+    /** Ajuste manual de pecas soltas; posicao nao enviada mantem o automatico. */
+    private List<LayoutItemDTO> itens = new ArrayList<>();
     private List<CadastroItemMapaPalcoDTO> itensGerais;
 
     @Data
@@ -29,10 +32,19 @@ public class AtualizacaoMapaPalcoDTO {
     @AllArgsConstructor
     public static class LayoutPosicaoDTO {
         private Long id;
-        private Integer coluna;
+        private Double posX;
         private Integer linha;
-        private Integer larguraCel;
-        private Integer alturaCel;
+        private Double escala;
         private Integer ordemCanal;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class LayoutItemDTO {
+        private Long id;
+        private Double posX;
+        private Double posY;
+        private Double escala;
     }
 }

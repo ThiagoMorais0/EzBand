@@ -20,6 +20,15 @@ import java.util.Set;
 public enum TipoItemPalco {
 
     // --- Fonte de som ---
+    // Bateria, percussao e teclado sao tipos proprios (e nao INSTRUMENTO com o
+    // nome escrito) porque cada um tem um simbolo distinto em planta e um
+    // tamanho de ocupacao proprio no palco.
+    BATERIA(CategoriaItemPalco.FONTE_SOM, "Bateria", "bateria", true, 6,
+            EnumSet.of(CampoItemPalco.MARCA_MODELO, CampoItemPalco.CANAIS)),
+    PERCUSSAO(CategoriaItemPalco.FONTE_SOM, "Percussão", "percussao", true, 2,
+            EnumSet.of(CampoItemPalco.MARCA_MODELO, CampoItemPalco.CANAIS)),
+    TECLADO(CategoriaItemPalco.FONTE_SOM, "Teclado", "teclado", true, 2,
+            EnumSet.of(CampoItemPalco.MARCA_MODELO, CampoItemPalco.CANAIS)),
     INSTRUMENTO(CategoriaItemPalco.FONTE_SOM, "Instrumento", "instrumento", false, 1,
             EnumSet.of(CampoItemPalco.MARCA_MODELO, CampoItemPalco.CANAIS)),
     AMPLIFICADOR(CategoriaItemPalco.FONTE_SOM, "Amplificador", "amplificador", true, 1,

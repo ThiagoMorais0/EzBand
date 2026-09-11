@@ -2,53 +2,191 @@
   "chave": "power-trio",
   "nome": "Power trio",
   "descricao": "Guitarra, baixo e bateria. O guitarrista assume o vocal principal.",
-  "gradeColunas": 12,
-  "gradeLinhas": 6,
+  "larguraM": 7.0,
+  "profundidadeM": 5.0,
+  "gradeLinhas": 3,
   "posicoes": [
     {
       "rotulo": "Bateria",
       "instrumento": "Bateria",
-      "coluna": 5, "linha": 0, "larguraCel": 3, "alturaCel": 2,
-      "backingVocal": false, "ordemCanal": 10,
+      "posX": 50,
+      "linha": 0,
+      "escala": 1,
+      "backingVocal": false,
+      "ordemCanal": 10,
       "itens": [
-        { "tipo": "INSTRUMENTO", "origem": "PROPRIO", "quantidade": 1, "canais": 6, "rotulo": "Bateria completa", "observacao": "Bumbo, caixa, 2 tons, 2 overheads", "ordem": 0 },
-        { "tipo": "MICROFONE", "origem": "CASA", "quantidade": 6, "canais": 0, "observacao": "Microfonação de bateria", "ordem": 1 },
-        { "tipo": "PRATICAVEL", "origem": "CASA", "quantidade": 1, "rotulo": "Praticável 2x2m", "ordem": 2 },
-        { "tipo": "MONITOR_WEDGE", "origem": "CASA", "quantidade": 1, "vias": 1, "mixIndependente": true, "ordem": 3 },
-        { "tipo": "TOMADA", "origem": "CASA", "quantidade": 1, "voltagem": 220, "ponto": "fundo do palco", "ordem": 4 }
+        {
+          "tipo": "BATERIA",
+          "origem": "PROPRIO",
+          "quantidade": 1,
+          "canais": 6,
+          "rotulo": "Bateria completa",
+          "observacao": "Bumbo, caixa, 2 tons, 2 overheads",
+          "ordem": 0
+        },
+        {
+          "tipo": "MICROFONE",
+          "origem": "CASA",
+          "quantidade": 6,
+          "canais": 0,
+          "observacao": "Microfonação de bateria",
+          "ordem": 1
+        },
+        {
+          "tipo": "PRATICAVEL",
+          "origem": "CASA",
+          "quantidade": 1,
+          "rotulo": "Praticável 2x2m",
+          "ordem": 2
+        },
+        {
+          "tipo": "MONITOR_WEDGE",
+          "origem": "CASA",
+          "quantidade": 1,
+          "vias": 1,
+          "mixIndependente": true,
+          "ordem": 3
+        },
+        {
+          "tipo": "TOMADA",
+          "origem": "CASA",
+          "quantidade": 1,
+          "voltagem": 220,
+          "ponto": "fundo do palco",
+          "ordem": 4
+        }
       ]
     },
     {
       "rotulo": "Guitarra / Voz",
       "instrumento": "Guitarra",
-      "coluna": 2, "linha": 3, "larguraCel": 2, "alturaCel": 1,
-      "backingVocal": false, "ordemCanal": 40,
+      "posX": 28,
+      "linha": 2,
+      "escala": 1,
+      "backingVocal": false,
+      "ordemCanal": 40,
       "itens": [
-        { "tipo": "AMPLIFICADOR", "origem": "PROPRIO", "quantidade": 1, "canais": 1, "observacao": "Microfonado com SM57", "ordem": 0 },
-        { "tipo": "MICROFONE", "origem": "CASA", "quantidade": 1, "canais": 0, "observacao": "Captação do amplificador", "ordem": 1 },
-        { "tipo": "MICROFONE", "origem": "CASA", "quantidade": 1, "canais": 1, "rotulo": "Microfone de voz", "ordem": 2 },
-        { "tipo": "SUPORTE", "origem": "CASA", "quantidade": 1, "rotulo": "Pedestal girafa", "ordem": 3 },
-        { "tipo": "MONITOR_WEDGE", "origem": "CASA", "quantidade": 1, "vias": 1, "mixIndependente": true, "ordem": 4 },
-        { "tipo": "TOMADA", "origem": "CASA", "quantidade": 2, "voltagem": 220, "ponto": "amplificador e pedais", "ordem": 5 }
+        {
+          "tipo": "AMPLIFICADOR",
+          "origem": "PROPRIO",
+          "quantidade": 1,
+          "canais": 1,
+          "observacao": "Microfonado com SM57",
+          "ordem": 0
+        },
+        {
+          "tipo": "MICROFONE",
+          "origem": "CASA",
+          "quantidade": 1,
+          "canais": 0,
+          "observacao": "Captação do amplificador",
+          "ordem": 1
+        },
+        {
+          "tipo": "MICROFONE",
+          "origem": "CASA",
+          "quantidade": 1,
+          "canais": 1,
+          "rotulo": "Microfone de voz",
+          "ordem": 2
+        },
+        {
+          "tipo": "SUPORTE",
+          "origem": "CASA",
+          "quantidade": 1,
+          "rotulo": "Pedestal girafa",
+          "ordem": 3
+        },
+        {
+          "tipo": "MONITOR_WEDGE",
+          "origem": "CASA",
+          "quantidade": 1,
+          "vias": 1,
+          "mixIndependente": true,
+          "ordem": 4
+        },
+        {
+          "tipo": "TOMADA",
+          "origem": "CASA",
+          "quantidade": 2,
+          "voltagem": 220,
+          "ponto": "amplificador e pedais",
+          "ordem": 5
+        }
       ]
     },
     {
       "rotulo": "Baixo",
       "instrumento": "Baixo",
-      "coluna": 8, "linha": 3, "larguraCel": 2, "alturaCel": 1,
-      "backingVocal": true, "ordemCanal": 30,
+      "posX": 72,
+      "linha": 2,
+      "escala": 1,
+      "backingVocal": true,
+      "ordemCanal": 30,
       "itens": [
-        { "tipo": "AMPLIFICADOR", "origem": "PROPRIO", "quantidade": 1, "canais": 0, "ordem": 0 },
-        { "tipo": "DI", "origem": "CASA", "quantidade": 1, "canais": 1, "observacao": "Saída do amplificador", "ordem": 1 },
-        { "tipo": "MICROFONE", "origem": "CASA", "quantidade": 1, "canais": 1, "rotulo": "Microfone de backing vocal", "ordem": 2 },
-        { "tipo": "SUPORTE", "origem": "CASA", "quantidade": 1, "rotulo": "Pedestal girafa", "ordem": 3 },
-        { "tipo": "MONITOR_WEDGE", "origem": "CASA", "quantidade": 1, "vias": 1, "mixIndependente": false, "ordem": 4 },
-        { "tipo": "TOMADA", "origem": "CASA", "quantidade": 1, "voltagem": 220, "ponto": "amplificador", "ordem": 5 }
+        {
+          "tipo": "AMPLIFICADOR",
+          "origem": "PROPRIO",
+          "quantidade": 1,
+          "canais": 0,
+          "ordem": 0
+        },
+        {
+          "tipo": "DI",
+          "origem": "CASA",
+          "quantidade": 1,
+          "canais": 1,
+          "observacao": "Saída do amplificador",
+          "ordem": 1
+        },
+        {
+          "tipo": "MICROFONE",
+          "origem": "CASA",
+          "quantidade": 1,
+          "canais": 1,
+          "rotulo": "Microfone de backing vocal",
+          "ordem": 2
+        },
+        {
+          "tipo": "SUPORTE",
+          "origem": "CASA",
+          "quantidade": 1,
+          "rotulo": "Pedestal girafa",
+          "ordem": 3
+        },
+        {
+          "tipo": "MONITOR_WEDGE",
+          "origem": "CASA",
+          "quantidade": 1,
+          "vias": 1,
+          "mixIndependente": false,
+          "ordem": 4
+        },
+        {
+          "tipo": "TOMADA",
+          "origem": "CASA",
+          "quantidade": 1,
+          "voltagem": 220,
+          "ponto": "amplificador",
+          "ordem": 5
+        }
       ]
     }
   ],
   "itensGerais": [
-    { "tipo": "PA", "origem": "CASA", "quantidade": 1, "rotulo": "Sistema de PA compatível com o espaço", "ordem": 0 },
-    { "tipo": "MESA_SOM", "origem": "CASA", "quantidade": 1, "canais": 0, "ordem": 1 }
+    {
+      "tipo": "PA",
+      "origem": "CASA",
+      "quantidade": 1,
+      "rotulo": "Sistema de PA compatível com o espaço",
+      "ordem": 0
+    },
+    {
+      "tipo": "MESA_SOM",
+      "origem": "CASA",
+      "quantidade": 1,
+      "canais": 0,
+      "ordem": 1
+    }
   ]
 }

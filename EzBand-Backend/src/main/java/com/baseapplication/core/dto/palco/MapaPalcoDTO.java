@@ -24,7 +24,8 @@ public class MapaPalcoDTO {
     private String descricao;
     private Boolean padrao;
     private Long idDerivadoDe;
-    private Integer gradeColunas;
+    private Double larguraM;
+    private Double profundidadeM;
     private Integer gradeLinhas;
     private String observacoes;
     private String dataAtualizacao;
@@ -39,7 +40,8 @@ public class MapaPalcoDTO {
         this.descricao = mapa.getDescricao();
         this.padrao = mapa.getPadrao();
         this.idDerivadoDe = mapa.getIdDerivadoDe();
-        this.gradeColunas = mapa.getGradeColunas();
+        this.larguraM = mapa.getLarguraM() != null ? mapa.getLarguraM().doubleValue() : null;
+        this.profundidadeM = mapa.getProfundidadeM() != null ? mapa.getProfundidadeM().doubleValue() : null;
         this.gradeLinhas = mapa.getGradeLinhas();
         this.observacoes = mapa.getObservacoes();
         this.dataAtualizacao = DateUtils.localDateTimeToString(mapa.getDataAtualizacao());

@@ -16,10 +16,9 @@ public class PosicaoPalcoDTO {
     private Long id;
     private String rotulo;
     private String instrumento;
-    private Integer coluna;
+    private Double posX;
     private Integer linha;
-    private Integer larguraCel;
-    private Integer alturaCel;
+    private Double escala;
     private Long idUsuario;
     private Long idMembroFantasma;
     private String nomeOcupante;
@@ -34,10 +33,9 @@ public class PosicaoPalcoDTO {
         this.id = posicao.getId();
         this.rotulo = posicao.getRotulo();
         this.instrumento = posicao.getInstrumento();
-        this.coluna = posicao.getColuna();
+        this.posX = posicao.getPosX() != null ? posicao.getPosX().doubleValue() : null;
         this.linha = posicao.getLinha();
-        this.larguraCel = posicao.getLarguraCel();
-        this.alturaCel = posicao.getAlturaCel();
+        this.escala = posicao.getEscala() != null ? posicao.getEscala().doubleValue() : null;
         this.idUsuario = posicao.getIdUsuario();
         this.idMembroFantasma = posicao.getIdMembroFantasma();
         this.backingVocal = posicao.getBackingVocal();

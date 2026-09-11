@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -88,8 +89,9 @@ public class MapaPalcoServiceImpl implements MapaPalcoService {
         mapa.setIdBanda(idBanda);
         mapa.setNome(primeiroNaoVazio(dto.getNome(), template != null ? template.getNome() : "Novo mapa de palco"));
         mapa.setDescricao(primeiroNaoVazio(dto.getDescricao(), template != null ? template.getDescricao() : null));
-        mapa.setGradeColunas(template != null && template.getGradeColunas() != null ? template.getGradeColunas() : 12);
-        mapa.setGradeLinhas(template != null && template.getGradeLinhas() != null ? template.getGradeLinhas() : 6);
+        mapa.setLarguraM(dec(template != null ? template.getLarguraM() : null, "8.00"));
+        mapa.setProfundidadeM(dec(template != null ? template.getProfundidadeM() : null, "6.00"));
+        mapa.setGradeLinhas(template != null && template.getGradeLinhas() != null ? template.getGradeLinhas() : 4);
         // O primeiro mapa da banda ja nasce como o padrao exibido no perfil.
         mapa.setPadrao(mapaPalcoDao.contarPorIdBanda(idBanda) == 0);
         mapa.setAtivo(true);
@@ -110,10 +112,9 @@ public class MapaPalcoServiceImpl implements MapaPalcoService {
             posicao.setIdMapaPalco(mapa.getId());
             posicao.setRotulo(posicaoTemplate.getRotulo());
             posicao.setInstrumento(posicaoTemplate.getInstrumento());
-            posicao.setColuna(nz(posicaoTemplate.getColuna()));
+            posicao.setPosX(dec(posicaoTemplate.getPosX(), "50.00"));
             posicao.setLinha(nz(posicaoTemplate.getLinha()));
-            posicao.setLarguraCel(Math.max(1, nz(posicaoTemplate.getLarguraCel())));
-            posicao.setAlturaCel(Math.max(1, nz(posicaoTemplate.getAlturaCel())));
+            posicao.setEscala(dec(posicaoTemplate.getEscala(), "1.00"));
             posicao.setBackingVocal(Boolean.TRUE.equals(posicaoTemplate.getBackingVocal()));
             posicao.setOrdemCanal(nz(posicaoTemplate.getOrdemCanal()));
             // Vem do template sem dono: nasce pendente de propositalmente, para o
@@ -141,8 +142,11 @@ public class MapaPalcoServiceImpl implements MapaPalcoService {
         if (dto.getObservacoes() != null) {
             mapa.setObservacoes(dto.getObservacoes());
         }
-        if (dto.getGradeColunas() != null) {
-            mapa.setGradeColunas(dto.getGradeColunas());
+        if (dto.getLarguraM() != null) {
+            mapa.setLarguraM(BigDecimal.valueOf(dto.getLarguraM()));
+        }
+        if (dto.getProfundidadeM() != null) {
+            mapa.setProfundidadeM(BigDecimal.valueOf(dto.getProfundidadeM()));
         }
         if (dto.getGradeLinhas() != null) {
             mapa.setGradeLinhas(dto.getGradeLinhas());
@@ -160,22 +164,43 @@ public class MapaPalcoServiceImpl implements MapaPalcoService {
                 if (posicao == null) {
                     continue;
                 }
-                if (layout.getColuna() != null) {
-                    posicao.setColuna(layout.getColuna());
+                if (layout.getPosX() != null) {
+                    posicao.setPosX(BigDecimal.valueOf(limitarPercentual(layout.getPosX())));
                 }
                 if (layout.getLinha() != null) {
-                    posicao.setLinha(layout.getLinha());
+                    posicao.setLinha(Math.max(0, layout.getLinha()));
                 }
-                if (layout.getLarguraCel() != null) {
-                    posicao.setLarguraCel(Math.max(1, layout.getLarguraCel()));
-                }
-                if (layout.getAlturaCel() != null) {
-                    posicao.setAlturaCel(Math.max(1, layout.getAlturaCel()));
+                if (layout.getEscala() != null) {
+                    posicao.setEscala(BigDecimal.valueOf(layout.getEscala()));
                 }
                 if (layout.getOrdemCanal() != null) {
                     posicao.setOrdemCanal(layout.getOrdemCanal());
                 }
                 posicaoPalcoDao.save(posicao);
+            }
+        }
+
+        // Ajuste manual de pecas soltas. Item nao enviado mantem pos_x/pos_y
+        // nulos e continua sendo posicionado automaticamente pelo dono.
+        if (dto.getItens() != null && !dto.getItens().isEmpty()) {
+            Map<Long, ItemMapaPalco> itensExistentes = itemMapaPalcoDao.buscarPorIdMapaPalco(id).stream()
+                    .collect(Collectors.toMap(ItemMapaPalco::getId, i -> i));
+
+            for (AtualizacaoMapaPalcoDTO.LayoutItemDTO layout : dto.getItens()) {
+                ItemMapaPalco item = itensExistentes.get(layout.getId());
+                if (item == null) {
+                    continue;
+                }
+                if (layout.getPosX() != null) {
+                    item.setPosX(BigDecimal.valueOf(limitarPercentual(layout.getPosX())));
+                }
+                if (layout.getPosY() != null) {
+                    item.setPosY(BigDecimal.valueOf(limitarPercentual(layout.getPosY())));
+                }
+                if (layout.getEscala() != null) {
+                    item.setEscala(BigDecimal.valueOf(layout.getEscala()));
+                }
+                itemMapaPalcoDao.save(item);
             }
         }
 
@@ -198,7 +223,8 @@ public class MapaPalcoServiceImpl implements MapaPalcoService {
         copia.setNome(primeiroNaoVazio(novoNome, "Cópia de " + origem.getNome()));
         copia.setDescricao(origem.getDescricao());
         copia.setObservacoes(origem.getObservacoes());
-        copia.setGradeColunas(origem.getGradeColunas());
+        copia.setLarguraM(origem.getLarguraM());
+        copia.setProfundidadeM(origem.getProfundidadeM());
         copia.setGradeLinhas(origem.getGradeLinhas());
         copia.setIdDerivadoDe(origem.getId());
         copia.setPadrao(false);
@@ -217,10 +243,9 @@ public class MapaPalcoServiceImpl implements MapaPalcoService {
             posicaoCopia.setIdMapaPalco(copia.getId());
             posicaoCopia.setRotulo(posicaoOrigem.getRotulo());
             posicaoCopia.setInstrumento(posicaoOrigem.getInstrumento());
-            posicaoCopia.setColuna(posicaoOrigem.getColuna());
+            posicaoCopia.setPosX(posicaoOrigem.getPosX());
             posicaoCopia.setLinha(posicaoOrigem.getLinha());
-            posicaoCopia.setLarguraCel(posicaoOrigem.getLarguraCel());
-            posicaoCopia.setAlturaCel(posicaoOrigem.getAlturaCel());
+            posicaoCopia.setEscala(posicaoOrigem.getEscala());
             posicaoCopia.setIdUsuario(posicaoOrigem.getIdUsuario());
             posicaoCopia.setIdMembroFantasma(posicaoOrigem.getIdMembroFantasma());
             posicaoCopia.setBackingVocal(posicaoOrigem.getBackingVocal());
@@ -261,8 +286,9 @@ public class MapaPalcoServiceImpl implements MapaPalcoService {
         copia.setVias(origem.getVias());
         copia.setMixIndependente(origem.getMixIndependente());
         copia.setPonto(origem.getPonto());
-        copia.setColuna(origem.getColuna());
-        copia.setLinha(origem.getLinha());
+        copia.setPosX(origem.getPosX());
+        copia.setPosY(origem.getPosY());
+        copia.setEscala(origem.getEscala());
         itemMapaPalcoDao.save(copia);
     }
 
@@ -336,17 +362,14 @@ public class MapaPalcoServiceImpl implements MapaPalcoService {
         if (dto.getInstrumento() != null) {
             posicao.setInstrumento(dto.getInstrumento());
         }
-        if (dto.getColuna() != null) {
-            posicao.setColuna(dto.getColuna());
+        if (dto.getPosX() != null) {
+            posicao.setPosX(BigDecimal.valueOf(limitarPercentual(dto.getPosX())));
         }
         if (dto.getLinha() != null) {
-            posicao.setLinha(dto.getLinha());
+            posicao.setLinha(Math.max(0, dto.getLinha()));
         }
-        if (dto.getLarguraCel() != null) {
-            posicao.setLarguraCel(Math.max(1, dto.getLarguraCel()));
-        }
-        if (dto.getAlturaCel() != null) {
-            posicao.setAlturaCel(Math.max(1, dto.getAlturaCel()));
+        if (dto.getEscala() != null) {
+            posicao.setEscala(BigDecimal.valueOf(dto.getEscala()));
         }
         if (dto.getBackingVocal() != null) {
             posicao.setBackingVocal(dto.getBackingVocal());
@@ -434,8 +457,9 @@ public class MapaPalcoServiceImpl implements MapaPalcoService {
             item.setVias(dto.getVias());
             item.setMixIndependente(dto.getMixIndependente());
             item.setPonto(dto.getPonto());
-            item.setColuna(dto.getColuna());
-            item.setLinha(dto.getLinha());
+            item.setPosX(dto.getPosX() != null ? BigDecimal.valueOf(limitarPercentual(dto.getPosX())) : null);
+            item.setPosY(dto.getPosY() != null ? BigDecimal.valueOf(limitarPercentual(dto.getPosY())) : null);
+            item.setEscala(dto.getEscala() != null ? BigDecimal.valueOf(dto.getEscala()) : null);
             itemMapaPalcoDao.save(item);
             ordem++;
         }
@@ -632,5 +656,14 @@ public class MapaPalcoServiceImpl implements MapaPalcoService {
 
     private int nz(Integer valor) {
         return valor == null ? 0 : valor;
+    }
+
+    private BigDecimal dec(Double valor, String padrao) {
+        return valor != null ? BigDecimal.valueOf(valor) : new BigDecimal(padrao);
+    }
+
+    /** Mantem a peca dentro do palco mesmo se o front mandar algo fora de faixa. */
+    private double limitarPercentual(double valor) {
+        return Math.max(0d, Math.min(100d, valor));
     }
 }

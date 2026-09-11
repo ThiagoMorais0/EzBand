@@ -25,6 +25,8 @@ public class RiderTecnicoDTO {
     private String descricaoMapa;
     private String dataAtualizacao;
     private String observacoes;
+    /** Ex: "8,0 × 6,0 m" -- linha que toda casa de show precisa conferir. */
+    private String palcoMinimo;
 
     /** O mapa completo, para desenhar o palco no topo do documento. */
     private MapaPalcoDTO mapa;

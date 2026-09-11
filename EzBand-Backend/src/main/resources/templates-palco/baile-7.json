@@ -2,98 +2,335 @@
   "chave": "baile-7",
   "nome": "Banda de baile 7 peças",
   "descricao": "Dois vocais, teclado, guitarra, baixo, bateria e percussão.",
-  "gradeColunas": 12,
-  "gradeLinhas": 6,
+  "larguraM": 10.0,
+  "profundidadeM": 6.0,
+  "gradeLinhas": 4,
   "posicoes": [
     {
       "rotulo": "Bateria",
       "instrumento": "Bateria",
-      "coluna": 4, "linha": 0, "larguraCel": 3, "alturaCel": 2,
-      "backingVocal": false, "ordemCanal": 10,
+      "posX": 42,
+      "linha": 0,
+      "escala": 1,
+      "backingVocal": false,
+      "ordemCanal": 10,
       "itens": [
-        { "tipo": "INSTRUMENTO", "origem": "PROPRIO", "quantidade": 1, "canais": 8, "rotulo": "Bateria completa", "ordem": 0 },
-        { "tipo": "MICROFONE", "origem": "CASA", "quantidade": 8, "canais": 0, "observacao": "Microfonação de bateria", "ordem": 1 },
-        { "tipo": "PRATICAVEL", "origem": "CASA", "quantidade": 1, "rotulo": "Praticável 2x2m", "ordem": 2 },
-        { "tipo": "MONITOR_WEDGE", "origem": "CASA", "quantidade": 1, "vias": 1, "mixIndependente": true, "ordem": 3 },
-        { "tipo": "TOMADA", "origem": "CASA", "quantidade": 1, "voltagem": 220, "ponto": "fundo do palco", "ordem": 4 }
+        {
+          "tipo": "BATERIA",
+          "origem": "PROPRIO",
+          "quantidade": 1,
+          "canais": 8,
+          "rotulo": "Bateria completa",
+          "ordem": 0
+        },
+        {
+          "tipo": "MICROFONE",
+          "origem": "CASA",
+          "quantidade": 8,
+          "canais": 0,
+          "observacao": "Microfonação de bateria",
+          "ordem": 1
+        },
+        {
+          "tipo": "PRATICAVEL",
+          "origem": "CASA",
+          "quantidade": 1,
+          "rotulo": "Praticável 2x2m",
+          "ordem": 2
+        },
+        {
+          "tipo": "MONITOR_WEDGE",
+          "origem": "CASA",
+          "quantidade": 1,
+          "vias": 1,
+          "mixIndependente": true,
+          "ordem": 3
+        },
+        {
+          "tipo": "TOMADA",
+          "origem": "CASA",
+          "quantidade": 1,
+          "voltagem": 220,
+          "ponto": "fundo do palco",
+          "ordem": 4
+        }
       ]
     },
     {
       "rotulo": "Percussão",
       "instrumento": "Percussão",
-      "coluna": 8, "linha": 0, "larguraCel": 2, "alturaCel": 2,
-      "backingVocal": false, "ordemCanal": 20,
+      "posX": 72,
+      "linha": 0,
+      "escala": 1,
+      "backingVocal": false,
+      "ordemCanal": 20,
       "itens": [
-        { "tipo": "INSTRUMENTO", "origem": "PROPRIO", "quantidade": 1, "canais": 3, "rotulo": "Set de percussão", "observacao": "Timbau, congas e acessórios", "ordem": 0 },
-        { "tipo": "MICROFONE", "origem": "CASA", "quantidade": 3, "canais": 0, "ordem": 1 },
-        { "tipo": "MONITOR_WEDGE", "origem": "CASA", "quantidade": 1, "vias": 1, "mixIndependente": false, "ordem": 2 }
+        {
+          "tipo": "PERCUSSAO",
+          "origem": "PROPRIO",
+          "quantidade": 1,
+          "canais": 3,
+          "rotulo": "Set de percussão",
+          "observacao": "Timbau, congas e acessórios",
+          "ordem": 0
+        },
+        {
+          "tipo": "MICROFONE",
+          "origem": "CASA",
+          "quantidade": 3,
+          "canais": 0,
+          "ordem": 1
+        },
+        {
+          "tipo": "MONITOR_WEDGE",
+          "origem": "CASA",
+          "quantidade": 1,
+          "vias": 1,
+          "mixIndependente": false,
+          "ordem": 2
+        }
       ]
     },
     {
       "rotulo": "Teclado",
       "instrumento": "Teclado",
-      "coluna": 0, "linha": 2, "larguraCel": 2, "alturaCel": 1,
-      "backingVocal": true, "ordemCanal": 50,
+      "posX": 15,
+      "linha": 1,
+      "escala": 1,
+      "backingVocal": true,
+      "ordemCanal": 50,
       "itens": [
-        { "tipo": "INSTRUMENTO", "origem": "PROPRIO", "quantidade": 1, "canais": 2, "rotulo": "Teclado", "observacao": "Saída estéreo L/R", "ordem": 0 },
-        { "tipo": "DI", "origem": "CASA", "quantidade": 2, "canais": 0, "observacao": "Um par para a saída estéreo", "ordem": 1 },
-        { "tipo": "SUPORTE", "origem": "PROPRIO", "quantidade": 1, "rotulo": "Suporte de teclado", "ordem": 2 },
-        { "tipo": "MICROFONE", "origem": "CASA", "quantidade": 1, "canais": 1, "rotulo": "Microfone de backing vocal", "ordem": 3 },
-        { "tipo": "SUPORTE", "origem": "CASA", "quantidade": 1, "rotulo": "Pedestal girafa", "ordem": 4 },
-        { "tipo": "MONITOR_WEDGE", "origem": "CASA", "quantidade": 1, "vias": 1, "mixIndependente": false, "ordem": 5 },
-        { "tipo": "TOMADA", "origem": "CASA", "quantidade": 2, "voltagem": 220, "ponto": "suporte de teclado", "ordem": 6 }
+        {
+          "tipo": "TECLADO",
+          "origem": "PROPRIO",
+          "quantidade": 1,
+          "canais": 2,
+          "rotulo": "Teclado",
+          "observacao": "Saída estéreo L/R",
+          "ordem": 0
+        },
+        {
+          "tipo": "DI",
+          "origem": "CASA",
+          "quantidade": 2,
+          "canais": 0,
+          "observacao": "Um par para a saída estéreo",
+          "ordem": 1
+        },
+        {
+          "tipo": "SUPORTE",
+          "origem": "PROPRIO",
+          "quantidade": 1,
+          "rotulo": "Suporte de teclado",
+          "ordem": 2
+        },
+        {
+          "tipo": "MICROFONE",
+          "origem": "CASA",
+          "quantidade": 1,
+          "canais": 1,
+          "rotulo": "Microfone de backing vocal",
+          "ordem": 3
+        },
+        {
+          "tipo": "SUPORTE",
+          "origem": "CASA",
+          "quantidade": 1,
+          "rotulo": "Pedestal girafa",
+          "ordem": 4
+        },
+        {
+          "tipo": "MONITOR_WEDGE",
+          "origem": "CASA",
+          "quantidade": 1,
+          "vias": 1,
+          "mixIndependente": false,
+          "ordem": 5
+        },
+        {
+          "tipo": "TOMADA",
+          "origem": "CASA",
+          "quantidade": 2,
+          "voltagem": 220,
+          "ponto": "suporte de teclado",
+          "ordem": 6
+        }
       ]
     },
     {
       "rotulo": "Guitarra",
       "instrumento": "Guitarra",
-      "coluna": 10, "linha": 2, "larguraCel": 2, "alturaCel": 1,
-      "backingVocal": false, "ordemCanal": 40,
+      "posX": 85,
+      "linha": 1,
+      "escala": 1,
+      "backingVocal": false,
+      "ordemCanal": 40,
       "itens": [
-        { "tipo": "AMPLIFICADOR", "origem": "PROPRIO", "quantidade": 1, "canais": 1, "observacao": "Microfonado com SM57", "ordem": 0 },
-        { "tipo": "MICROFONE", "origem": "CASA", "quantidade": 1, "canais": 0, "observacao": "Captação do amplificador", "ordem": 1 },
-        { "tipo": "MONITOR_WEDGE", "origem": "CASA", "quantidade": 1, "vias": 1, "mixIndependente": false, "ordem": 2 },
-        { "tipo": "TOMADA", "origem": "CASA", "quantidade": 2, "voltagem": 220, "ponto": "amplificador e pedais", "ordem": 3 }
+        {
+          "tipo": "AMPLIFICADOR",
+          "origem": "PROPRIO",
+          "quantidade": 1,
+          "canais": 1,
+          "observacao": "Microfonado com SM57",
+          "ordem": 0
+        },
+        {
+          "tipo": "MICROFONE",
+          "origem": "CASA",
+          "quantidade": 1,
+          "canais": 0,
+          "observacao": "Captação do amplificador",
+          "ordem": 1
+        },
+        {
+          "tipo": "MONITOR_WEDGE",
+          "origem": "CASA",
+          "quantidade": 1,
+          "vias": 1,
+          "mixIndependente": false,
+          "ordem": 2
+        },
+        {
+          "tipo": "TOMADA",
+          "origem": "CASA",
+          "quantidade": 2,
+          "voltagem": 220,
+          "ponto": "amplificador e pedais",
+          "ordem": 3
+        }
       ]
     },
     {
       "rotulo": "Baixo",
       "instrumento": "Baixo",
-      "coluna": 0, "linha": 4, "larguraCel": 2, "alturaCel": 1,
-      "backingVocal": false, "ordemCanal": 30,
+      "posX": 25,
+      "linha": 2,
+      "escala": 1,
+      "backingVocal": false,
+      "ordemCanal": 30,
       "itens": [
-        { "tipo": "AMPLIFICADOR", "origem": "PROPRIO", "quantidade": 1, "canais": 0, "ordem": 0 },
-        { "tipo": "DI", "origem": "CASA", "quantidade": 1, "canais": 1, "ordem": 1 },
-        { "tipo": "MONITOR_WEDGE", "origem": "CASA", "quantidade": 1, "vias": 1, "mixIndependente": false, "ordem": 2 },
-        { "tipo": "TOMADA", "origem": "CASA", "quantidade": 1, "voltagem": 220, "ponto": "amplificador", "ordem": 3 }
+        {
+          "tipo": "AMPLIFICADOR",
+          "origem": "PROPRIO",
+          "quantidade": 1,
+          "canais": 0,
+          "ordem": 0
+        },
+        {
+          "tipo": "DI",
+          "origem": "CASA",
+          "quantidade": 1,
+          "canais": 1,
+          "ordem": 1
+        },
+        {
+          "tipo": "MONITOR_WEDGE",
+          "origem": "CASA",
+          "quantidade": 1,
+          "vias": 1,
+          "mixIndependente": false,
+          "ordem": 2
+        },
+        {
+          "tipo": "TOMADA",
+          "origem": "CASA",
+          "quantidade": 1,
+          "voltagem": 220,
+          "ponto": "amplificador",
+          "ordem": 3
+        }
       ]
     },
     {
       "rotulo": "Vocal 1",
       "instrumento": "Voz",
-      "coluna": 3, "linha": 4, "larguraCel": 2, "alturaCel": 1,
-      "backingVocal": false, "ordemCanal": 70,
+      "posX": 44,
+      "linha": 3,
+      "escala": 1,
+      "backingVocal": false,
+      "ordemCanal": 70,
       "itens": [
-        { "tipo": "MICROFONE", "origem": "PROPRIO", "quantidade": 1, "canais": 1, "rotulo": "Microfone de voz", "ordem": 0 },
-        { "tipo": "SUPORTE", "origem": "CASA", "quantidade": 1, "rotulo": "Pedestal girafa", "ordem": 1 },
-        { "tipo": "MONITOR_WEDGE", "origem": "CASA", "quantidade": 1, "vias": 1, "mixIndependente": true, "ordem": 2 }
+        {
+          "tipo": "MICROFONE",
+          "origem": "PROPRIO",
+          "quantidade": 1,
+          "canais": 1,
+          "rotulo": "Microfone de voz",
+          "ordem": 0
+        },
+        {
+          "tipo": "SUPORTE",
+          "origem": "CASA",
+          "quantidade": 1,
+          "rotulo": "Pedestal girafa",
+          "ordem": 1
+        },
+        {
+          "tipo": "MONITOR_WEDGE",
+          "origem": "CASA",
+          "quantidade": 1,
+          "vias": 1,
+          "mixIndependente": true,
+          "ordem": 2
+        }
       ]
     },
     {
       "rotulo": "Vocal 2",
       "instrumento": "Voz",
-      "coluna": 7, "linha": 4, "larguraCel": 2, "alturaCel": 1,
-      "backingVocal": false, "ordemCanal": 71,
+      "posX": 62,
+      "linha": 3,
+      "escala": 1,
+      "backingVocal": false,
+      "ordemCanal": 71,
       "itens": [
-        { "tipo": "MICROFONE", "origem": "PROPRIO", "quantidade": 1, "canais": 1, "rotulo": "Microfone de voz", "ordem": 0 },
-        { "tipo": "SUPORTE", "origem": "CASA", "quantidade": 1, "rotulo": "Pedestal girafa", "ordem": 1 },
-        { "tipo": "MONITOR_WEDGE", "origem": "CASA", "quantidade": 1, "vias": 1, "mixIndependente": true, "ordem": 2 }
+        {
+          "tipo": "MICROFONE",
+          "origem": "PROPRIO",
+          "quantidade": 1,
+          "canais": 1,
+          "rotulo": "Microfone de voz",
+          "ordem": 0
+        },
+        {
+          "tipo": "SUPORTE",
+          "origem": "CASA",
+          "quantidade": 1,
+          "rotulo": "Pedestal girafa",
+          "ordem": 1
+        },
+        {
+          "tipo": "MONITOR_WEDGE",
+          "origem": "CASA",
+          "quantidade": 1,
+          "vias": 1,
+          "mixIndependente": true,
+          "ordem": 2
+        }
       ]
     }
   ],
   "itensGerais": [
-    { "tipo": "PA", "origem": "CASA", "quantidade": 1, "rotulo": "Sistema de PA compatível com o espaço", "ordem": 0 },
-    { "tipo": "MESA_SOM", "origem": "CASA", "quantidade": 1, "canais": 0, "ordem": 1 },
-    { "tipo": "ILUMINACAO", "origem": "CASA", "quantidade": 1, "rotulo": "Iluminação básica de palco", "ordem": 2 }
+    {
+      "tipo": "PA",
+      "origem": "CASA",
+      "quantidade": 1,
+      "rotulo": "Sistema de PA compatível com o espaço",
+      "ordem": 0
+    },
+    {
+      "tipo": "MESA_SOM",
+      "origem": "CASA",
+      "quantidade": 1,
+      "canais": 0,
+      "ordem": 1
+    },
+    {
+      "tipo": "ILUMINACAO",
+      "origem": "CASA",
+      "quantidade": 1,
+      "rotulo": "Iluminação básica de palco",
+      "ordem": 2
+    }
   ]
 }

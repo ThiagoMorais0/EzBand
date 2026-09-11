@@ -11,11 +11,11 @@ import java.util.List;
 public interface PosicaoPalcoDao extends JpaRepository<PosicaoPalco, Long> {
 
     @Query("SELECT p FROM PosicaoPalco p WHERE p.idMapaPalco = :idMapaPalco "
-            + "ORDER BY p.linha ASC, p.coluna ASC")
+            + "ORDER BY p.linha ASC, p.posX ASC")
     List<PosicaoPalco> buscarPorIdMapaPalco(Long idMapaPalco);
 
     @Query("SELECT p FROM PosicaoPalco p WHERE p.idMapaPalco IN :idsMapaPalco "
-            + "ORDER BY p.linha ASC, p.coluna ASC")
+            + "ORDER BY p.linha ASC, p.posX ASC")
     List<PosicaoPalco> buscarPorIdsMapaPalco(List<Long> idsMapaPalco);
 
     @Query("SELECT COUNT(p) FROM PosicaoPalco p WHERE p.idMapaPalco = :idMapaPalco "
