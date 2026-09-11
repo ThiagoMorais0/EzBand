@@ -32,16 +32,22 @@ public class PosicaoPalco {
     @Column(length = 100)
     private String instrumento;
 
-    /** Percentual da largura do palco (0 = coxia esquerda, 100 = direita). */
+    /** Qual figura desenhar: musico em pe, sentado, maestro. */
+    @Column(nullable = false, length = 50)
+    private String modelo = "musico-em-pe";
+
+    /** Percentuais das dimensoes do palco. 0,0 = fundo a esquerda. */
     @Column(name = "POS_X", nullable = false, precision = 6, scale = 2)
     private BigDecimal posX = new BigDecimal("50.00");
 
-    /** Faixa horizontal. 0 e o fundo do palco. */
-    @Column(nullable = false)
-    private Integer linha = 0;
+    @Column(name = "POS_Y", nullable = false, precision = 6, scale = 2)
+    private BigDecimal posY = new BigDecimal("50.00");
 
     @Column(nullable = false, precision = 4, scale = 2)
     private BigDecimal escala = BigDecimal.ONE;
+
+    @Column(nullable = false, precision = 5, scale = 2)
+    private BigDecimal rotacao = BigDecimal.ZERO;
 
     @Column(name = "ID_USUARIO")
     private Long idUsuario;

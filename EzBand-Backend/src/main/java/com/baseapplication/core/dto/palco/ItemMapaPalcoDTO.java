@@ -15,6 +15,7 @@ public class ItemMapaPalcoDTO {
     private Long id;
     private Long idPosicao;
     private TipoItemPalco tipo;
+    private String modelo;
     private String tipoDescricao;
     private String categoria;
     private String icone;
@@ -34,11 +35,13 @@ public class ItemMapaPalcoDTO {
     private Double posX;
     private Double posY;
     private Double escala;
+    private Double rotacao;
 
     public ItemMapaPalcoDTO(ItemMapaPalco item) {
         this.id = item.getId();
         this.idPosicao = item.getIdPosicao();
         this.tipo = item.getTipo();
+        this.modelo = item.getModelo();
         this.tipoDescricao = item.getTipo() != null ? item.getTipo().getDescricao() : null;
         this.categoria = item.getTipo() != null ? item.getTipo().getCategoria().name() : null;
         this.icone = item.getTipo() != null ? item.getTipo().getIcone() : null;
@@ -58,6 +61,7 @@ public class ItemMapaPalcoDTO {
         this.posX = item.getPosX() != null ? item.getPosX().doubleValue() : null;
         this.posY = item.getPosY() != null ? item.getPosY().doubleValue() : null;
         this.escala = item.getEscala() != null ? item.getEscala().doubleValue() : null;
+        this.rotacao = item.getRotacao() != null ? item.getRotacao().doubleValue() : null;
     }
 
     /** Nome curto para listas do rider: prioriza o rotulo livre, cai no tipo. */

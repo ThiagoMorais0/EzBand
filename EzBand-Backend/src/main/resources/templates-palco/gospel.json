@@ -4,14 +4,15 @@
   "descricao": "Ministro de louvor, dois backing vocals, teclado, guitarra, baixo e bateria. Monitoração em in-ear.",
   "larguraM": 10.0,
   "profundidadeM": 6.0,
-  "gradeLinhas": 4,
   "posicoes": [
     {
       "rotulo": "Bateria",
       "instrumento": "Bateria",
+      "modelo": "musico-sentado",
       "posX": 50,
-      "linha": 0,
+      "posY": 14.0,
       "escala": 1,
+      "rotacao": 0,
       "backingVocal": false,
       "ordemCanal": 10,
       "itens": [
@@ -22,7 +23,10 @@
           "canais": 8,
           "rotulo": "Bateria completa",
           "observacao": "Usamos a bateria do local; levamos pratos e caixa",
-          "ordem": 0
+          "ordem": 0,
+          "modelo": "bateria-6-pecas",
+          "posX": 50.0,
+          "posY": 23.17
         },
         {
           "tipo": "MICROFONE",
@@ -53,9 +57,11 @@
     {
       "rotulo": "Teclado",
       "instrumento": "Teclado",
+      "modelo": "musico-em-pe",
       "posX": 16,
-      "linha": 1,
+      "posY": 38.0,
       "escala": 1,
+      "rotacao": 0,
       "backingVocal": true,
       "ordemCanal": 50,
       "itens": [
@@ -66,7 +72,10 @@
           "canais": 2,
           "rotulo": "Teclado",
           "observacao": "Saída estéreo L/R",
-          "ordem": 0
+          "ordem": 0,
+          "modelo": "teclado-88",
+          "posX": 16.0,
+          "posY": 45.5
         },
         {
           "tipo": "DI",
@@ -89,7 +98,10 @@
           "quantidade": 1,
           "canais": 1,
           "rotulo": "Microfone de backing vocal",
-          "ordem": 3
+          "ordem": 3,
+          "modelo": "pedestal-girafa",
+          "posX": 16.0,
+          "posY": 45.0
         },
         {
           "tipo": "IN_EAR",
@@ -112,9 +124,11 @@
     {
       "rotulo": "Guitarra",
       "instrumento": "Guitarra",
+      "modelo": "musico-em-pe",
       "posX": 84,
-      "linha": 1,
+      "posY": 38.0,
       "escala": 1,
+      "rotacao": 0,
       "backingVocal": false,
       "ordemCanal": 40,
       "itens": [
@@ -124,7 +138,10 @@
           "quantidade": 1,
           "canais": 2,
           "observacao": "Saída XLR balanceada estéreo, direto para a mesa",
-          "ordem": 0
+          "ordem": 0,
+          "modelo": "pedaleira",
+          "posX": 90.0,
+          "posY": 44.67
         },
         {
           "tipo": "IN_EAR",
@@ -147,9 +164,11 @@
     {
       "rotulo": "Baixo",
       "instrumento": "Baixo",
+      "modelo": "musico-em-pe",
       "posX": 28,
-      "linha": 2,
+      "posY": 62.0,
       "escala": 1,
+      "rotacao": 0,
       "backingVocal": false,
       "ordemCanal": 30,
       "itens": [
@@ -182,9 +201,11 @@
     {
       "rotulo": "Ministro de louvor",
       "instrumento": "Voz",
+      "modelo": "musico-em-pe",
       "posX": 50,
-      "linha": 3,
+      "posY": 86.0,
       "escala": 1,
+      "rotacao": 0,
       "backingVocal": false,
       "ordemCanal": 70,
       "itens": [
@@ -195,7 +216,10 @@
           "canais": 1,
           "rotulo": "Microfone sem fio",
           "observacao": "Preferência por microfone sem fio",
-          "ordem": 0
+          "ordem": 0,
+          "modelo": "pedestal-girafa",
+          "posX": 50.0,
+          "posY": 93.0
         },
         {
           "tipo": "IN_EAR",
@@ -210,9 +234,11 @@
     {
       "rotulo": "Backing vocal 1",
       "instrumento": "Voz",
+      "modelo": "musico-em-pe",
       "posX": 30,
-      "linha": 3,
+      "posY": 86.0,
       "escala": 1,
+      "rotacao": 0,
       "backingVocal": true,
       "ordemCanal": 71,
       "itens": [
@@ -221,7 +247,10 @@
           "origem": "CASA",
           "quantidade": 1,
           "canais": 1,
-          "ordem": 0
+          "ordem": 0,
+          "modelo": "pedestal-girafa",
+          "posX": 30.0,
+          "posY": 93.0
         },
         {
           "tipo": "SUPORTE",
@@ -243,9 +272,11 @@
     {
       "rotulo": "Backing vocal 2",
       "instrumento": "Voz",
+      "modelo": "musico-em-pe",
       "posX": 70,
-      "linha": 3,
+      "posY": 86.0,
       "escala": 1,
+      "rotacao": 0,
       "backingVocal": true,
       "ordemCanal": 72,
       "itens": [
@@ -254,7 +285,10 @@
           "origem": "CASA",
           "quantidade": 1,
           "canais": 1,
-          "ordem": 0
+          "ordem": 0,
+          "modelo": "pedestal-girafa",
+          "posX": 70.0,
+          "posY": 93.0
         },
         {
           "tipo": "SUPORTE",
@@ -280,14 +314,20 @@
       "origem": "CASA",
       "quantidade": 1,
       "rotulo": "Sistema de PA compatível com o espaço",
-      "ordem": 0
+      "ordem": 0,
+      "modelo": "caixa-pa",
+      "posX": 6,
+      "posY": 94
     },
     {
       "tipo": "MESA_SOM",
       "origem": "CASA",
       "quantidade": 1,
       "canais": 0,
-      "ordem": 1
+      "ordem": 1,
+      "modelo": "mesa-som",
+      "posX": 50,
+      "posY": 97
     },
     {
       "tipo": "OUTRO",

@@ -30,6 +30,13 @@ public interface MapaPalcoService {
     /** Substitui a ficha inteira da posicao e devolve o agregado com o resumo novo. */
     MapaPalcoDTO salvarFicha(Long idPosicao, FichaPosicaoDTO dto);
 
+    /** Soltar uma peca da paleta no palco. */
+    MapaPalcoDTO adicionarItem(Long idMapa, CadastroItemMapaPalcoDTO dto);
+
+    MapaPalcoDTO atualizarItem(Long idItem, CadastroItemMapaPalcoDTO dto);
+
+    MapaPalcoDTO removerItem(Long idItem);
+
     RiderTecnicoDTO gerarRider(Long id);
 
     /** Versao publica: nao exige autenticacao, valida que o mapa pertence a banda. */

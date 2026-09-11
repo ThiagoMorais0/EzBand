@@ -4,14 +4,15 @@
   "descricao": "Dois vocais, teclado, guitarra, baixo, bateria e percussão.",
   "larguraM": 10.0,
   "profundidadeM": 6.0,
-  "gradeLinhas": 4,
   "posicoes": [
     {
       "rotulo": "Bateria",
       "instrumento": "Bateria",
+      "modelo": "musico-sentado",
       "posX": 42,
-      "linha": 0,
+      "posY": 14.0,
       "escala": 1,
+      "rotacao": 0,
       "backingVocal": false,
       "ordemCanal": 10,
       "itens": [
@@ -21,7 +22,10 @@
           "quantidade": 1,
           "canais": 8,
           "rotulo": "Bateria completa",
-          "ordem": 0
+          "ordem": 0,
+          "modelo": "bateria-6-pecas",
+          "posX": 42.0,
+          "posY": 23.17
         },
         {
           "tipo": "MICROFONE",
@@ -36,7 +40,10 @@
           "origem": "CASA",
           "quantidade": 1,
           "rotulo": "Praticável 2x2m",
-          "ordem": 2
+          "ordem": 2,
+          "modelo": "praticavel-2x2",
+          "posX": 42.0,
+          "posY": 21.5
         },
         {
           "tipo": "MONITOR_WEDGE",
@@ -44,7 +51,10 @@
           "quantidade": 1,
           "vias": 1,
           "mixIndependente": true,
-          "ordem": 3
+          "ordem": 3,
+          "modelo": "wedge",
+          "posX": 42.0,
+          "posY": 32.67
         },
         {
           "tipo": "TOMADA",
@@ -59,9 +69,11 @@
     {
       "rotulo": "Percussão",
       "instrumento": "Percussão",
+      "modelo": "musico-sentado",
       "posX": 72,
-      "linha": 0,
+      "posY": 14.0,
       "escala": 1,
+      "rotacao": 0,
       "backingVocal": false,
       "ordemCanal": 20,
       "itens": [
@@ -72,7 +84,10 @@
           "canais": 3,
           "rotulo": "Set de percussão",
           "observacao": "Timbau, congas e acessórios",
-          "ordem": 0
+          "ordem": 0,
+          "modelo": "set-percussao",
+          "posX": 72.0,
+          "posY": 22.33
         },
         {
           "tipo": "MICROFONE",
@@ -87,16 +102,21 @@
           "quantidade": 1,
           "vias": 1,
           "mixIndependente": false,
-          "ordem": 2
+          "ordem": 2,
+          "modelo": "wedge",
+          "posX": 72.0,
+          "posY": 32.67
         }
       ]
     },
     {
       "rotulo": "Teclado",
       "instrumento": "Teclado",
+      "modelo": "musico-em-pe",
       "posX": 15,
-      "linha": 1,
+      "posY": 38.0,
       "escala": 1,
+      "rotacao": 0,
       "backingVocal": true,
       "ordemCanal": 50,
       "itens": [
@@ -107,7 +127,10 @@
           "canais": 2,
           "rotulo": "Teclado",
           "observacao": "Saída estéreo L/R",
-          "ordem": 0
+          "ordem": 0,
+          "modelo": "teclado-88",
+          "posX": 15.0,
+          "posY": 45.5
         },
         {
           "tipo": "DI",
@@ -130,7 +153,10 @@
           "quantidade": 1,
           "canais": 1,
           "rotulo": "Microfone de backing vocal",
-          "ordem": 3
+          "ordem": 3,
+          "modelo": "pedestal-girafa",
+          "posX": 15.0,
+          "posY": 45.0
         },
         {
           "tipo": "SUPORTE",
@@ -145,7 +171,10 @@
           "quantidade": 1,
           "vias": 1,
           "mixIndependente": false,
-          "ordem": 5
+          "ordem": 5,
+          "modelo": "wedge",
+          "posX": 15.0,
+          "posY": 56.67
         },
         {
           "tipo": "TOMADA",
@@ -160,9 +189,11 @@
     {
       "rotulo": "Guitarra",
       "instrumento": "Guitarra",
+      "modelo": "musico-em-pe",
       "posX": 85,
-      "linha": 1,
+      "posY": 38.0,
       "escala": 1,
+      "rotacao": 0,
       "backingVocal": false,
       "ordemCanal": 40,
       "itens": [
@@ -172,7 +203,10 @@
           "quantidade": 1,
           "canais": 1,
           "observacao": "Microfonado com SM57",
-          "ordem": 0
+          "ordem": 0,
+          "modelo": "combo-2x12",
+          "posX": 85.0,
+          "posY": 26.33
         },
         {
           "tipo": "MICROFONE",
@@ -188,7 +222,10 @@
           "quantidade": 1,
           "vias": 1,
           "mixIndependente": false,
-          "ordem": 2
+          "ordem": 2,
+          "modelo": "wedge",
+          "posX": 85.0,
+          "posY": 56.67
         },
         {
           "tipo": "TOMADA",
@@ -203,9 +240,11 @@
     {
       "rotulo": "Baixo",
       "instrumento": "Baixo",
+      "modelo": "musico-em-pe",
       "posX": 25,
-      "linha": 2,
+      "posY": 62.0,
       "escala": 1,
+      "rotacao": 0,
       "backingVocal": false,
       "ordemCanal": 30,
       "itens": [
@@ -214,7 +253,10 @@
           "origem": "PROPRIO",
           "quantidade": 1,
           "canais": 0,
-          "ordem": 0
+          "ordem": 0,
+          "modelo": "cubo-baixo-1x15",
+          "posX": 25.0,
+          "posY": 50.33
         },
         {
           "tipo": "DI",
@@ -229,7 +271,10 @@
           "quantidade": 1,
           "vias": 1,
           "mixIndependente": false,
-          "ordem": 2
+          "ordem": 2,
+          "modelo": "wedge",
+          "posX": 25.0,
+          "posY": 80.67
         },
         {
           "tipo": "TOMADA",
@@ -244,9 +289,11 @@
     {
       "rotulo": "Vocal 1",
       "instrumento": "Voz",
+      "modelo": "musico-em-pe",
       "posX": 44,
-      "linha": 3,
+      "posY": 86.0,
       "escala": 1,
+      "rotacao": 0,
       "backingVocal": false,
       "ordemCanal": 70,
       "itens": [
@@ -256,7 +303,10 @@
           "quantidade": 1,
           "canais": 1,
           "rotulo": "Microfone de voz",
-          "ordem": 0
+          "ordem": 0,
+          "modelo": "pedestal-girafa",
+          "posX": 44.0,
+          "posY": 93.0
         },
         {
           "tipo": "SUPORTE",
@@ -271,16 +321,21 @@
           "quantidade": 1,
           "vias": 1,
           "mixIndependente": true,
-          "ordem": 2
+          "ordem": 2,
+          "modelo": "wedge",
+          "posX": 44.0,
+          "posY": 97
         }
       ]
     },
     {
       "rotulo": "Vocal 2",
       "instrumento": "Voz",
+      "modelo": "musico-em-pe",
       "posX": 62,
-      "linha": 3,
+      "posY": 86.0,
       "escala": 1,
+      "rotacao": 0,
       "backingVocal": false,
       "ordemCanal": 71,
       "itens": [
@@ -290,7 +345,10 @@
           "quantidade": 1,
           "canais": 1,
           "rotulo": "Microfone de voz",
-          "ordem": 0
+          "ordem": 0,
+          "modelo": "pedestal-girafa",
+          "posX": 62.0,
+          "posY": 93.0
         },
         {
           "tipo": "SUPORTE",
@@ -305,7 +363,10 @@
           "quantidade": 1,
           "vias": 1,
           "mixIndependente": true,
-          "ordem": 2
+          "ordem": 2,
+          "modelo": "wedge",
+          "posX": 62.0,
+          "posY": 97
         }
       ]
     }
@@ -316,14 +377,20 @@
       "origem": "CASA",
       "quantidade": 1,
       "rotulo": "Sistema de PA compatível com o espaço",
-      "ordem": 0
+      "ordem": 0,
+      "modelo": "caixa-pa",
+      "posX": 6,
+      "posY": 94
     },
     {
       "tipo": "MESA_SOM",
       "origem": "CASA",
       "quantidade": 1,
       "canais": 0,
-      "ordem": 1
+      "ordem": 1,
+      "modelo": "mesa-som",
+      "posX": 50,
+      "posY": 97
     },
     {
       "tipo": "ILUMINACAO",

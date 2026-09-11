@@ -30,9 +30,18 @@ public class ItemMapaPalco {
     @Column(name = "ID_POSICAO")
     private Long idPosicao;
 
+    /** O que e, para o rider somar. */
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 40)
     private TipoItemPalco tipo;
+
+    /**
+     * O que foi arrastado da paleta, para desenhar e dimensionar. Nulo
+     * significa que o item nao e uma peca no palco, e sim um atributo
+     * invisivel do dono (microfonacao da bateria, tomadas do amplificador).
+     */
+    @Column(length = 50)
+    private String modelo;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
@@ -67,11 +76,7 @@ public class ItemMapaPalco {
     @Column(length = 100)
     private String ponto;
 
-    /**
-     * Nulos = "desenhe onde faz sentido" (amplificador atras do dono, pedaleira
-     * nos pes, microfone a frente). Preenchidos = ajuste manual. E o que faz o
-     * palco nascer montado sem tirar o controle fino de quem quer usar.
-     */
+    /** Preenchidos apenas quando o item e uma peca desenhada no palco. */
     @Column(name = "POS_X", precision = 6, scale = 2)
     private BigDecimal posX;
 
@@ -80,4 +85,7 @@ public class ItemMapaPalco {
 
     @Column(precision = 4, scale = 2)
     private BigDecimal escala;
+
+    @Column(precision = 5, scale = 2)
+    private BigDecimal rotacao;
 }

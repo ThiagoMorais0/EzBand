@@ -22,7 +22,6 @@ public class TemplateMapaPalcoDTO {
     private String descricao;
     private Double larguraM;
     private Double profundidadeM;
-    private Integer gradeLinhas;
     private List<PosicaoTemplateDTO> posicoes = new ArrayList<>();
     private List<CadastroItemMapaPalcoDTO> itensGerais = new ArrayList<>();
 
@@ -32,9 +31,11 @@ public class TemplateMapaPalcoDTO {
     public static class PosicaoTemplateDTO {
         private String rotulo;
         private String instrumento;
+        private String modelo;
         private Double posX;
-        private Integer linha;
+        private Double posY;
         private Double escala;
+        private Double rotacao;
         private Boolean backingVocal;
         private Integer ordemCanal;
         private List<CadastroItemMapaPalcoDTO> itens = new ArrayList<>();

@@ -16,9 +16,11 @@ public class PosicaoPalcoDTO {
     private Long id;
     private String rotulo;
     private String instrumento;
+    private String modelo;
     private Double posX;
-    private Integer linha;
+    private Double posY;
     private Double escala;
+    private Double rotacao;
     private Long idUsuario;
     private Long idMembroFantasma;
     private String nomeOcupante;
@@ -33,9 +35,11 @@ public class PosicaoPalcoDTO {
         this.id = posicao.getId();
         this.rotulo = posicao.getRotulo();
         this.instrumento = posicao.getInstrumento();
+        this.modelo = posicao.getModelo();
         this.posX = posicao.getPosX() != null ? posicao.getPosX().doubleValue() : null;
-        this.linha = posicao.getLinha();
+        this.posY = posicao.getPosY() != null ? posicao.getPosY().doubleValue() : null;
         this.escala = posicao.getEscala() != null ? posicao.getEscala().doubleValue() : null;
+        this.rotacao = posicao.getRotacao() != null ? posicao.getRotacao().doubleValue() : null;
         this.idUsuario = posicao.getIdUsuario();
         this.idMembroFantasma = posicao.getIdMembroFantasma();
         this.backingVocal = posicao.getBackingVocal();

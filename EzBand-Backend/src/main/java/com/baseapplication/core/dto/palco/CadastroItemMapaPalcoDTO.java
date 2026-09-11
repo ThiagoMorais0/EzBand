@@ -12,6 +12,9 @@ import lombok.NoArgsConstructor;
 public class CadastroItemMapaPalcoDTO {
 
     private TipoItemPalco tipo;
+    private String modelo;
+    /** Dono da peca. Preenchido pelo vinculo por proximidade ao soltar. */
+    private Long idPosicao;
     private OrigemItemPalco origem;
     private Integer quantidade;
     private String rotulo;
@@ -26,4 +29,5 @@ public class CadastroItemMapaPalcoDTO {
     private Double posX;
     private Double posY;
     private Double escala;
+    private Double rotacao;
 }

@@ -4,14 +4,15 @@
   "descricao": "Guitarra, baixo e bateria. O guitarrista assume o vocal principal.",
   "larguraM": 7.0,
   "profundidadeM": 5.0,
-  "gradeLinhas": 3,
   "posicoes": [
     {
       "rotulo": "Bateria",
       "instrumento": "Bateria",
+      "modelo": "musico-sentado",
       "posX": 50,
-      "linha": 0,
+      "posY": 17.0,
       "escala": 1,
+      "rotacao": 0,
       "backingVocal": false,
       "ordemCanal": 10,
       "itens": [
@@ -22,7 +23,10 @@
           "canais": 6,
           "rotulo": "Bateria completa",
           "observacao": "Bumbo, caixa, 2 tons, 2 overheads",
-          "ordem": 0
+          "ordem": 0,
+          "modelo": "bateria-5-pecas",
+          "posX": 50.0,
+          "posY": 28.0
         },
         {
           "tipo": "MICROFONE",
@@ -37,7 +41,10 @@
           "origem": "CASA",
           "quantidade": 1,
           "rotulo": "Praticável 2x2m",
-          "ordem": 2
+          "ordem": 2,
+          "modelo": "praticavel-2x2",
+          "posX": 50.0,
+          "posY": 26.0
         },
         {
           "tipo": "MONITOR_WEDGE",
@@ -45,7 +52,10 @@
           "quantidade": 1,
           "vias": 1,
           "mixIndependente": true,
-          "ordem": 3
+          "ordem": 3,
+          "modelo": "wedge",
+          "posX": 50.0,
+          "posY": 39.4
         },
         {
           "tipo": "TOMADA",
@@ -60,9 +70,11 @@
     {
       "rotulo": "Guitarra / Voz",
       "instrumento": "Guitarra",
+      "modelo": "musico-em-pe",
       "posX": 28,
-      "linha": 2,
+      "posY": 83.0,
       "escala": 1,
+      "rotacao": 0,
       "backingVocal": false,
       "ordemCanal": 40,
       "itens": [
@@ -72,7 +84,10 @@
           "quantidade": 1,
           "canais": 1,
           "observacao": "Microfonado com SM57",
-          "ordem": 0
+          "ordem": 0,
+          "modelo": "combo-2x12",
+          "posX": 28.0,
+          "posY": 69.0
         },
         {
           "tipo": "MICROFONE",
@@ -88,7 +103,10 @@
           "quantidade": 1,
           "canais": 1,
           "rotulo": "Microfone de voz",
-          "ordem": 2
+          "ordem": 2,
+          "modelo": "pedestal-girafa",
+          "posX": 28.0,
+          "posY": 91.4
         },
         {
           "tipo": "SUPORTE",
@@ -103,7 +121,10 @@
           "quantidade": 1,
           "vias": 1,
           "mixIndependente": true,
-          "ordem": 4
+          "ordem": 4,
+          "modelo": "wedge",
+          "posX": 28.0,
+          "posY": 97
         },
         {
           "tipo": "TOMADA",
@@ -118,9 +139,11 @@
     {
       "rotulo": "Baixo",
       "instrumento": "Baixo",
+      "modelo": "musico-em-pe",
       "posX": 72,
-      "linha": 2,
+      "posY": 83.0,
       "escala": 1,
+      "rotacao": 0,
       "backingVocal": true,
       "ordemCanal": 30,
       "itens": [
@@ -129,7 +152,10 @@
           "origem": "PROPRIO",
           "quantidade": 1,
           "canais": 0,
-          "ordem": 0
+          "ordem": 0,
+          "modelo": "cubo-baixo-1x15",
+          "posX": 72.0,
+          "posY": 69.0
         },
         {
           "tipo": "DI",
@@ -145,7 +171,10 @@
           "quantidade": 1,
           "canais": 1,
           "rotulo": "Microfone de backing vocal",
-          "ordem": 2
+          "ordem": 2,
+          "modelo": "pedestal-girafa",
+          "posX": 72.0,
+          "posY": 91.4
         },
         {
           "tipo": "SUPORTE",
@@ -160,7 +189,10 @@
           "quantidade": 1,
           "vias": 1,
           "mixIndependente": false,
-          "ordem": 4
+          "ordem": 4,
+          "modelo": "wedge",
+          "posX": 72.0,
+          "posY": 97
         },
         {
           "tipo": "TOMADA",
@@ -179,14 +211,20 @@
       "origem": "CASA",
       "quantidade": 1,
       "rotulo": "Sistema de PA compatível com o espaço",
-      "ordem": 0
+      "ordem": 0,
+      "modelo": "caixa-pa",
+      "posX": 6,
+      "posY": 94
     },
     {
       "tipo": "MESA_SOM",
       "origem": "CASA",
       "quantidade": 1,
       "canais": 0,
-      "ordem": 1
+      "ordem": 1,
+      "modelo": "mesa-som",
+      "posX": 50,
+      "posY": 97
     }
   ]
 }

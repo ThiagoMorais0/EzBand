@@ -97,6 +97,25 @@ public class MapaPalcoController {
         return ResponseEntity.ok(mapaPalcoService.salvarFicha(idPosicao, dto));
     }
 
+    // --- Peças soltas (paleta) ---
+
+    @PostMapping("/{id}/item")
+    public ResponseEntity<MapaPalcoDTO> adicionarItem(@PathVariable Long id,
+                                                      @RequestBody CadastroItemMapaPalcoDTO dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(mapaPalcoService.adicionarItem(id, dto));
+    }
+
+    @PutMapping("/item/{idItem}")
+    public ResponseEntity<MapaPalcoDTO> atualizarItem(@PathVariable Long idItem,
+                                                      @RequestBody CadastroItemMapaPalcoDTO dto) {
+        return ResponseEntity.ok(mapaPalcoService.atualizarItem(idItem, dto));
+    }
+
+    @DeleteMapping("/item/{idItem}")
+    public ResponseEntity<MapaPalcoDTO> removerItem(@PathVariable Long idItem) {
+        return ResponseEntity.ok(mapaPalcoService.removerItem(idItem));
+    }
+
     // --- Vínculo com show ---
 
     /** idMapa ausente desvincula: o show volta a usar o mapa padrão da banda. */

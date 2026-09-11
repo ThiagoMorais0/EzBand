@@ -48,10 +48,6 @@ public class MapaPalco {
     @Column(name = "PROFUNDIDADE_M", nullable = false, precision = 5, scale = 2)
     private BigDecimal profundidadeM = new BigDecimal("6.00");
 
-    /** Faixas horizontais onde os musicos se organizam ("linha de tras"). */
-    @Column(name = "GRADE_LINHAS", nullable = false)
-    private Integer gradeLinhas = 4;
-
     @Column(columnDefinition = "TEXT")
     private String observacoes;
 

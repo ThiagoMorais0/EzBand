@@ -21,7 +21,6 @@ public class AtualizacaoMapaPalcoDTO {
     private String observacoes;
     private Double larguraM;
     private Double profundidadeM;
-    private Integer gradeLinhas;
     private List<LayoutPosicaoDTO> posicoes = new ArrayList<>();
     /** Ajuste manual de pecas soltas; posicao nao enviada mantem o automatico. */
     private List<LayoutItemDTO> itens = new ArrayList<>();
@@ -33,8 +32,9 @@ public class AtualizacaoMapaPalcoDTO {
     public static class LayoutPosicaoDTO {
         private Long id;
         private Double posX;
-        private Integer linha;
+        private Double posY;
         private Double escala;
+        private Double rotacao;
         private Integer ordemCanal;
     }
 
@@ -46,5 +46,9 @@ public class AtualizacaoMapaPalcoDTO {
         private Double posX;
         private Double posY;
         private Double escala;
+        private Double rotacao;
+        /** Vinculo por proximidade: muda de dono ao ser solto perto de outro. */
+        private Long idPosicao;
+        private Boolean desvincular;
     }
 }

@@ -331,10 +331,10 @@ public class RiderCalculoService {
 
     private List<PosicaoPalcoDTO> ordenadasPorCanal(List<PosicaoPalcoDTO> posicoes) {
         return posicoes.stream()
-                // Desempate por linha e depois da esquerda para a direita, que e
-                // a ordem em que o tecnico varre o palco.
+                // Desempate do fundo para a frente e da esquerda para a
+                // direita, que e a ordem em que o tecnico varre o palco.
                 .sorted(Comparator.comparing((PosicaoPalcoDTO p) -> nz(p.getOrdemCanal()))
-                        .thenComparing(p -> nz(p.getLinha()))
+                        .thenComparing(p -> p.getPosY() == null ? 0d : p.getPosY())
                         .thenComparing(p -> p.getPosX() == null ? 0d : p.getPosX()))
                 .collect(Collectors.toList());
     }
