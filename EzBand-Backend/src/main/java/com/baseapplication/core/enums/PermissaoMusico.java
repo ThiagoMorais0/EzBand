@@ -12,7 +12,8 @@ public enum PermissaoMusico {
     GERENCIADOR_DE_SHOWS(2, "Gerencia Shows"),
     ADMINISTRADOR(3, "Administrador"),
     GERENCIA_ORCAMENTOS(4, "Gerencia Orçamentos"),
-    FUNDADOR(5, "Fundador");
+    FUNDADOR(5, "Fundador"),
+    GERENCIA_MAPA_PALCO(6, "Gerencia Mapa de Palco");
 
     private final Integer nivel;
     private final String descricao;
