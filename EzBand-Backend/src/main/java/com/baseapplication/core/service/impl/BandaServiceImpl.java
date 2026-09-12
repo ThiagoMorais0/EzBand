@@ -16,6 +16,7 @@ import com.baseapplication.core.event.events.ConviteParaUsuarioIngressarBandaEve
 import com.baseapplication.core.event.events.UsuarioExpulsoDeBandaEvent;
 import com.baseapplication.core.model.*;
 import com.baseapplication.core.model.embedded.ParametrosBanda;
+import com.baseapplication.core.model.superClasses.Evento;
 import com.baseapplication.core.service.*;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.baseapplication.core.dao.BandaDao;
+import com.baseapplication.core.dao.EnsaioDao;
+import com.baseapplication.core.dao.MusicoBandaDao;
 import com.baseapplication.core.dao.NotificacaoDao;
+import com.baseapplication.core.dao.ShowDao;
 import com.baseapplication.core.model.notificacao.ConviteParaUsuarioIngressarBanda;
 import com.baseapplication.core.dto.CadastroBandaDTO;
 import com.baseapplication.core.dto.EdicaoBandaDTO;
@@ -37,6 +41,7 @@ import com.baseapplication.core.dto.RepertorioBandaDTO;
 import com.baseapplication.core.dto.ShowsFuturosDTO;
 import com.baseapplication.core.enums.Tonalidade;
 import com.baseapplication.core.dto.EventoConviteDTO;
+import com.baseapplication.core.dto.EventoPendenteConviteDTO;
 import com.baseapplication.core.exception.ConflictException;
 import com.baseapplication.core.exception.InternalException;
 import com.baseapplication.core.exception.InvalidParamException;
@@ -70,6 +75,10 @@ public class BandaServiceImpl implements BandaService {
 	private final MembroFantasmaService membroFantasmaService;
 	private final NotificacaoDao notificacaoDao;
 	private final ConviteBandaService conviteBandaService;
+	private final MusicoBandaDao musicoBandaDao;
+	private final MusicoEventoService musicoEventoService;
+	private final ShowDao showDao;
+	private final EnsaioDao ensaioDao;
 
 	/** Nenhuma banda de verdade foi fundada antes disso; abaixo daqui e erro de digitacao. */
 	private static final int ANO_FUNDACAO_MINIMO = 1900;
@@ -98,10 +107,51 @@ public class BandaServiceImpl implements BandaService {
 	}
 
 	@Override
-	public void expulsarUsuario(Long idBanda, Long idUsuario) {
+	@Transactional
+	public void expulsarUsuario(Long idBanda, Long idUsuario, List<EventoConviteDTO> eventosParaRemover) {
 		Banda banda = buscarPorId(idBanda);
+		removerMembroDosEventos(idBanda, idUsuario, eventosParaRemover);
 		musicoBandaService.expulsar(idBanda, idUsuario);
 		notificacaoService.enviarNotificacao(new UsuarioExpulsoDeBandaEvent(idUsuario, banda));
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<EventoPendenteConviteDTO> buscarEventosDoMembro(Long idBanda, Long idUsuario) {
+		validarMembroDaBanda(idBanda, Context.getUsuarioLogado().getId());
+		return buscarEventosFuturosDoMembro(idBanda, idUsuario).stream()
+				.map(EventoPendenteConviteDTO::new)
+				.toList();
+	}
+
+	/**
+	 * So remove dos eventos que o cliente marcou E que realmente sao eventos futuros
+	 * da banda com esse musico: assim um id forjado nao tira ninguem de outro evento.
+	 */
+	private void removerMembroDosEventos(Long idBanda, Long idUsuario, List<EventoConviteDTO> eventosParaRemover) {
+		if (eventosParaRemover == null || eventosParaRemover.isEmpty())
+			return;
+
+		for (Evento evento : buscarEventosFuturosDoMembro(idBanda, idUsuario)) {
+			boolean marcado = eventosParaRemover.stream()
+					.anyMatch(e -> evento.getId().equals(e.getId()) && evento.getTipoEvento() == e.getTipoEvento());
+			if (marcado)
+				musicoEventoService.remover(evento.getId(), evento.getTipoEvento(), idUsuario);
+		}
+	}
+
+	private List<Evento> buscarEventosFuturosDoMembro(Long idBanda, Long idUsuario) {
+		List<Evento> eventos = new ArrayList<>();
+		eventos.addAll(showDao.buscarFuturosPorBandaEMusico(idBanda, idUsuario));
+		eventos.addAll(ensaioDao.buscarFuturosPorBandaEMusico(idBanda, idUsuario));
+		eventos.sort(Comparator.comparing(Evento::getData)
+				.thenComparing(Evento::getHorarioInicio, Comparator.nullsLast(Comparator.naturalOrder())));
+		return eventos;
+	}
+
+	private void validarMembroDaBanda(Long idBanda, Long idUsuario) {
+		if (!musicoBandaDao.existsById(new MusicoBandaId(idUsuario, idBanda)))
+			throw new RestrictionException("Você não faz parte desta banda.");
 	}
 
 	@Override

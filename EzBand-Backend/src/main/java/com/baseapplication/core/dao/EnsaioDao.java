@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
-import com.baseapplication.core.enums.StatusEvento;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -38,6 +37,16 @@ public interface EnsaioDao extends JpaRepository<Ensaio, Long> {
             "ORDER BY e.data, e.horarioInicio")
     List<Ensaio> buscarFuturosNaoRealizadosPorBanda(@Param("idBanda") Long idBanda);
 
+    @Query("SELECT e FROM Ensaio e LEFT JOIN FETCH e.estudio " +
+            "INNER JOIN MusicoEvento me ON me.id.idEvento = e.id " +
+            "AND me.id.tipoEvento = com.baseapplication.core.enums.TipoEvento.ENSAIO " +
+            "WHERE e.banda.id = :idBanda AND me.usuario.id = :idUsuario " +
+            "AND e.data IS NOT NULL AND e.data >= CURRENT_DATE " +
+            "AND e.status NOT IN (com.baseapplication.core.enums.StatusEvento.REALIZADO, " +
+            "com.baseapplication.core.enums.StatusEvento.CANCELADO) " +
+            "ORDER BY e.data, e.horarioInicio")
+    List<Ensaio> buscarFuturosPorBandaEMusico(@Param("idBanda") Long idBanda, @Param("idUsuario") Long idUsuario);
+
     @Query("SELECT e FROM Ensaio e INNER JOIN MusicoEvento me ON me.id.idEvento = e.id AND e.tipoEvento = 'ENSAIO' " +
             "WHERE me.usuario.id = :idUsuario AND e.data BETWEEN :inicio AND :fim " +
             "AND e.status IN ('PENDENTE', 'AGUARDANDO_APROVACAO') ORDER BY e.data, e.horarioInicio")
@@ -47,8 +56,15 @@ public interface EnsaioDao extends JpaRepository<Ensaio, Long> {
             "WHERE me.usuario.id = :idUsuario AND e.data = :data AND e.status IN ('PENDENTE', 'AGUARDANDO_APROVACAO')")
     List<Ensaio> buscarPorUsuarioEData(Long idUsuario, LocalDate data);
 
-    @Query(value = "SELECT e FROM Ensaio e WHERE e.data <= :now and e.status <> :status ")
-    List<Ensaio> buscarComDataAnteriorAHoje(LocalDate now, StatusEvento status);
+    /**
+     * Varredura do job que fecha eventos vencidos. CANCELADO fica de fora: evento
+     * cancelado cuja data passou continua cancelado — sem esta exclusão o job o
+     * marcaria como REALIZADO na rodada seguinte, desfazendo o cancelamento.
+     */
+    @Query("SELECT e FROM Ensaio e WHERE e.data <= :now "
+            + "AND e.status NOT IN (com.baseapplication.core.enums.StatusEvento.REALIZADO, "
+            + "com.baseapplication.core.enums.StatusEvento.CANCELADO)")
+    List<Ensaio> buscarComDataAnteriorAHoje(LocalDate now);
 
     // Métricas para Banda
     @Query("SELECT COALESCE(SUM(e.valor), 0) FROM Ensaio e WHERE e.banda.id = :idBanda AND e.status = 'REALIZADO' " +

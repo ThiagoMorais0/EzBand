@@ -43,6 +43,12 @@ public class MusicoEventoServiceImpl implements MusicoEventoService {
     }
 
     @Override
+    public void remover(Long idEvento, TipoEvento tipoEvento, Long idUsuario) {
+        musicoEventoDao.findById(new MusicoEventoId(idEvento, idUsuario, tipoEvento))
+                .ifPresent(musicoEventoDao::delete);
+    }
+
+    @Override
     public List<MusicoEvento> buscarMusicosPorEvento(Long idEvento, TipoEvento tipoEvento) {
         return musicoEventoDao.buscarMusicosPorEvento(idEvento, tipoEvento.toString());
     }

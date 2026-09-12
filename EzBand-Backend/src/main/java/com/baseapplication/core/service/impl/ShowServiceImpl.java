@@ -91,7 +91,7 @@ public class ShowServiceImpl implements ShowService {
 
     @Override
     public List<Show> buscarComDataAnteriorAHoje() {
-        return showDao.buscarComDataAnteriorAHoje(LocalDate.now(), StatusEvento.REALIZADO);
+        return showDao.buscarComDataAnteriorAHoje(LocalDate.now());
     }
 
     @Override

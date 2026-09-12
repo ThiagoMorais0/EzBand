@@ -12,4 +12,6 @@ import lombok.Setter;
 public class ConviteExternoGeradoDTO {
     private String token;
     private String link;
+    /** Código curto já formatado para leitura humana (ex.: "4K2P-WX7N"). */
+    private String codigo;
 }

@@ -16,5 +16,7 @@ public interface MusicoEventoService {
 
     void remover(MusicoEvento musicoEvento);
 
+    void remover(Long idEvento, TipoEvento tipoEvento, Long idUsuario);
+
     List<MusicoEvento> buscarMusicosPorEvento(Long idEvento, TipoEvento tipoEvento);
 }

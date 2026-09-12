@@ -48,6 +48,16 @@ public interface ShowDao extends JpaRepository<Show, Long> {
             "ORDER BY s.data, s.horarioInicio")
     List<Show> buscarFuturosNaoRealizadosPorBanda(@Param("idBanda") Long idBanda);
 
+    @Query("SELECT s FROM Show s LEFT JOIN FETCH s.localEvento " +
+            "INNER JOIN MusicoEvento me ON me.id.idEvento = s.id " +
+            "AND me.id.tipoEvento = com.baseapplication.core.enums.TipoEvento.SHOW " +
+            "WHERE s.banda.id = :idBanda AND me.usuario.id = :idUsuario " +
+            "AND s.data IS NOT NULL AND s.data >= CURRENT_DATE " +
+            "AND s.status NOT IN (com.baseapplication.core.enums.StatusEvento.REALIZADO, " +
+            "com.baseapplication.core.enums.StatusEvento.CANCELADO) " +
+            "ORDER BY s.data, s.horarioInicio")
+    List<Show> buscarFuturosPorBandaEMusico(@Param("idBanda") Long idBanda, @Param("idUsuario") Long idUsuario);
+
     @Query(value = "SELECT s FROM Show s " +
             "INNER JOIN MusicoEvento me ON me.id.idEvento = s.id AND s.tipoEvento = 'SHOW' " +
             "WHERE s.data = :data AND me.usuario.id = :idUsuario and s.status in ('PENDENTE', 'AGUARDANDO_APROVACAO') " +
@@ -65,8 +75,15 @@ public interface ShowDao extends JpaRepository<Show, Long> {
             "AND s.status IN ('PENDENTE', 'AGUARDANDO_APROVACAO') ORDER BY s.data, s.horarioInicio")
     List<Show> buscarPorUsuarioEPeriodo(Long idUsuario, LocalDate inicio, LocalDate fim);
 
-    @Query(value = "SELECT e FROM Show e WHERE e.data <= :now and e.status <> :status ")
-    List<Show> buscarComDataAnteriorAHoje(LocalDate now, StatusEvento status);
+    /**
+     * Varredura do job que fecha eventos vencidos. CANCELADO fica de fora: evento
+     * cancelado cuja data passou continua cancelado — sem esta exclusão o job o
+     * marcaria como REALIZADO na rodada seguinte, desfazendo o cancelamento.
+     */
+    @Query("SELECT e FROM Show e WHERE e.data <= :now "
+            + "AND e.status NOT IN (com.baseapplication.core.enums.StatusEvento.REALIZADO, "
+            + "com.baseapplication.core.enums.StatusEvento.CANCELADO)")
+    List<Show> buscarComDataAnteriorAHoje(LocalDate now);
 
     // Métricas para Banda
     @Query("SELECT COUNT(s) FROM Show s WHERE s.banda.id = :idBanda AND s.status = 'REALIZADO' " +

@@ -41,6 +41,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -56,6 +57,14 @@ import java.util.UUID;
 public class ConviteBandaServiceImpl implements ConviteBandaService {
 
     private static final int DIAS_VALIDADE_CONVITE_EXTERNO = 30;
+
+    /** Sem 0/O/1/I/L: o código é lido em voz alta e digitado à mão. */
+    private static final String ALFABETO_CODIGO = "23456789ABCDEFGHJKMNPQRSTUVWXYZ";
+    /** 8 caracteres (31^8 ≈ 8,5·10^11) para que adivinhar um convite válido não seja viável. */
+    private static final int TAMANHO_CODIGO = 8;
+    private static final int TENTATIVAS_CODIGO_UNICO = 10;
+
+    private static final SecureRandom RANDOM = new SecureRandom();
 
     @Value("${app.frontend.url:http://localhost:5173}")
     private String frontendUrl;
@@ -117,6 +126,7 @@ public class ConviteBandaServiceImpl implements ConviteBandaService {
 
         ConviteExternoBanda convite = new ConviteExternoBanda();
         convite.setToken(UUID.randomUUID().toString());
+        convite.setCodigo(gerarCodigoUnico());
         convite.setBanda(banda);
         convite.setIdUsuarioRemetente(remetente.getId());
         convite.setInstrumento(dto.getInstrumento());
@@ -124,12 +134,15 @@ public class ConviteBandaServiceImpl implements ConviteBandaService {
         convite.setDataExpiracao(LocalDateTime.now().plusDays(DIAS_VALIDADE_CONVITE_EXTERNO));
         conviteExternoBandaDao.save(convite);
 
-        return new ConviteExternoGeradoDTO(convite.getToken(), montarLinkConvite(convite.getToken()));
+        return new ConviteExternoGeradoDTO(
+                convite.getToken(),
+                montarLinkConvite(convite.getToken()),
+                formatarCodigo(convite.getCodigo()));
     }
 
     @Override
     public ConviteExternoPreviewDTO previewConviteExterno(String token) {
-        Optional<ConviteExternoBanda> externoOpt = conviteExternoBandaDao.findByToken(token);
+        Optional<ConviteExternoBanda> externoOpt = buscarConviteExterno(token);
         if (externoOpt.isPresent()) {
             return previewDeConviteExterno(externoOpt.get());
         }
@@ -233,7 +246,7 @@ public class ConviteBandaServiceImpl implements ConviteBandaService {
             return aceitarConviteDeNotificacao(notificacaoOpt.get(), usuarioLogado);
         }
 
-        ConviteExternoBanda conviteExterno = conviteExternoBandaDao.findByToken(token)
+        ConviteExternoBanda conviteExterno = buscarConviteExterno(token)
                 .orElseThrow(() -> new ResourceNotFoundException("Convite não encontrado ou expirado."));
         return aceitarConviteExterno(conviteExterno, usuarioLogado);
     }
@@ -445,5 +458,61 @@ public class ConviteBandaServiceImpl implements ConviteBandaService {
 
     private String montarLinkConvite(String token) {
         return frontendUrl + "/convite/" + token;
+    }
+
+    /**
+     * O mesmo convite é alcançável pelo token do link ou pelo código curto digitado no app,
+     * então quem chama não precisa saber qual dos dois recebeu.
+     */
+    private Optional<ConviteExternoBanda> buscarConviteExterno(String identificador) {
+        if (identificador == null || identificador.isBlank()) {
+            return Optional.empty();
+        }
+
+        Optional<ConviteExternoBanda> porToken = conviteExternoBandaDao.findByToken(identificador);
+        if (porToken.isPresent()) {
+            return porToken;
+        }
+
+        String codigo = normalizarCodigo(identificador);
+        if (codigo.length() != TAMANHO_CODIGO) {
+            return Optional.empty();
+        }
+        return conviteExternoBandaDao.findByCodigo(codigo);
+    }
+
+    /** Aceita o código como o usuário digitar: com hífen, espaço ou minúsculas. */
+    private String normalizarCodigo(String entrada) {
+        return entrada.replaceAll("[^A-Za-z0-9]", "").toUpperCase();
+    }
+
+    /** "4K2PWX7N" -> "4K2P-WX7N": o hífen no meio reduz erro de digitação. */
+    private String formatarCodigo(String codigo) {
+        if (codigo == null || codigo.length() != TAMANHO_CODIGO) {
+            return codigo;
+        }
+        int meio = TAMANHO_CODIGO / 2;
+        return codigo.substring(0, meio) + "-" + codigo.substring(meio);
+    }
+
+    private String gerarCodigoUnico() {
+        for (int tentativa = 0; tentativa < TENTATIVAS_CODIGO_UNICO; tentativa++) {
+            String codigo = gerarCodigo();
+            if (!conviteExternoBandaDao.existsByCodigo(codigo)) {
+                return codigo;
+            }
+        }
+        // Colidir 10 vezes seguidas em 31^8 possibilidades significa que algo está errado;
+        // melhor gerar o convite só com link do que estourar a geração inteira.
+        log.warn("Não foi possível gerar um código de convite único após {} tentativas", TENTATIVAS_CODIGO_UNICO);
+        return null;
+    }
+
+    private String gerarCodigo() {
+        StringBuilder codigo = new StringBuilder(TAMANHO_CODIGO);
+        for (int i = 0; i < TAMANHO_CODIGO; i++) {
+            codigo.append(ALFABETO_CODIGO.charAt(RANDOM.nextInt(ALFABETO_CODIGO.length())));
+        }
+        return codigo.toString();
     }
 }

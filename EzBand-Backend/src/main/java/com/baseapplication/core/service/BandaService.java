@@ -5,6 +5,7 @@ import java.util.List;
 import com.baseapplication.core.dto.BuscaBandaDTO;
 import com.baseapplication.core.dto.EditarMembroMusicoBandaDTO;
 import com.baseapplication.core.dto.EventoConviteDTO;
+import com.baseapplication.core.dto.EventoPendenteConviteDTO;
 import com.baseapplication.core.model.dto.EnsaioDTO;
 import com.baseapplication.core.model.dto.ShowDTO;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +27,9 @@ public interface BandaService {
 
     void cadastrarUsuario(Long idBanda, Long idUsuario, String instrumentos);
 
-    void expulsarUsuario(Long idBanda, Long idUsuario);
+    void expulsarUsuario(Long idBanda, Long idUsuario, List<EventoConviteDTO> eventosParaRemover);
+
+    List<EventoPendenteConviteDTO> buscarEventosDoMembro(Long idBanda, Long idUsuario);
 
     List<InfoMembroBandaDTO> buscarMembros(Long idBanda);
 

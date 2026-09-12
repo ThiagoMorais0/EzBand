@@ -85,11 +85,23 @@ public class BandaController {
     }
 
     @PostMapping("/expulsarUsuario")
-    public ResponseEntity<?> expulsarUsuario(@RequestParam Long idBanda, @RequestParam Long idUsuario) {
+    public ResponseEntity<?> expulsarUsuario(@RequestParam Long idBanda, @RequestParam Long idUsuario,
+                                             @RequestBody(required = false) List<EventoConviteDTO> eventosParaRemover) {
         try{
-            bandaService.expulsarUsuario(idBanda, idUsuario);
+            bandaService.expulsarUsuario(idBanda, idUsuario, eventosParaRemover);
             return ResponseEntity.ok("Usuário expulso");
         }catch (Exception e){
+            log.error("Erro ao expulsar usuário da banda", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/eventosDoMembro")
+    public ResponseEntity<?> eventosDoMembro(@RequestParam Long idBanda, @RequestParam Long idUsuario) {
+        try {
+            return ResponseEntity.ok(bandaService.buscarEventosDoMembro(idBanda, idUsuario));
+        } catch (Exception e) {
+            log.error("Erro ao buscar eventos do membro da banda", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

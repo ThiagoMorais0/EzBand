@@ -10,4 +10,8 @@ import java.util.Optional;
 public interface ConviteExternoBandaDao extends JpaRepository<ConviteExternoBanda, Long> {
 
     Optional<ConviteExternoBanda> findByToken(String token);
+
+    Optional<ConviteExternoBanda> findByCodigo(String codigo);
+
+    boolean existsByCodigo(String codigo);
 }

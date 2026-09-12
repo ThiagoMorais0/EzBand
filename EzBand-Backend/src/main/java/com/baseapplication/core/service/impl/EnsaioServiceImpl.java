@@ -64,7 +64,7 @@ public class EnsaioServiceImpl implements EnsaioService {
 
     @Override
     public List<Ensaio> buscarComDataAnteriorAHoje() {
-        return ensaioDao.buscarComDataAnteriorAHoje(LocalDate.now(), StatusEvento.REALIZADO);
+        return ensaioDao.buscarComDataAnteriorAHoje(LocalDate.now());
     }
 
     @Override

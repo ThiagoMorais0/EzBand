@@ -101,10 +101,10 @@ class BandaControllerTest {
     void deveExpulsarUsuarioDaBandaComSucesso() {
         Long idBanda = 1L;
         Long idUsuario = 1L;
-        doNothing().when(bandaService).expulsarUsuario(anyLong(), anyLong());
+        doNothing().when(bandaService).expulsarUsuario(anyLong(), anyLong(), any());
 
-        assertDoesNotThrow(() -> bandaController.expulsarUsuario(idBanda, idUsuario));
-        verify(bandaService, times(1)).expulsarUsuario(idBanda, idUsuario);
+        assertDoesNotThrow(() -> bandaController.expulsarUsuario(idBanda, idUsuario, null));
+        verify(bandaService, times(1)).expulsarUsuario(idBanda, idUsuario, null);
     }
 
     @Test

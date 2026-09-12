@@ -25,6 +25,14 @@ public class ConviteExternoBanda {
     @Column(unique = true, nullable = false)
     private String token;
 
+    /**
+     * Código curto digitável do mesmo convite, sem separadores (ex.: "4K2PWX7N").
+     * Existe porque o link abre no navegador: quem já tem o app instalado (PWA) não consegue
+     * ser redirecionado para ele a partir de uma aba, então digita o código dentro do app.
+     */
+    @Column(unique = true, length = 16)
+    private String codigo;
+
     @ManyToOne
     @JoinColumn(name = "ID_BANDA")
     private Banda banda;
