@@ -63,6 +63,8 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.GET, "/banda/convite-externo/preview").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/validacao-celular/validar-token").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/validacao-celular/status").permitAll()
+                        // RIDER TECNICO PUBLICO: a casa de show abre o link sem ter conta
+                        .requestMatchers(HttpMethod.GET, "/publico/rider/*/*").permitAll()
                         // SWAGGER
                         .requestMatchers(HttpMethod.GET, "/swagger-ui.html").permitAll()
                         .requestMatchers(HttpMethod.GET, "/swagger-ui/*").permitAll()

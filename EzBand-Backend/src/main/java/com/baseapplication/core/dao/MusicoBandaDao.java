@@ -1,6 +1,7 @@
 package com.baseapplication.core.dao;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -13,4 +14,8 @@ import com.baseapplication.core.model.MusicoBandaId;
 public interface MusicoBandaDao extends JpaRepository<MusicoBanda, MusicoBandaId> {
     @Query("SELECT mb FROM MusicoBanda mb LEFT JOIN FETCH mb.permissoes WHERE mb.id.idBanda = :idBanda")
     List<MusicoBanda> buscarMembrosPorIdBanda(Long idBanda);
+
+    @Query("SELECT mb FROM MusicoBanda mb LEFT JOIN FETCH mb.permissoes "
+            + "WHERE mb.id.idBanda = :idBanda AND mb.id.idUsuario = :idUsuario")
+    Optional<MusicoBanda> buscarMembro(Long idBanda, Long idUsuario);
 }

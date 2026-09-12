@@ -23,6 +23,8 @@ public class ShowDTO extends EventoDTO {
     private BigDecimal cacheIndividual;
     private BigDecimal consumacaoPorMusico;
     private String linkIngresso;
+    /** Nulo = o show usa o mapa de palco padrao da banda. */
+    private Long idMapaPalco;
 
     public ShowDTO(Evento evento){
         Show show = (Show) evento;
