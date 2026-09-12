@@ -213,12 +213,26 @@ public class BandaController {
         }
     }
 
+    /**
+     * Salva a musica e, no corpo da resposta, devolve o convite para refletir a mesma alteracao
+     * no repertorio dos shows pendentes -- corpo vazio quando nao ha nada a perguntar.
+     */
     @PostMapping("/atualizarMusicaRepertorio")
     public ResponseEntity<?> atualizarMusicaRertorio(@RequestBody RepertorioBandaDTO repertorioBandaDTO) {
         try{
-            bandaService.atualizarMusicaRertorio(repertorioBandaDTO);
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok(bandaService.atualizarMusicaRertorio(repertorioBandaDTO));
         } catch (Exception e) {
+            log.error("Erro ao atualizar música do repertório da banda", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PostMapping("/propagarMusicaParaShowsPendentes")
+    public ResponseEntity<?> propagarMusicaParaShowsPendentes(@RequestBody PropagacaoMusicaRepertorioDTO propagacao) {
+        try{
+            return ResponseEntity.ok(bandaService.propagarMusicaParaShowsPendentes(propagacao));
+        } catch (Exception e) {
+            log.error("Erro ao propagar música para os shows pendentes", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

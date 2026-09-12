@@ -21,6 +21,11 @@ WORKDIR /app
 RUN apk add --no-cache tzdata
 ENV TZ=America/Sao_Paulo
 
+# ffmpeg/ffprobe convertem o VS que o usuario envia (WAV da DAW, em geral) para MP3 antes de
+# ir ao storage -- 40MB viram ~5MB. O ffprobe tambem valida que o arquivo tem mesmo faixa de
+# audio, o que a extensao sozinha nao garante. ~80MB na imagem final.
+RUN apk add --no-cache ffmpeg
+
 # Copia o JAR da etapa anterior
 COPY --from=builder /app/target/*.jar app.jar
 

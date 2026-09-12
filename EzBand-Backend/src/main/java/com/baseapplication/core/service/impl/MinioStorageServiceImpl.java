@@ -62,6 +62,27 @@ public class MinioStorageServiceImpl {
 		}
 	}
 
+	/**
+	 * Sobe bytes ja prontos, sem passar pelo Thumbnailator.
+	 *
+	 * <p>{@link #uploadImage} manda todo arquivo por {@code comprimirSeNecessario}, que so sabe
+	 * o que fazer com imagem. Para audio o conteudo ja chega no formato final do
+	 * {@code TranscodificadorAudio} -- aqui e so o putObject.
+	 */
+	public String uploadBytes(byte[] conteudo, String bucketName, String fileName, String contentType) {
+		try (S3Client s3 = buildS3Client()) {
+			PutObjectRequest putRequest = PutObjectRequest.builder()
+					.bucket(bucketName)
+					.key(fileName)
+					.contentType(contentType)
+					.build();
+
+			s3.putObject(putRequest, RequestBody.fromBytes(conteudo));
+
+			return String.format("%s/%s/%s", minioExternalUrl, bucketName, fileName);
+		}
+	}
+
 	public void deleteImage(String bucketName, String fileName) {
 		try (S3Client s3 = buildS3Client()) {
 			s3.deleteObject(DeleteObjectRequest.builder()

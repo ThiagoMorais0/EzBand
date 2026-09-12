@@ -31,6 +31,19 @@ public interface RepertorioEventoDao extends JpaRepository<RepertorioEvento, Rep
     RepertorioEvento buscarPorIndiceEEvento(Integer indice, Long idEvento, TipoEvento tipoEvento);
 
     /**
+     * Itens de repertorio de varios eventos de uma banda de uma vez.
+     *
+     * <p>Serve a propagacao de uma edicao do setlist da banda para os shows pendentes. A musica e
+     * reencontrada pela chave normalizada de titulo + artista, que so existe em Java (ver
+     * {@link com.baseapplication.core.utils.ChaveMusica}), entao o filtro por musica acontece na
+     * memoria -- e por isso esta consulta traz os itens de todos os shows de uma vez, em vez de
+     * uma ida ao banco por show.
+     */
+    @Query(value = "SELECT r FROM RepertorioEvento r WHERE r.id.idBanda = :idBanda "
+            + "and r.id.tipoEvento = :tipoEvento and r.id.idEvento in :idsEventos")
+    List<RepertorioEvento> buscarPorEventos(Long idBanda, TipoEvento tipoEvento, List<Long> idsEventos);
+
+    /**
      * Índice, título, artista e duração das faixas de um evento, em ordem.
      *
      * <p>Usada pelo Modo Performance para congelar o repertório no estado da sessão. Projeção

@@ -4,13 +4,17 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import com.baseapplication.core.dto.BuscaBandaDTO;
 import com.baseapplication.core.dto.EditarMembroMusicoBandaDTO;
 import com.baseapplication.core.enums.PermissaoMusico;
+import com.baseapplication.core.enums.CampoMusica;
 import com.baseapplication.core.enums.StatusEvento;
+import com.baseapplication.core.enums.TipoEvento;
 import com.baseapplication.core.enums.TipoRepertorio;
 import com.baseapplication.core.event.events.ConviteParaUsuarioIngressarBandaEvent;
 import com.baseapplication.core.event.events.UsuarioExpulsoDeBandaEvent;
@@ -37,6 +41,7 @@ import com.baseapplication.core.dto.CadastroBandaDTO;
 import com.baseapplication.core.dto.EdicaoBandaDTO;
 import com.baseapplication.core.dto.EnsaiosFuturosDTO;
 import com.baseapplication.core.dto.InfoMembroBandaDTO;
+import com.baseapplication.core.dto.PropagacaoMusicaRepertorioDTO;
 import com.baseapplication.core.dto.RepertorioBandaDTO;
 import com.baseapplication.core.dto.ShowsFuturosDTO;
 import com.baseapplication.core.enums.Tonalidade;
@@ -57,6 +62,7 @@ import com.baseapplication.core.service.ImagemService;
 import com.baseapplication.core.service.ConviteBandaService;
 import com.baseapplication.core.service.MusicoBandaService;
 import com.baseapplication.core.service.RepertorioBandaService;
+import com.baseapplication.core.utils.ChaveMusica;
 import com.baseapplication.core.utils.Context;
 import com.baseapplication.core.utils.FileUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -71,6 +77,7 @@ public class BandaServiceImpl implements BandaService {
 	private final ImagemService imagemService;
 	private final EventoHelperService eventoHelperService;
 	private final RepertorioBandaService repertorioBandaService;
+	private final RepertorioEventoService repertorioEventoService;
 	private final NotificacaoService notificacaoService;
 	private final MembroFantasmaService membroFantasmaService;
 	private final NotificacaoDao notificacaoDao;
@@ -79,6 +86,7 @@ public class BandaServiceImpl implements BandaService {
 	private final MusicoEventoService musicoEventoService;
 	private final ShowDao showDao;
 	private final EnsaioDao ensaioDao;
+	private final AudioMusicaService audioMusicaService;
 
 	/** Nenhuma banda de verdade foi fundada antes disso; abaixo daqui e erro de digitacao. */
 	private static final int ANO_FUNDACAO_MINIMO = 1900;
@@ -290,8 +298,20 @@ public class BandaServiceImpl implements BandaService {
 	}
 
 	@Override
-	public void atualizarMusicaRertorio(RepertorioBandaDTO repertorioBandaDTO) {
+	public PropagacaoMusicaRepertorioDTO atualizarMusicaRertorio(RepertorioBandaDTO repertorioBandaDTO) {
 		RepertorioBanda musicaRepertorio = repertorioBandaService.buscarPorId(repertorioBandaDTO.getId());
+
+		// O VS e achado por titulo|artista normalizado, nao por FK -- ver ChaveMusica. Guardar
+		// os valores antigos antes de sobrescrever e o que permite levar o audio junto quando
+		// a musica e renomeada; sem isso ele fica orfao e some da tela sem erro nenhum.
+		String tituloAnterior = musicaRepertorio.getMusica().getTitulo();
+		String artistaAnterior = musicaRepertorio.getMusica().getArtista();
+
+		// O embutido e mutado campo a campo logo abaixo, entao a foto do estado anterior tem que
+		// sair daqui -- e o que diz, depois, o que exatamente mudou para oferecer aos shows.
+		Musica anterior = new Musica();
+		BeanUtils.copyProperties(musicaRepertorio.getMusica(), anterior);
+
 		musicaRepertorio.getMusica().setTitulo(repertorioBandaDTO.getMusica().getTitulo());
 		musicaRepertorio.getMusica().setArtista(repertorioBandaDTO.getMusica().getArtista());
 		musicaRepertorio.getMusica().setTonalidade(Tonalidade.encontrarPeloNumero(repertorioBandaDTO.getMusica().getTonalidade()));
@@ -307,6 +327,114 @@ public class BandaServiceImpl implements BandaService {
 		musicaRepertorio.setEnergia(repertorioBandaDTO.getEnergia());
 		musicaRepertorio.setRelevancia(repertorioBandaDTO.getRelevancia());
 		repertorioBandaService.salvar(musicaRepertorio);
+
+		if (musicaRepertorio.getBanda() != null) {
+			audioMusicaService.renomear(musicaRepertorio.getBanda().getId(),
+					tituloAnterior, artistaAnterior,
+					musicaRepertorio.getMusica().getTitulo(),
+					musicaRepertorio.getMusica().getArtista());
+		}
+
+		return montarPropagacao(musicaRepertorio, anterior, tituloAnterior, artistaAnterior);
+	}
+
+	/**
+	 * Monta a pergunta "quer refletir isso nos shows pendentes?" -- ou devolve {@code null}
+	 * quando nao ha o que perguntar.
+	 *
+	 * <p>Sao tres portoes, e todos existem para a tela nao interromper quem so queria salvar:
+	 * a edicao precisa ter mexido em algum campo que tambem vive na linha do evento (arrastar a
+	 * musica de posicao ou mudar a energia nao conta), a musica precisa estar no setlist de pelo
+	 * menos um show pendente, e a busca e feita pela chave anterior, que e o unico jeito de
+	 * reencontrar a musica no show quando o que mudou foi justamente o nome dela.
+	 */
+	private PropagacaoMusicaRepertorioDTO montarPropagacao(RepertorioBanda repertorio, Musica anterior,
+			String tituloAnterior, String artistaAnterior) {
+		if (repertorio.getBanda() == null) {
+			return null;
+		}
+
+		List<CampoMusica> campos = CampoMusica.alterados(anterior, repertorio.getMusica());
+		if (campos.isEmpty()) {
+			return null;
+		}
+
+		Long idBanda = repertorio.getBanda().getId();
+		List<Show> shows = showsPendentesComMusica(idBanda, ChaveMusica.de(tituloAnterior, artistaAnterior));
+		if (shows.isEmpty()) {
+			return null;
+		}
+
+		PropagacaoMusicaRepertorioDTO propagacao = new PropagacaoMusicaRepertorioDTO();
+		propagacao.setId(repertorio.getId());
+		propagacao.setIdBanda(idBanda);
+		propagacao.setTituloAnterior(tituloAnterior);
+		propagacao.setArtistaAnterior(artistaAnterior);
+		propagacao.setCampos(campos);
+		propagacao.setShows(shows.stream().map(EventoPendenteConviteDTO::new).toList());
+		return propagacao;
+	}
+
+	@Override
+	@Transactional
+	public int propagarMusicaParaShowsPendentes(PropagacaoMusicaRepertorioDTO propagacao) {
+		RepertorioBanda repertorio = repertorioBandaService.buscarPorId(propagacao.getId());
+		if (repertorio.getBanda() == null || !repertorio.getBanda().getId().equals(propagacao.getIdBanda())) {
+			throw new InvalidParamException("Música não pertence ao repertório da banda informada");
+		}
+		// Estoura para quem nao e da banda: o payload volta do navegador e aponta que linha ler.
+		musicoBandaService.buscarPorIdUsuarioEIdBanda(Context.getUsuarioLogado().getId(), propagacao.getIdBanda());
+
+		List<CampoMusica> campos = propagacao.getCampos() == null ? List.of()
+				: propagacao.getCampos().stream().filter(Objects::nonNull).toList();
+		if (campos.isEmpty()) {
+			return 0;
+		}
+
+		// Os valores saem sempre da linha da banda, ja salva -- o payload so escolhe quais campos
+		// copiar. E por isso que nao ha o que validar no conteudo que voltou do navegador.
+		List<RepertorioEvento> itens = itensDosShowsPendentes(propagacao.getIdBanda(),
+				ChaveMusica.de(propagacao.getTituloAnterior(), propagacao.getArtistaAnterior()));
+
+		itens.forEach(item -> {
+			campos.forEach(campo -> campo.copiar(repertorio.getMusica(), item.getMusica()));
+			repertorioEventoService.salvar(item);
+		});
+
+		long showsAtualizados = itens.stream().map(item -> item.getId().getIdEvento()).distinct().count();
+		log.info("Musica {} do repertorio da banda {} propagada para {} show(s) pendente(s): {}",
+				propagacao.getId(), propagacao.getIdBanda(), showsAtualizados, campos);
+		return (int) showsAtualizados;
+	}
+
+	private List<Show> showsPendentesComMusica(Long idBanda, String chaveMusica) {
+		List<Show> pendentes = showDao.buscarFuturosNaoRealizadosPorBanda(idBanda);
+		Set<Long> comAMusica = itensComMusica(idBanda, pendentes, chaveMusica).stream()
+				.map(item -> item.getId().getIdEvento())
+				.collect(Collectors.toSet());
+
+		return pendentes.stream().filter(show -> comAMusica.contains(show.getId())).toList();
+	}
+
+	private List<RepertorioEvento> itensDosShowsPendentes(Long idBanda, String chaveMusica) {
+		return itensComMusica(idBanda, showDao.buscarFuturosNaoRealizadosPorBanda(idBanda), chaveMusica);
+	}
+
+	/**
+	 * As linhas de repertorio desses eventos que sao a musica procurada.
+	 *
+	 * <p>Momentos ("dar boa noite") ficam de fora mesmo tendo titulo: um momento sem artista
+	 * produziria a chave {@code "titulo|"} e poderia colidir com uma musica cadastrada sem
+	 * artista, e ai o texto do roteiro seria sobrescrito pela letra de uma cancao.
+	 */
+	private List<RepertorioEvento> itensComMusica(Long idBanda, List<Show> shows, String chaveMusica) {
+		List<Long> idsShows = shows.stream().map(Show::getId).toList();
+
+		return repertorioEventoService.buscarPorEventos(idBanda, TipoEvento.SHOW, idsShows).stream()
+				.filter(item -> !item.isMomento())
+				.filter(item -> ChaveMusica.de(item.getMusica().getTitulo(), item.getMusica().getArtista())
+						.equals(chaveMusica))
+				.toList();
 	}
 
     @Override

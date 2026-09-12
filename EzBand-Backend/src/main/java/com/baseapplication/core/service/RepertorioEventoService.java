@@ -12,6 +12,8 @@ public interface RepertorioEventoService {
 
     List<RepertorioEvento> buscarPorEvento(Long idEvento, TipoEvento tipoEvento);
 
+    List<RepertorioEvento> buscarPorEventos(Long idBanda, TipoEvento tipoEvento, List<Long> idsEventos);
+
     RepertorioEvento buscarPorIndiceEEvento(Integer indice, Long idEvento, TipoEvento tipoEvento);
 
     void salvar(RepertorioEvento repertorioEvento);

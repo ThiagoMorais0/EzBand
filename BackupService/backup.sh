@@ -20,9 +20,22 @@ mc alias list
 mc mb --ignore-existing prod/backups
 
 # Habilitando versionamento
+#
+# setlistaudio fica de fora: os VS das musicas sao arquivos de alguns MB, e versionar
+# significa guardar para sempre toda versao anterior de todo arquivo trocado. Um bucket de
+# logos (KB) aguenta isso; um de audio cresce sem teto e sem ninguem perceber, porque a
+# versao antiga nao aparece em lugar nenhum da interface. O bucket e reconstituivel pelo
+# usuario -- e so reenviar o arquivo -- entao nao vale o custo.
+BUCKETS_SEM_VERSIONAMENTO="setlistaudio"
+
 readarray -t bucket_array <<< "$(mc ls prod | awk '{print $NF}' | sed 's:/$::')"
 for bucket in "${bucket_array[@]}"; do
   echo "Bucket encontrado: $bucket"
+  if echo " $BUCKETS_SEM_VERSIONAMENTO " | grep -q " $bucket "; then
+    echo "  -> versionamento intencionalmente desligado"
+    mc version suspend prod/$bucket
+    continue
+  fi
   mc version enable prod/$bucket
 done
 

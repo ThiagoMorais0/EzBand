@@ -30,6 +30,14 @@ public class RepertorioEventoServiceImpl implements RepertorioEventoService {
     }
 
     @Override
+    public List<RepertorioEvento> buscarPorEventos(Long idBanda, TipoEvento tipoEvento, List<Long> idsEventos) {
+        if (idsEventos == null || idsEventos.isEmpty()) {
+            return List.of();
+        }
+        return repertorioEventoDao.buscarPorEventos(idBanda, tipoEvento, idsEventos);
+    }
+
+    @Override
     public RepertorioEvento buscarPorIndiceEEvento(Integer indice, Long idEvento, TipoEvento tipoEvento) {
         return repertorioEventoDao.buscarPorIndiceEEvento(indice, idEvento, tipoEvento);
     }

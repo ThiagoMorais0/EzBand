@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.baseapplication.core.dto.EnsaiosFuturosDTO;
 import com.baseapplication.core.dto.InfoMembroBandaDTO;
+import com.baseapplication.core.dto.PropagacaoMusicaRepertorioDTO;
 import com.baseapplication.core.dto.RepertorioBandaDTO;
 import com.baseapplication.core.dto.ShowsFuturosDTO;
 import com.baseapplication.core.model.Banda;
@@ -68,7 +69,14 @@ public interface BandaService {
 
     List<ShowDTO> buscarShows(Long idBanda);
 
-    void atualizarMusicaRertorio(RepertorioBandaDTO repertorioBandaDTO);
+    /**
+     * Salva a edicao de uma musica do repertorio da banda e devolve o convite para refletir a
+     * mesma alteracao nos shows pendentes -- ou {@code null} quando nao ha o que perguntar.
+     */
+    PropagacaoMusicaRepertorioDTO atualizarMusicaRertorio(RepertorioBandaDTO repertorioBandaDTO);
+
+    /** Aplica a edicao ja salva no repertorio dos shows pendentes. Devolve quantos foram tocados. */
+    int propagarMusicaParaShowsPendentes(PropagacaoMusicaRepertorioDTO propagacao);
 
     void alterarPermissaoMembro(EditarMembroMusicoBandaDTO permissaoMusicoDTO);
 
