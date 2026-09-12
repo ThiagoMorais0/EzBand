@@ -311,9 +311,9 @@ public class BandaController {
     @GetMapping("/aceitar-convite-link")
     public ResponseEntity<?> aceitarConvitePorLink(@RequestParam String token) {
         try {
-            Long idBanda = conviteBandaService.aceitarConvitePorToken(token);
-            return ResponseEntity.ok(idBanda);
+            return ResponseEntity.ok(conviteBandaService.aceitarConvitePorToken(token));
         } catch (Exception e) {
+            log.error("Erro ao aceitar convite por link", e);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }

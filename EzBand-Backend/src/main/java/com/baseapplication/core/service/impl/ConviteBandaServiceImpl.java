@@ -7,12 +7,16 @@ import com.baseapplication.core.dao.InstrumentoUsuarioDao;
 import com.baseapplication.core.dao.MusicoBandaDao;
 import com.baseapplication.core.dao.MusicoEventoDao;
 import com.baseapplication.core.dao.NotificacaoDao;
+import com.baseapplication.core.dao.RespostaNotificacaoDao;
 import com.baseapplication.core.dao.ShowDao;
+import com.baseapplication.core.dao.UsuarioDao;
+import com.baseapplication.core.dto.ConviteAceitoDTO;
 import com.baseapplication.core.dto.ConviteExternoGeradoDTO;
 import com.baseapplication.core.dto.ConviteExternoPreviewDTO;
 import com.baseapplication.core.dto.EventoConviteDTO;
 import com.baseapplication.core.dto.EventoPendenteConviteDTO;
 import com.baseapplication.core.dto.GerarConviteExternoDTO;
+import com.baseapplication.core.enums.AcaoResposta;
 import com.baseapplication.core.enums.PermissaoMusico;
 import com.baseapplication.core.enums.SituacaoMusicoEvento;
 import com.baseapplication.core.enums.TipoEvento;
@@ -26,6 +30,7 @@ import com.baseapplication.core.model.MusicoEvento;
 import com.baseapplication.core.model.MusicoEventoId;
 import com.baseapplication.core.model.Usuario;
 import com.baseapplication.core.model.notificacao.ConviteParaUsuarioIngressarBanda;
+import com.baseapplication.core.model.notificacao.RespostaNotificacao;
 import com.baseapplication.core.model.superClasses.Evento;
 import com.baseapplication.core.service.ConviteBandaService;
 import com.baseapplication.core.service.MusicoBandaService;
@@ -38,6 +43,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -81,6 +87,12 @@ public class ConviteBandaServiceImpl implements ConviteBandaService {
     @Autowired
     private InstrumentoUsuarioDao instrumentoUsuarioDao;
 
+    @Autowired
+    private UsuarioDao usuarioDao;
+
+    @Autowired
+    private RespostaNotificacaoDao respostaNotificacaoDao;
+
     @Override
     public List<EventoPendenteConviteDTO> buscarEventosPendentes(Long idBanda) {
         validarMembroDaBanda(idBanda, Context.getUsuarioLogado().getId());
@@ -112,33 +124,109 @@ public class ConviteBandaServiceImpl implements ConviteBandaService {
         convite.setDataExpiracao(LocalDateTime.now().plusDays(DIAS_VALIDADE_CONVITE_EXTERNO));
         conviteExternoBandaDao.save(convite);
 
-        return new ConviteExternoGeradoDTO(convite.getToken(), montarLinkCadastro(convite.getToken()));
+        return new ConviteExternoGeradoDTO(convite.getToken(), montarLinkConvite(convite.getToken()));
     }
 
     @Override
     public ConviteExternoPreviewDTO previewConviteExterno(String token) {
-        Optional<ConviteExternoBanda> conviteOpt = conviteExternoBandaDao.findByToken(token);
-        if (conviteOpt.isEmpty()) {
-            return new ConviteExternoPreviewDTO(false, null, null, "Convite não encontrado.");
+        Optional<ConviteExternoBanda> externoOpt = conviteExternoBandaDao.findByToken(token);
+        if (externoOpt.isPresent()) {
+            return previewDeConviteExterno(externoOpt.get());
         }
 
-        ConviteExternoBanda convite = conviteOpt.get();
+        Optional<ConviteParaUsuarioIngressarBanda> notificacaoOpt = notificacaoDao.findConviteByLinkToken(token);
+        if (notificacaoOpt.isPresent()) {
+            return previewDeNotificacao(notificacaoOpt.get());
+        }
+
+        return ConviteExternoPreviewDTO.invalido("Convite não encontrado.");
+    }
+
+    private ConviteExternoPreviewDTO previewDeConviteExterno(ConviteExternoBanda convite) {
+        Banda banda = convite.getBanda();
+        ConviteExternoPreviewDTO dto = montarPreview(banda, convite.getInstrumento(), convite.getEventos());
+        dto.setNomeRemetente(nomeUsuario(convite.getIdUsuarioRemetente()));
+
         if (convite.isUtilizado()) {
-            return new ConviteExternoPreviewDTO(false, convite.getBanda().getNome(),
-                    convite.getBanda().getUrlLogo(), "Este convite já foi utilizado.");
+            // Quem reabre o proprio link ja usado nao pode ver isso como erro: o destino dele e a banda.
+            dto.setValido(dto.isJaEMembro());
+            dto.setMotivo(dto.isJaEMembro() ? null : "Este convite já foi utilizado.");
+            return dto;
         }
         if (convite.isExpirado()) {
-            return new ConviteExternoPreviewDTO(false, convite.getBanda().getNome(),
-                    convite.getBanda().getUrlLogo(), "Este convite expirou.");
+            dto.setValido(false);
+            dto.setMotivo("Este convite expirou.");
+            return dto;
         }
-        return new ConviteExternoPreviewDTO(true, convite.getBanda().getNome(),
-                convite.getBanda().getUrlLogo(), null);
+        dto.setValido(true);
+        return dto;
+    }
+
+    private ConviteExternoPreviewDTO previewDeNotificacao(ConviteParaUsuarioIngressarBanda convite) {
+        Banda banda = bandaDao.findById(convite.getRemetenteId()).orElse(null);
+        if (banda == null) {
+            return ConviteExternoPreviewDTO.invalido("A banda deste convite não existe mais.");
+        }
+
+        ConviteExternoPreviewDTO dto = montarPreview(banda, convite.getInstrumento(), convite.getEventos());
+        Long idLogado = idUsuarioLogadoOuNull();
+
+        if (idLogado != null && !idLogado.equals(convite.getDestinatarioId())) {
+            dto.setValido(false);
+            dto.setMotivo("Este convite é de outra pessoa.");
+            return dto;
+        }
+        if (jaRespondido(convite.getId()) && !dto.isJaEMembro()) {
+            dto.setValido(false);
+            dto.setMotivo("Este convite já foi respondido.");
+            return dto;
+        }
+        dto.setValido(true);
+        return dto;
+    }
+
+    private ConviteExternoPreviewDTO montarPreview(Banda banda, String instrumento, String eventos) {
+        ConviteExternoPreviewDTO dto = new ConviteExternoPreviewDTO();
+        dto.setIdBanda(banda.getId());
+        dto.setNomeBanda(banda.getNome());
+        dto.setUrlLogo(banda.getUrlLogo());
+        dto.setInstrumento(instrumento);
+        dto.setQuantidadeEventos(contarEventos(eventos));
+
+        Long idLogado = idUsuarioLogadoOuNull();
+        dto.setJaEMembro(idLogado != null && ehMembro(idLogado, banda.getId()));
+        return dto;
+    }
+
+    private int contarEventos(String eventosSerializados) {
+        if (eventosSerializados == null || eventosSerializados.isBlank()) {
+            return 0;
+        }
+        return (int) Arrays.stream(eventosSerializados.split(","))
+                .filter(chave -> !chave.isBlank())
+                .count();
+    }
+
+    private String nomeUsuario(Long idUsuario) {
+        if (idUsuario == null) {
+            return null;
+        }
+        return usuarioDao.findById(idUsuario).map(Usuario::getNome).orElse(null);
+    }
+
+    /** O preview e publico: sem sessao o Context devolve um Usuario vazio, sem id. */
+    private Long idUsuarioLogadoOuNull() {
+        Usuario usuario = Context.getUsuarioLogado();
+        return usuario == null ? null : usuario.getId();
     }
 
     @Override
     @Transactional
-    public Long aceitarConvitePorToken(String token) {
+    public ConviteAceitoDTO aceitarConvitePorToken(String token) {
         Usuario usuarioLogado = Context.getUsuarioLogado();
+        if (usuarioLogado == null || usuarioLogado.getId() == null) {
+            throw new RestrictionException("Entre na sua conta para aceitar o convite.");
+        }
 
         Optional<ConviteParaUsuarioIngressarBanda> notificacaoOpt = notificacaoDao.findConviteByLinkToken(token);
         if (notificacaoOpt.isPresent()) {
@@ -150,21 +238,46 @@ public class ConviteBandaServiceImpl implements ConviteBandaService {
         return aceitarConviteExterno(conviteExterno, usuarioLogado);
     }
 
-    private Long aceitarConviteDeNotificacao(ConviteParaUsuarioIngressarBanda convite, Usuario usuarioLogado) {
+    private ConviteAceitoDTO aceitarConviteDeNotificacao(ConviteParaUsuarioIngressarBanda convite, Usuario usuarioLogado) {
         if (!convite.getDestinatarioId().equals(usuarioLogado.getId())) {
             throw new RestrictionException("Este convite não é para você.");
         }
 
         Banda banda = buscarBanda(convite.getRemetenteId());
+        boolean jaEraMembro = ehMembro(usuarioLogado.getId(), banda.getId());
+        if (jaRespondido(convite.getId()) && !jaEraMembro) {
+            throw new RestrictionException("Este convite já foi respondido.");
+        }
+
         ingressarNaBanda(usuarioLogado, banda, convite.getInstrumento());
         incluirUsuarioNosEventos(usuarioLogado, banda, convite.getEventos());
 
         convite.setLida(true);
         notificacaoDao.save(convite);
-        return banda.getId();
+        registrarAceite(convite.getId());
+        return new ConviteAceitoDTO(banda.getId(), banda.getNome(), jaEraMembro);
     }
 
-    private Long aceitarConviteExterno(ConviteExternoBanda convite, Usuario usuarioLogado) {
+    /** Aceitar pelo link fecha a notificacao no app: o card para de pedir uma resposta. */
+    private void registrarAceite(Long idNotificacao) {
+        if (idNotificacao == null || jaRespondido(idNotificacao)) {
+            return;
+        }
+        RespostaNotificacao resposta = new RespostaNotificacao();
+        resposta.setNotificacaoId(idNotificacao);
+        resposta.setAcao(AcaoResposta.ACEITAR);
+        respostaNotificacaoDao.save(resposta);
+    }
+
+    private ConviteAceitoDTO aceitarConviteExterno(ConviteExternoBanda convite, Usuario usuarioLogado) {
+        Banda banda = convite.getBanda();
+        boolean jaEraMembro = ehMembro(usuarioLogado.getId(), banda.getId());
+
+        // Reabrir o proprio link depois de aceito e comum (WhatsApp, historico do navegador):
+        // quem ja esta na banda so precisa ser levado ate ela.
+        if (jaEraMembro && convite.isUtilizado()) {
+            return new ConviteAceitoDTO(banda.getId(), banda.getNome(), true);
+        }
         if (convite.isUtilizado()) {
             throw new RestrictionException("Este convite já foi utilizado.");
         }
@@ -172,18 +285,29 @@ public class ConviteBandaServiceImpl implements ConviteBandaService {
             throw new RestrictionException("Este convite expirou.");
         }
 
-        Banda banda = convite.getBanda();
         ingressarNaBanda(usuarioLogado, banda, convite.getInstrumento());
         incluirUsuarioNosEventos(usuarioLogado, banda, convite.getEventos());
 
         convite.setIdUsuarioAceitou(usuarioLogado.getId());
         convite.setDataAceite(LocalDateTime.now());
         conviteExternoBandaDao.save(convite);
-        return banda.getId();
+        return new ConviteAceitoDTO(banda.getId(), banda.getNome(), jaEraMembro);
+    }
+
+    /**
+     * O flag "lida" da notificacao nao diz nada sobre o convite: abrir o painel de notificacoes
+     * ja marca tudo como lido. Quem decide e a existencia de uma resposta (aceitar/recusar).
+     */
+    private boolean jaRespondido(Long idNotificacao) {
+        return idNotificacao != null && respostaNotificacaoDao.existsByNotificacaoId(idNotificacao);
+    }
+
+    private boolean ehMembro(Long idUsuario, Long idBanda) {
+        return musicoBandaDao.existsById(new MusicoBandaId(idUsuario, idBanda));
     }
 
     private void ingressarNaBanda(Usuario usuario, Banda banda, String instrumento) {
-        if (musicoBandaDao.existsById(new MusicoBandaId(usuario.getId(), banda.getId()))) {
+        if (ehMembro(usuario.getId(), banda.getId())) {
             return;
         }
         String instrumentos = (instrumento == null || instrumento.isBlank())
@@ -319,7 +443,7 @@ public class ConviteBandaServiceImpl implements ConviteBandaService {
         }
     }
 
-    private String montarLinkCadastro(String token) {
-        return frontendUrl + "/cadastro?convite=" + token;
+    private String montarLinkConvite(String token) {
+        return frontendUrl + "/convite/" + token;
     }
 }

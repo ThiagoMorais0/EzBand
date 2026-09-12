@@ -94,7 +94,7 @@ public class NotificacaoListener {
         String mensagem = "*" + titulo + "*\n" + notificacao.getMensagem();
 
         if (notificacao instanceof ConviteParaUsuarioIngressarBanda convite && convite.getLinkToken() != null) {
-            mensagem += "\n\nClique no link para aceitar o convite:\n" + frontendUrl + "/aceitar-convite?token=" + convite.getLinkToken();
+            mensagem += "\n\nClique no link para aceitar o convite:\n" + frontendUrl + "/convite/" + convite.getLinkToken();
         }
 
         log.info("[WhatsApp] Enviando notificação {} para usuário {} ({})", tipoNotif, idUsuario, usuario.getCelular());

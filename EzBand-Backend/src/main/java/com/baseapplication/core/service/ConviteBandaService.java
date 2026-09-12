@@ -1,5 +1,6 @@
 package com.baseapplication.core.service;
 
+import com.baseapplication.core.dto.ConviteAceitoDTO;
 import com.baseapplication.core.dto.ConviteExternoGeradoDTO;
 import com.baseapplication.core.dto.ConviteExternoPreviewDTO;
 import com.baseapplication.core.dto.EventoConviteDTO;
@@ -19,7 +20,7 @@ public interface ConviteBandaService {
     ConviteExternoPreviewDTO previewConviteExterno(String token);
 
     /** Aceita um convite por token, seja ele de notificação (usuário já cadastrado) ou externo. */
-    Long aceitarConvitePorToken(String token);
+    ConviteAceitoDTO aceitarConvitePorToken(String token);
 
     /** Valida os eventos informados e devolve a representação persistida ("SHOW:12,ENSAIO:33"). */
     String serializarEventos(Long idBanda, List<EventoConviteDTO> eventos);
