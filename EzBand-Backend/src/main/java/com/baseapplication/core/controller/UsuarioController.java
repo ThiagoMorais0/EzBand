@@ -126,6 +126,16 @@ public class UsuarioController {
 		}
 	}
 
+	@GetMapping("/buscarShowsParticipacoesEspeciais")
+	public ResponseEntity<?> buscarShowsParticipacoesEspeciais(@RequestParam Long idUsuario){
+		try{
+			return ResponseEntity.ok(usuarioService.buscarShowsParticipacoesEspeciaisPorUsuario(idUsuario));
+		}catch (Exception e){
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
+	}
+
 	@GetMapping("/buscar")
 	public ResponseEntity<List<BuscaGlobalDTO>> buscarGlobal(@RequestParam("termo") String termo) {
 		try {

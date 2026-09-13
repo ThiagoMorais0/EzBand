@@ -25,6 +25,7 @@ import com.baseapplication.core.exception.InvalidParamException;
 import com.baseapplication.core.exception.ResourceNotFoundException;
 import com.baseapplication.core.model.Usuario;
 import com.baseapplication.core.model.dto.BandaDTO;
+import com.baseapplication.core.model.dto.ShowDTO;
 import com.baseapplication.core.service.BandaService;
 import com.baseapplication.core.service.EmailService;
 import com.baseapplication.core.service.EventoHelperService;
@@ -104,7 +105,15 @@ public class UsuarioServiceImpl implements UsuarioService {
 	}
 
 	private QuantidadeParticipacoesEspeciaisDTO buscarQuantidadeParticipacoesEspeciais(Long idUsuario) {
-		return usuarioDao.buscarQuantidadeParticipacoesEspeciais(idUsuario);
+		QuantidadeParticipacoesEspeciaisDTO quantidade = usuarioDao.buscarQuantidadeParticipacoesEspeciais(idUsuario);
+		if (quantidade != null && (positivo(quantidade.getQtdShows()) || positivo(quantidade.getQtdEnsaios()))) {
+			quantidade.setBandas(usuarioDao.buscarBandasParticipacoesEspeciais(idUsuario));
+		}
+		return quantidade;
+	}
+
+	private static boolean positivo(Long valor) {
+		return valor != null && valor > 0;
 	}
 
 //	private CompletableFuture<Integer> buscarQuantidadeNotificacoesAsync(Long idUsuario) {
@@ -282,6 +291,18 @@ public class UsuarioServiceImpl implements UsuarioService {
 				usuarioDao.buscarShowsEspeciais(Context.getUsuarioLogado().getId()),
 				usuarioDao.buscarEnsaiosEspeciais(Context.getUsuarioLogado().getId())
 		);
+	}
+
+	/**
+	 * O ShowDTO le colecoes LAZY da banda, entao a conversao precisa ficar dentro da
+	 * transacao (open-in-view=false). O cache individual nao e montado: o perfil e publico.
+	 */
+	@Override
+	@Transactional(readOnly = true)
+	public List<ShowDTO> buscarShowsParticipacoesEspeciaisPorUsuario(Long idUsuario) {
+		return usuarioDao.buscarShowsParticipacoesEspeciaisPublicos(idUsuario).stream()
+				.map(ShowDTO::new)
+				.toList();
 	}
 
 	private CompletableFuture<EventosSeparadosDTO> buscarProximosEventosAsync(Long idUsuario) {

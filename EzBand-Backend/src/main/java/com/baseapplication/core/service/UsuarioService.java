@@ -14,6 +14,7 @@ import com.baseapplication.core.enums.TipoContato;
 import com.baseapplication.core.enums.TipoRelacionamento;
 import com.baseapplication.core.model.Usuario;
 import com.baseapplication.core.model.dto.BandaDTO;
+import com.baseapplication.core.model.dto.ShowDTO;
 
 import java.util.List;
 
@@ -56,6 +57,9 @@ public interface UsuarioService {
 	InfoPerfilUsuarioDTO buscarPorEmail(String email);
 
 	ParticipacoesEspeciaisDTO buscarParticipacoesEspeciais();
+
+	/** Shows de participacao especial aceitos pelo usuario, para perfil e agenda publicos. */
+	List<ShowDTO> buscarShowsParticipacoesEspeciaisPorUsuario(Long idUsuario);
 
 	List<BuscaGlobalDTO> buscarGlobal(String termo);
 

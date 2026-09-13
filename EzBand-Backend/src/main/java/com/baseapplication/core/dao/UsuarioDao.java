@@ -1,7 +1,9 @@
 package com.baseapplication.core.dao;
 
 import com.baseapplication.core.dto.BuscaGlobalProjection;
+import com.baseapplication.core.dto.BandaParticipacaoResumoDTO;
 import com.baseapplication.core.dto.QuantidadeParticipacoesEspeciaisDTO;
+import com.baseapplication.core.model.Show;
 import com.baseapplication.core.model.dto.EnsaioDTO;
 import com.baseapplication.core.model.dto.ShowDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -61,6 +63,49 @@ public interface UsuarioDao extends JpaRepository<Usuario, Long> {
       )
 """)
     QuantidadeParticipacoesEspeciaisDTO buscarQuantidadeParticipacoesEspeciais(Long idUsuario);
+
+    @Query("""
+    SELECT new com.baseapplication.core.dto.BandaParticipacaoResumoDTO(
+        b.id, b.nome, b.urlLogo, COUNT(me.id.idEvento)
+    )
+    FROM MusicoEvento me
+    JOIN me.evento ev
+    JOIN ev.banda b
+    WHERE me.id.idUsuario = :idUsuario
+      AND ev.status = 'PENDENTE'
+      AND NOT EXISTS (
+          SELECT 1
+          FROM MusicoBanda mb
+          WHERE mb.banda.id = b.id
+            AND mb.usuario.id = me.id.idUsuario
+      )
+    GROUP BY b.id, b.nome, b.urlLogo
+    ORDER BY COUNT(me.id.idEvento) DESC, b.nome
+""")
+    List<BandaParticipacaoResumoDTO> buscarBandasParticipacoesEspeciais(Long idUsuario);
+
+    /**
+     * Shows de outras bandas em que o usuario participa, em qualquer status, para a vitrine
+     * publica (perfil e agenda). So entra participacao aceita: convite pendente, recusado ou
+     * inativo nao e publico. Situacao nula sao registros antigos, anteriores ao convite.
+     */
+    @Query("""
+    SELECT s
+    FROM MusicoEvento me
+    JOIN Show s ON s.id = me.id.idEvento
+    WHERE me.id.idUsuario = :idUsuario
+      AND me.id.tipoEvento = com.baseapplication.core.enums.TipoEvento.SHOW
+      AND s.data IS NOT NULL
+      AND (me.situacao IS NULL OR me.situacao = com.baseapplication.core.enums.SituacaoMusicoEvento.ATIVO)
+      AND NOT EXISTS (
+          SELECT 1
+          FROM MusicoBanda mb
+          WHERE mb.banda.id = s.banda.id
+            AND mb.usuario.id = me.id.idUsuario
+      )
+    ORDER BY s.data, s.horarioInicio
+""")
+    List<Show> buscarShowsParticipacoesEspeciaisPublicos(Long idUsuario);
 
     @Query("""
     SELECT new com.baseapplication.core.model.dto.ShowDTO(s, me.cache)
