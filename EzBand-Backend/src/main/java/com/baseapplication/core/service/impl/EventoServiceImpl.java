@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.baseapplication.core.dto.superClasses.InformacoesEventoDTO;
+import com.baseapplication.core.enums.PermissaoMusico;
 import com.baseapplication.core.enums.SituacaoMusicoEvento;
 import com.baseapplication.core.enums.StatusEvento;
 import com.baseapplication.core.enums.TipoContato;
@@ -189,15 +190,53 @@ public class EventoServiceImpl implements EventoService {
 		if (evento.getBanda() != null
 				&& musicoBandaDao.existsById(new MusicoBandaId(idUsuario, evento.getBanda().getId())))
 			return true;
-		MusicoEvento musicoEvento = musicoEventoService.buscar(evento.getId(), evento.getTipoEvento(), idUsuario);
+		MusicoEvento musicoEvento = musicoEventoService.buscar(evento.getId(), tipoDoEvento(evento), idUsuario);
 		return musicoEvento.getId() != null
 				&& musicoEvento.getSituacao() != SituacaoMusicoEvento.RECUSADO
 				&& musicoEvento.getSituacao() != SituacaoMusicoEvento.INATIVO;
 	}
 
+	// As regras abaixo espelham as do front (InfoShow, InfoEnsaio, RepertorioEvento): sem
+	// elas, quem chamasse a API direto conseguia editar ou cancelar evento de qualquer banda.
+
+	private static final List<PermissaoMusico> PERMISSOES_GESTAO_REPERTORIO = List.of(PermissaoMusico.FUNDADOR,
+			PermissaoMusico.ADMINISTRADOR, PermissaoMusico.GERENCIADOR_DE_SHOWS, PermissaoMusico.GERENCIADOR_DE_ENSAIOS);
+
+	private void validarGestaoDoEvento(Evento evento) {
+		PermissaoMusico gerenciador = tipoDoEvento(evento) == TipoEvento.SHOW
+				? PermissaoMusico.GERENCIADOR_DE_SHOWS
+				: PermissaoMusico.GERENCIADOR_DE_ENSAIOS;
+		validarPermissaoNaBanda(evento.getBanda(),
+				List.of(PermissaoMusico.FUNDADOR, PermissaoMusico.ADMINISTRADOR, gerenciador));
+	}
+
+	// Pela classe, e não pela coluna TIPO_EVENTO, que pode estar nula em registros antigos
+	private static TipoEvento tipoDoEvento(Evento evento) {
+		return evento instanceof Show ? TipoEvento.SHOW : TipoEvento.ENSAIO;
+	}
+
+	private void validarGestaoDoRepertorio(Evento evento) {
+		validarPermissaoNaBanda(evento.getBanda(), PERMISSOES_GESTAO_REPERTORIO);
+	}
+
+	private void validarPermissaoNaBanda(Banda banda, List<PermissaoMusico> permitidas) {
+		List<PermissaoMusico> permissoes = buscarMembroLogado(banda == null ? null : banda.getId()).getPermissoes();
+		if (permissoes == null || permissoes.stream().noneMatch(permitidas::contains))
+			throw new RestrictionException("Você não tem permissão para alterar este evento");
+	}
+
+	private MusicoBanda buscarMembroLogado(Long idBanda) {
+		Long idUsuario = Context.getUsuarioLogado().getId();
+		if (idBanda == null || idUsuario == null)
+			throw new RestrictionException("Você não faz parte desta banda");
+		return musicoBandaDao.buscarMembro(idBanda, idUsuario)
+				.orElseThrow(() -> new RestrictionException("Você não faz parte desta banda"));
+	}
+
 	@Override
 	public void atualizarInformacoesEvento(InformacoesEventoDTO informacoesEventoDTO) {
 		Evento evento = buscarEvento(informacoesEventoDTO.getId(), informacoesEventoDTO.getTipoEvento());
+		validarGestaoDoEvento(evento);
 		atualizarParticipantesEvento(evento, informacoesEventoDTO.getIdUsuariosParticipantes());
 		BeanUtils.copyProperties(informacoesEventoDTO, evento);
 		salvar(evento);
@@ -248,6 +287,7 @@ public class EventoServiceImpl implements EventoService {
 		Evento evento = buscarEvento(atualizacaoRepertorio.getIdEvento(), atualizacaoRepertorio.getTipoEvento());
 		if (evento == null)
 			throw new ResourceNotFoundException("Evento não encontrado");
+		validarGestaoDoRepertorio(evento);
 
 		List<RepertorioEvento> repertorio = atualizacaoRepertorio.getMusicas().stream()
 				.map(i -> montarMusicaRepertorioEvento(i, evento)).toList();
@@ -268,6 +308,7 @@ public class EventoServiceImpl implements EventoService {
 
 	@Override
 	public ResponseEntity<?> buscarMembrosEDisponibilidadeParaShow(Long idBanda, LocalDate data) {
+		buscarMembroLogado(idBanda);
 		Banda banda = bandaService.buscarPorId(idBanda);
 		List<MusicoBanda> musicos = banda.getMusicos();
 		List<MembroFantasma> membrosFantasma = banda.getMembrosFantasma();
@@ -309,6 +350,7 @@ public class EventoServiceImpl implements EventoService {
 //			// TODO Auto-generated catch block
 //			e.printStackTrace();
 //		}
+		buscarMembroLogado(novoShowDTO.getIdBanda());
 		Show show = novoShowDTO.toEntity();
 		Banda banda = bandaService.buscarPorId(novoShowDTO.getIdBanda());
 		if (banda == null)
@@ -368,6 +410,7 @@ public class EventoServiceImpl implements EventoService {
 	@Transactional
 	@Override
 	public void marcarEnsaio(NovoEnsaioDTO novoEnsaioDTO) {
+        buscarMembroLogado(novoEnsaioDTO.getIdBanda());
         validarDataEnsaio(novoEnsaioDTO.getDataEnsaio());
         Ensaio ensaio = novoEnsaioDTO.toEntity();
         Banda banda = bandaService.buscarPorId(novoEnsaioDTO.getIdBanda());
@@ -478,12 +521,15 @@ public class EventoServiceImpl implements EventoService {
 	@Override
 	public void cancelarEvento(Long idEvento, TipoEvento tipoEvento) {
 		Evento evento = buscarEvento(idEvento, tipoEvento);
+		validarGestaoDoEvento(evento);
 		evento.setStatus(StatusEvento.CANCELADO);
 		salvar(evento);
 	}
 
 	@Override
 	public void atualizarMusicaRepertorio(AtualizacaoMusicaRepertorioDTO atualizacaoMusicaRepertorio) {
+		validarGestaoDoRepertorio(buscarEvento(atualizacaoMusicaRepertorio.getIdEvento(),
+				atualizacaoMusicaRepertorio.getTipoEvento()));
 		RepertorioEvento repertorioEvento = repertorioEventoService.buscarPorIndiceEEvento(
 				atualizacaoMusicaRepertorio.getIndice(),
 				atualizacaoMusicaRepertorio.getIdEvento(),
@@ -548,6 +594,7 @@ public class EventoServiceImpl implements EventoService {
 
 	@Override
 	public void removerMusicaDoRepertorio(Long idEvento, TipoEvento tipoEvento, Integer indice) {
+		validarGestaoDoRepertorio(buscarEvento(idEvento, tipoEvento));
 		RepertorioEvento existente = repertorioEventoService.buscarPorIndiceEEvento(indice, idEvento, tipoEvento);
 		if (existente == null) {
 			return;
@@ -560,6 +607,7 @@ public class EventoServiceImpl implements EventoService {
 	@Transactional
 	public void editarShow(NovoShowDTO novoShowDTO, Long idShow) {
 		Show show = (Show) buscarEvento(idShow, TipoEvento.SHOW);
+		validarGestaoDoEvento(show);
 		Banda banda = show.getBanda();
 		List<MusicoEvento> musicosAntigos = musicoEventoService.buscarMusicosPorEvento(idShow, TipoEvento.SHOW);
 		List<MembroFantasmaEvento> membrosFantasmaAntigos = membroFantasmaEventoService.buscarMembrosFantasmaPorEvento(idShow, TipoEvento.SHOW);
@@ -676,6 +724,7 @@ public class EventoServiceImpl implements EventoService {
 	@Transactional
 	public void editarEnsaio(NovoEnsaioDTO novoEnsaioDTO, Long idEnsaio) {
 		Ensaio ensaio = (Ensaio) buscarEvento(idEnsaio, TipoEvento.ENSAIO);
+		validarGestaoDoEvento(ensaio);
 		Banda banda = ensaio.getBanda();
 		List<MusicoEvento> musicosAntigos = musicoEventoService.buscarMusicosPorEvento(idEnsaio, TipoEvento.ENSAIO);
 		List<MembroFantasmaEvento> membrosFantasmaAntigos = membroFantasmaEventoService.buscarMembrosFantasmaPorEvento(idEnsaio, TipoEvento.ENSAIO);

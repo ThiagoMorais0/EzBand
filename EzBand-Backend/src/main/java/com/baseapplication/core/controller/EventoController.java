@@ -32,6 +32,8 @@ public class EventoController {
     @GetMapping("/buscarPorId")
     public ResponseEntity<?> buscar(@RequestParam Long idEvento, @RequestParam TipoEvento tipoEvento) {
         try {
+            if (!eventoService.podeAcessarEvento(idEvento, tipoEvento, null))
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             return ResponseEntity.ok(new EventoDTO(eventoService.buscarPorId(idEvento, tipoEvento)));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -87,6 +89,8 @@ public class EventoController {
         try {
             eventoService.atualizarRepertorioEvento(atualizacaoRepertorio);
             return ResponseEntity.ok().build();
+        } catch (RestrictionException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
@@ -97,6 +101,8 @@ public class EventoController {
         try {
             eventoService.atualizarMusicaRepertorio(atualizacaoMusicaRepertorio);
             return ResponseEntity.ok().build();
+        } catch (RestrictionException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
@@ -107,6 +113,8 @@ public class EventoController {
         try {
             eventoService.removerMusicaDoRepertorio(atualizacaoMusicaRepertorio.getIdEvento(), atualizacaoMusicaRepertorio.getTipoEvento(), atualizacaoMusicaRepertorio.getIndice());
             return ResponseEntity.ok().build();
+        } catch (RestrictionException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -124,6 +132,8 @@ public class EventoController {
         try {
             eventoService.marcarShow(novoShowDTO);
             return ResponseEntity.ok("Show marcado com sucseso");
+        } catch (RestrictionException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
@@ -134,6 +144,8 @@ public class EventoController {
         try {
             eventoService.marcarEnsaio(novoEnsaioDTO);
             return ResponseEntity.ok("Ensaio marcado com sucesso");
+        } catch (RestrictionException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
@@ -144,6 +156,8 @@ public class EventoController {
         try {
             eventoService.editarShow(novoShowDTO, idShow);
             return ResponseEntity.ok("Show editado com sucesso");
+        } catch (RestrictionException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -155,6 +169,8 @@ public class EventoController {
         try {
             eventoService.editarEnsaio(novoEnsaioDTO, idEnsaio);
             return ResponseEntity.ok("Ensaio editado com sucesso");
+        } catch (RestrictionException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -181,6 +197,8 @@ public class EventoController {
         try {
             eventoService.cancelarEvento(idEvento, tipoEvento);
             return ResponseEntity.ok("Evento cancelado com sucesso");
+        } catch (RestrictionException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
