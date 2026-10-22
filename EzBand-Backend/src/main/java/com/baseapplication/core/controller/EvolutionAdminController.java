@@ -1,6 +1,8 @@
 package com.baseapplication.core.controller;
 
 import com.baseapplication.core.service.WhatsappService;
+import com.baseapplication.core.utils.LimitadorTentativasLogin;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +21,7 @@ import java.util.Map;
 public class EvolutionAdminController {
     
     private final WhatsappService whatsappService;
+    private final LimitadorTentativasLogin limitadorTentativasLogin;
     
     @Value("${evolution.admin.password:admin123}")
     private String adminPassword;
@@ -33,7 +36,16 @@ public class EvolutionAdminController {
     @PostMapping("/auth/login")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> login(@RequestBody Map<String, String> credentials, 
-                                                      HttpSession session) {
+                                                      HttpSession session, HttpServletRequest request) {
+        // Senha única, sem usuário: o único freio contra força bruta é o limite por IP
+        String chaveIp = LimitadorTentativasLogin.chaveAdminIp(request.getRemoteAddr());
+        if (!limitadorTentativasLogin.tempoRestanteBloqueio(chaveIp).isZero()) {
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(Map.of(
+                "success", false,
+                "message", "Muitas tentativas. Tente novamente mais tarde."
+            ));
+        }
+
         String password = credentials.get("password");
         
         log.debug("Tentativa de login - Senha esperada length: {}, Senha recebida length: {}", 
@@ -41,6 +53,7 @@ public class EvolutionAdminController {
                  password != null ? password.length() : 0);
         
         if (password != null && password.equals(adminPassword)) {
+            limitadorTentativasLogin.registrarSucesso(chaveIp);
             session.setAttribute(ADMIN_SESSION_KEY, true);
             log.info("✅ Admin autenticado com sucesso. Session ID: {}", session.getId());
             
@@ -51,6 +64,7 @@ public class EvolutionAdminController {
         }
         
         log.warn("❌ Tentativa de login com senha incorreta. Password configured: {}", adminPassword != null && !adminPassword.isBlank());
+        limitadorTentativasLogin.registrarFalha(chaveIp, LimitadorTentativasLogin.MAX_FALHAS_ADMIN_POR_IP);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
             "success", false,
             "message", "Senha incorreta"
