@@ -22,6 +22,8 @@ public interface EventoService {
 
     InformacoesEventoDTO buscarPobuscarInformacoesEventorId(Long idEvento, TipoEvento tipoEvento);
 
+    boolean podeAcessarEvento(Long idEvento, TipoEvento tipoEvento, Long idBanda);
+
     void atualizarInformacoesEvento(InformacoesEventoDTO informacoesEventoDTO);
 
     MusicoEventoDTO buscarMusicoParaEvento(String contato, TipoContato tipoContato);

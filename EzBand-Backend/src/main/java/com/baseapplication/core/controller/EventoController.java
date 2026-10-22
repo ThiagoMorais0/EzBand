@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.baseapplication.core.dto.superClasses.InformacoesEventoDTO;
 import com.baseapplication.core.enums.TipoContato;
 import com.baseapplication.core.enums.TipoEvento;
+import com.baseapplication.core.exception.RestrictionException;
 import com.baseapplication.core.model.superClasses.Evento;
 import com.baseapplication.core.service.EventoService;
 import com.baseapplication.core.utils.DateUtils;
@@ -44,6 +45,13 @@ public class EventoController {
 
     }
 
+    @GetMapping("/podeAcessarEvento")
+    public boolean podeAcessarEvento(@RequestParam Long idEvento,
+                                     @RequestParam TipoEvento tipoEvento,
+                                     @RequestParam(required = false) Long idBanda) {
+        return eventoService.podeAcessarEvento(idEvento, tipoEvento, idBanda);
+    }
+
     @PostMapping("/atualizarInformacoesEvento")
     public void atualizarInformacoesEvento(@RequestBody InformacoesEventoDTO informacoesEventoDTO) {
         eventoService.atualizarInformacoesEvento(informacoesEventoDTO);
@@ -67,6 +75,8 @@ public class EventoController {
                                                     @RequestParam String tipoEvento) {
         try {
             return ResponseEntity.ok(eventoService.buscarRepertorioEvento(idEvento, TipoEvento.valueOf(tipoEvento)));
+        } catch (RestrictionException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }

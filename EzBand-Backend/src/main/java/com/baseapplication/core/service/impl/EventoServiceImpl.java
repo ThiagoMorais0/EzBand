@@ -27,6 +27,7 @@ import com.baseapplication.core.event.events.SolicitacaoAgendarEnsaioEvent;
 import com.baseapplication.core.exception.InternalException;
 import com.baseapplication.core.exception.InvalidParamException;
 import com.baseapplication.core.exception.ResourceNotFoundException;
+import com.baseapplication.core.exception.RestrictionException;
 import com.baseapplication.core.model.Banda;
 import com.baseapplication.core.model.Ensaio;
 import com.baseapplication.core.model.Estudio;
@@ -53,6 +54,8 @@ import com.baseapplication.core.service.NotificacaoService;
 import com.baseapplication.core.service.RepertorioEventoService;
 import com.baseapplication.core.dao.CompromissoPessoalDao;
 import com.baseapplication.core.dao.EnsaioDao;
+import com.baseapplication.core.dao.MusicoBandaDao;
+import com.baseapplication.core.model.MusicoBandaId;
 import com.baseapplication.core.service.ShowService;
 import com.baseapplication.core.service.UsuarioService;
 import com.baseapplication.core.utils.Context;
@@ -80,6 +83,7 @@ public class EventoServiceImpl implements EventoService {
 	private final com.baseapplication.core.service.NotificacaoEventoService notificacaoEventoService;
 	private final CompromissoPessoalDao compromissoPessoalDao;
 	private final EnsaioDao ensaioDao;
+	private final MusicoBandaDao musicoBandaDao;
 
 	@Override
 	public Evento buscarPorId(Long idEvento, TipoEvento tipoEvento) {
@@ -139,6 +143,7 @@ public class EventoServiceImpl implements EventoService {
 	@Transactional(readOnly = true)
 	public InformacoesEventoDTO buscarPobuscarInformacoesEventorId(Long idEvento, TipoEvento tipoEvento) {
 		Evento evento = buscarEvento(idEvento, tipoEvento);
+		validarAcessoAoEvento(evento);
 		MusicoEvento musicoEvento = musicoEventoService.buscar(idEvento, tipoEvento,
 				Context.getUsuarioLogado().getId());
 		List<MembroFantasmaEvento> membrosFantasma = membroFantasmaEventoService.buscarMembrosFantasmaPorEvento(idEvento, tipoEvento);
@@ -155,6 +160,39 @@ public class EventoServiceImpl implements EventoService {
 			throw new ResourceNotFoundException("Evento não encontrado");
 
 		return retorno;
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public boolean podeAcessarEvento(Long idEvento, TipoEvento tipoEvento, Long idBanda) {
+		Evento evento = buscarEvento(idEvento, tipoEvento);
+		// O id da banda vem da URL do front: um evento de outra banda não pode ser aberto
+		// "dentro" de uma banda qualquer só porque o usuário participa dele.
+		if (idBanda != null && (evento.getBanda() == null || !idBanda.equals(evento.getBanda().getId())))
+			return false;
+		return usuarioTemAcessoAoEvento(evento, Context.getUsuarioLogado().getId());
+	}
+
+	private void validarAcessoAoEvento(Evento evento) {
+		if (!usuarioTemAcessoAoEvento(evento, Context.getUsuarioLogado().getId()))
+			throw new RestrictionException("Você não tem acesso a este evento");
+	}
+
+	/**
+	 * Membros da banda dona do evento sempre acessam. Quem não é da banda (participação
+	 * especial) só acessa se estiver vinculado ao evento em MUSICO_EVENTO e não tiver
+	 * recusado nem sido inativado.
+	 */
+	private boolean usuarioTemAcessoAoEvento(Evento evento, Long idUsuario) {
+		if (idUsuario == null)
+			return false;
+		if (evento.getBanda() != null
+				&& musicoBandaDao.existsById(new MusicoBandaId(idUsuario, evento.getBanda().getId())))
+			return true;
+		MusicoEvento musicoEvento = musicoEventoService.buscar(evento.getId(), evento.getTipoEvento(), idUsuario);
+		return musicoEvento.getId() != null
+				&& musicoEvento.getSituacao() != SituacaoMusicoEvento.RECUSADO
+				&& musicoEvento.getSituacao() != SituacaoMusicoEvento.INATIVO;
 	}
 
 	@Override
@@ -198,8 +236,10 @@ public class EventoServiceImpl implements EventoService {
 	@Override
 	@Transactional(readOnly = true)
 	public List<RepertorioEventoDTO> buscarRepertorioEvento(Long idEvento, TipoEvento tipoEvento) {
+		Evento evento = buscarEvento(idEvento, tipoEvento);
+		validarAcessoAoEvento(evento);
 		//Ordernar por indice
-		return buscarEvento(idEvento, tipoEvento).getRepertorio().stream().map(RepertorioEventoDTO::new)
+		return evento.getRepertorio().stream().map(RepertorioEventoDTO::new)
 				.sorted(Comparator.comparing(RepertorioEventoDTO::getIndice)).collect(Collectors.toList());
 	}
 
