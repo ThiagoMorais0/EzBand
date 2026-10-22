@@ -3,12 +3,18 @@ name: Deploy Backend
 on:
   push:
     branches: [develop]
+  workflow_dispatch:
+
+# Evita dois deploys simultâneos brigando pelos mesmos containers
+concurrency:
+  group: deploy-backend
+  cancel-in-progress: false
 
 jobs:
   deploy:
     name: Deploy to VPS
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
 
     steps:
       - name: Deploy via SSH
@@ -16,52 +22,52 @@ jobs:
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}          
+          key: ${{ secrets.VPS_SSH_KEY }}
           passphrase: ${{ secrets.VPS_SSH_PASSPHRASE }}
-          port: 5022               # <--- Configurado na porta correta do SSH da VPS
-          sync: true            # <--- FORÇA O GITHUB A EXECUTAR EM UMA CONEXÃO SEQUENCIAL ÚNICA
-          timeout: 90s          # <--- Aumenta o tempo de tolerância para o aperto de mão inicial
-          command_timeout: 18m
+          port: 5022
+          sync: true
+          timeout: 90s
+          command_timeout: 22m
           script: |
             set -e
 
-            # 1. Desbloqueia a chave SSH com a passphrase para automatizar o git fetch sem travar
-            eval $(ssh-agent -s)
-            echo "${{ secrets.VPS_SSH_PASSPHRASE }}" | ssh-add ~/.ssh/id_ed25519 2>/dev/null
-
-            # 2. Acessa a pasta do projeto (Back-end)
+            # O remote do backend é HTTPS, então o git fetch não precisa de chave SSH
             cd /root/EzBand
 
             echo ">> Atualizando código..."
             git fetch origin develop
             git reset --hard origin/develop
 
-            echo ">> Reconstruindo containers (sem cache para garantir as alterações)..."
-            docker compose --profile deploy build --no-cache api chat-service
+            echo ">> Buildando imagem da API (sem cache)..."
+            # O build roda antes de derrubar o container antigo, então a API fica no ar durante o build
+            docker compose --profile deploy build --no-cache api
 
-            echo ">> Subindo serviços..."
-            # Mantivemos o --no-deps aqui porque api e chat-service não dependem de um build dinâmico mútuo no boot
-            docker compose --profile deploy up -d --no-deps api chat-service
+            echo ">> Recriando container da API..."
+            docker compose --profile deploy rm -sf api
+            docker rm -f api 2>/dev/null || true
+            docker compose --profile deploy up -d --no-deps api
 
-            echo ">> Verificando saúde da API (aguardando até 90s)..."
-            for i in $(seq 1 18); do
-              CODE=$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/ 2>/dev/null || echo "000")
-              
-              # Aceita respostas de sucesso (2xx) ou redirecionamentos (3xx) caso use alguma rota protegida/HTTPS local
-              if [ "$CODE" != "000" ] && [ -n "$CODE" ] && [ "$CODE" -lt 400 ]; then
+            echo ">> Verificando saúde da API (aguardando até 180s)..."
+            # Qualquer resposta HTTP abaixo de 500 indica que o Spring subiu (a raiz devolve 403 por causa do Spring Security)
+            for i in $(seq 1 36); do
+              CODE=$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/ 2>/dev/null || true)
+              if [ -n "$CODE" ] && [ "$CODE" != "000" ] && [ "$CODE" -lt 500 ]; then
                 echo "API respondeu — HTTP $CODE"
                 break
               fi
-              
-              if [ "$i" -eq 18 ]; then
-                echo "ERRO: API não respondeu com sucesso após 90s (Último status: $CODE)"
-                echo ">> Logs reais do container da API:"
-                docker logs api --tail 40
+              if [ "$i" -eq 36 ]; then
+                echo "ERRO: API não respondeu após 180s (último status: $CODE)"
+                echo ">> Logs do container da API:"
+                docker logs api --tail 60
                 exit 1
               fi
-              echo "  Aguardando... ($i/18)"
+              echo "  Aguardando... ($i/36)"
               sleep 5
             done
+
+            # O nginx resolve o host "api" só na inicialização; o container novo pode ter outro IP
+            echo ">> Recarregando nginx do front-end..."
+            docker exec ezband-frontend nginx -s reload || docker restart ezband-frontend
 
             echo ">> Limpando imagens antigas..."
             docker image prune -f
