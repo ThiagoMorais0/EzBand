@@ -19,7 +19,6 @@ public interface EstudioService {
     Estudio cadastrar(Estudio toEntity);
     List<Estudio> buscarEstudiosDoUsuario();
     List<Estudio> buscarTodos();
-    void deletarTodos();
     Estudio buscarPorId(Long id);
     void editar(EstudioDTO estudioDTO);
     ResponseEntity<?> cadastrarComImagem(CadastroEstudioDTO estudio, MultipartFile imagem);

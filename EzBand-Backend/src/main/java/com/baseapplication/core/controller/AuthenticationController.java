@@ -17,7 +17,6 @@ import com.baseapplication.core.dto.CadastroDTO;
 import com.baseapplication.core.dto.CadastroUsuarioDTO;
 import com.baseapplication.core.dto.CompletarCadastroGoogleDTO;
 import com.baseapplication.core.dto.GoogleLoginDTO;
-import com.baseapplication.core.dto.InfoUsuarioDTO;
 import com.baseapplication.core.dto.LoginDTO;
 import com.baseapplication.core.exception.ExcResponse;
 import com.baseapplication.core.exception.InternalException;
@@ -93,11 +92,6 @@ public class AuthenticationController {
 	@PostMapping("/validarToken")
 	public boolean validarToken(@RequestBody String token) {
 		return authenticationService.isTokenValid(token);
-	}
-
-	@GetMapping("buscarInfoUsuario")
-	public InfoUsuarioDTO buscarInfoUsuario(@RequestParam String email) {
-		return authenticationService.buscarInfoUsuario(email);
 	}
 
 	@PostMapping("/google")

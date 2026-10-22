@@ -16,7 +16,6 @@ public interface LocalEventoService {
     ResponseEntity<?> cadastrarComImagem(CadastroLocalEventoDTO dto, MultipartFile imagem);
     void editar(LocalEventoDTO dto);
     void deletar(Long id);
-    void deletarTodos();
 
     List<LocalEventoDTO> buscarLocalEventosDoUsuario();
     List<LocalEventoDTO> buscarTodos();

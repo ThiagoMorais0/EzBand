@@ -20,8 +20,6 @@ public interface NotificacaoService {
 
     List<Notificacao> buscarNaoLidas(Long destinatarioId, TipoParticipante destinatarioTipo);
 
-    void deletarTodos();
-
     void enviarNotificacao(NotificacaoEvent notificacaoEvent);
 
     void responderNotificacao(Long idNotificacao, RespostaNotificacaoDTO respostaDTO);

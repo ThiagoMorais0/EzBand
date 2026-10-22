@@ -90,11 +90,6 @@ public class NotificacaoServiceImpl implements NotificacaoService {
     }
 
     @Override
-    public void deletarTodos() {
-        notificacaoDao.deleteAll();
-    }
-
-    @Override
     public void enviarNotificacao(NotificacaoEvent notificacaoEvent) {
         applicationEventPublisher.publishEvent(notificacaoEvent);
     }

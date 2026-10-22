@@ -266,11 +266,6 @@ public class UsuarioServiceImpl implements UsuarioService {
 		reporteDeErroService.reportarErro(mensagem, Context.getUsuarioLogado());
 	}
 
-	@Override
-	public void enviarEmail(EmailDTO email) {
-		emailService.enviarEmail(email.getAssunto(), email.getMensagem(), email.getDestinatario());
-	}
-
     @Override
     public ResponseEntity<?> buscarProximosEventosDoUsuario() {
 		EventosSeparadosDTO eventosSeparadosDTO = buscarProximosEventosAsync(Context.getUsuarioLogado().getId()).join();

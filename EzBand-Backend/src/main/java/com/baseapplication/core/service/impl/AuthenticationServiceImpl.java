@@ -154,11 +154,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	}
 
 	@Override
-	public InfoUsuarioDTO buscarInfoUsuario(String email) {
-		return InfoUsuarioDTO.toDTO(usuarioService.findByEmail(email));
-	}
-
-	@Override
 	@Transactional
 	public ResponseEntity<?> cadastrarUsuarioComImagem(@RequestPart("usuario") CadastroUsuarioDTO cadastroUsuarioDTO,
 			@RequestPart("imagem") MultipartFile imagem) {

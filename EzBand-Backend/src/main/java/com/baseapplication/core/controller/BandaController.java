@@ -78,12 +78,6 @@ public class BandaController {
         }
     }
 
-    @PostMapping("/cadastrarUsuario")
-    public void cadastrarUsuario(@RequestParam Long idBanda, @RequestParam Long idUsuario,
-                                 @RequestParam String instrumentos) {
-        bandaService.cadastrarUsuario(idBanda, idUsuario, instrumentos);
-    }
-
     @PostMapping("/expulsarUsuario")
     public ResponseEntity<?> expulsarUsuario(@RequestParam Long idBanda, @RequestParam Long idUsuario,
                                              @RequestBody(required = false) List<EventoConviteDTO> eventosParaRemover) {

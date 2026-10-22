@@ -98,11 +98,6 @@ public class UsuarioController {
 		}
 	}
 
-	@PostMapping("/enviarEmail")
-	public void enviarEmail(@RequestBody EmailDTO email) {
-		usuarioService.enviarEmail(email);
-	}
-
 	@GetMapping("/buscarProximosEventosDoUsuario")
 	public ResponseEntity<?> buscarProximosEventosDoUsuario(){
 		return usuarioService.buscarProximosEventosDoUsuario();

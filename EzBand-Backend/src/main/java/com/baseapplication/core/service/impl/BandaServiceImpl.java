@@ -109,12 +109,6 @@ public class BandaServiceImpl implements BandaService {
 	}
 
 	@Override
-	public void cadastrarUsuario(Long idBanda, Long idUsuario, String instrumentos) {
-		musicoBandaService.cadastrarUsuarioEmBanda(Context.getUsuarioLogado(), bandaDao.findById(idBanda).get(),
-				instrumentos, List.of(PermissaoMusico.MEMBRO_REGULAR));
-	}
-
-	@Override
 	@Transactional
 	public void expulsarUsuario(Long idBanda, Long idUsuario, List<EventoConviteDTO> eventosParaRemover) {
 		Banda banda = buscarPorId(idBanda);

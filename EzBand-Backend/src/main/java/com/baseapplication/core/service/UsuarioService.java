@@ -5,7 +5,6 @@ import com.baseapplication.core.dto.SeguidorDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.baseapplication.core.dto.EmailDTO;
 import com.baseapplication.core.dto.InfoPerfilUsuarioDTO;
 import com.baseapplication.core.dto.InfoUsuarioPainelDTO;
 import com.baseapplication.core.dto.BuscaGlobalDTO;
@@ -49,8 +48,6 @@ public interface UsuarioService {
 	InfoPerfilUsuarioDTO buscarInformacoesDoPerfilPorId(Long idUsuario);
 
 	void reportarErro(String mensagem);
-
-	void enviarEmail(EmailDTO email);
 
     ResponseEntity<?> buscarProximosEventosDoUsuario();
 

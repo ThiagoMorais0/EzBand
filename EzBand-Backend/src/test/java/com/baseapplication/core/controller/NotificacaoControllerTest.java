@@ -65,15 +65,6 @@ class NotificacaoControllerTest {
     }
 
     @Test
-    @DisplayName("Deve deletar todas as notificações com sucesso")
-    void deveDeletarTodasNotificacoesComSucesso() {
-        doNothing().when(notificacaoService).deletarTodos();
-
-        assertDoesNotThrow(() -> notificacaoController.deletarTodas());
-        verify(notificacaoService, times(1)).deletarTodos();
-    }
-
-    @Test
     @DisplayName("Deve responder notificação com sucesso")
     void deveResponderNotificacaoComSucesso() {
         Long id = 1L;

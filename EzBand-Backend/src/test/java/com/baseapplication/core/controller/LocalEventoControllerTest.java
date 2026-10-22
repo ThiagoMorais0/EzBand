@@ -140,17 +140,6 @@ class LocalEventoControllerTest {
     }
 
     @Test
-    @DisplayName("Deve deletar todos os locais de evento com sucesso")
-    void deveDeletarTodosLocaisEventoComSucesso() {
-        doNothing().when(localEventoService).deletarTodos();
-
-        ResponseEntity resposta = localEventoController.deletarTodos();
-
-        assertEquals(HttpStatus.OK, resposta.getStatusCode());
-        verify(localEventoService, times(1)).deletarTodos();
-    }
-
-    @Test
     @DisplayName("Deve buscar shows por local de evento com sucesso")
     void deveBuscarShowsPorLocalEventoComSucesso() {
         Long idLocalEvento = 1L;

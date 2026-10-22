@@ -195,15 +195,4 @@ public class LocalEventoController {
     public ResponseEntity<?> recusarShow(@RequestParam Long idShow, @RequestParam String motivo) {
         return service.recusarShow(idShow, motivo);
     }
-
-    @GetMapping("/deletarTodos")
-    public ResponseEntity<?> deletarTodos() {
-        try {
-            service.deletarTodos();
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            log.error("Erro em LocalEventoController: {}", e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
 }

@@ -78,11 +78,6 @@ public class LocalEventoServiceImpl implements LocalEventoService {
     }
 
     @Override
-    public void deletarTodos() {
-        dao.deleteAll();
-    }
-
-    @Override
     @Transactional
     public List<LocalEventoDTO> buscarLocalEventosDoUsuario() {
         Long idUsuario = Context.getUsuarioLogado().getId();

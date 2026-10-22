@@ -114,16 +114,4 @@ class AuthenticationControllerTest {
         assertFalse(resultado);
         verify(authenticationService, times(1)).isTokenValid(token);
     }
-
-    @Test
-    @DisplayName("Deve buscar informações do usuário com sucesso")
-    void deveBuscarInformacoesDoUsuarioComSucesso() {
-        String email = "teste@teste.com";
-        when(authenticationService.buscarInfoUsuario(anyString())).thenReturn(infoUsuarioDTO);
-
-        InfoUsuarioDTO resultado = authenticationController.buscarInfoUsuario(email);
-
-        assertNotNull(resultado);
-        verify(authenticationService, times(1)).buscarInfoUsuario(email);
-    }
 }

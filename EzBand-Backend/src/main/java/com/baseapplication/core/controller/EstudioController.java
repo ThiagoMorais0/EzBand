@@ -66,16 +66,6 @@ public class EstudioController {
         }
     }
 
-    @GetMapping("/deletarTodos")
-    public ResponseEntity<?> deletarTodos(){
-        try{
-            service.deletarTodos();
-            return ResponseEntity.ok().build();
-        }catch (Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
     @PostMapping("/cadastrarComImagem")
     public ResponseEntity<?> cadastrarComImagem(@RequestParam("dados") String estudioJson,
                                                 @RequestParam(value = "imagem", required = false) MultipartFile imagem) {

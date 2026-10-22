@@ -53,11 +53,6 @@ public class NotificacaoController {
        notificacaoService.enviarNotificacaoSink(notificacao);
     }
 
-    @GetMapping("/deletarTodas")
-    public void deletarTodas(){
-        notificacaoService.deletarTodos();
-    }
-
     @PostMapping("/responder/{id}")
     public ResponseEntity<Void> responder(
             @PathVariable Long id,

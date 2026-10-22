@@ -26,8 +26,6 @@ public interface BandaService {
 
     BandaDTO getInfo(Long idBanda);
 
-    void cadastrarUsuario(Long idBanda, Long idUsuario, String instrumentos);
-
     void expulsarUsuario(Long idBanda, Long idUsuario, List<EventoConviteDTO> eventosParaRemover);
 
     List<EventoPendenteConviteDTO> buscarEventosDoMembro(Long idBanda, Long idUsuario);

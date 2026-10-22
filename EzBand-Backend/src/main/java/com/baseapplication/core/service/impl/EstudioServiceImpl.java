@@ -81,11 +81,6 @@ public class EstudioServiceImpl implements EstudioService {
     }
 
     @Override
-    public void deletarTodos() {
-        dao.deleteAll();
-    }
-
-    @Override
     public Estudio buscarPorId(Long id) {
         return dao.findById(id).orElse(null);
     }

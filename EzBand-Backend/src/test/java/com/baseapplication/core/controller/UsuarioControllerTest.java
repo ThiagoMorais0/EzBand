@@ -183,15 +183,6 @@ class UsuarioControllerTest {
     }
 
     @Test
-    @DisplayName("Deve enviar email com sucesso")
-    void deveEnviarEmailComSucesso() {
-        doNothing().when(usuarioService).enviarEmail(any(EmailDTO.class));
-
-        assertDoesNotThrow(() -> usuarioController.enviarEmail(emailDTO));
-        verify(usuarioService, times(1)).enviarEmail(emailDTO);
-    }
-
-    @Test
     @DisplayName("Deve buscar próximos eventos do usuário com sucesso")
     void deveBuscarProximosEventosDoUsuarioComSucesso() {
         ResponseEntity respostaEsperada = ResponseEntity.ok().build();

@@ -85,18 +85,6 @@ class BandaControllerTest {
     }
 
     @Test
-    @DisplayName("Deve cadastrar usuário na banda com sucesso")
-    void deveCadastrarUsuarioNaBandaComSucesso() {
-        Long idBanda = 1L;
-        Long idUsuario = 1L;
-        String instrumentos = "Guitarra";
-        doNothing().when(bandaService).cadastrarUsuario(anyLong(), anyLong(), anyString());
-
-        assertDoesNotThrow(() -> bandaController.cadastrarUsuario(idBanda, idUsuario, instrumentos));
-        verify(bandaService, times(1)).cadastrarUsuario(idBanda, idUsuario, instrumentos);
-    }
-
-    @Test
     @DisplayName("Deve expulsar usuário da banda com sucesso")
     void deveExpulsarUsuarioDaBandaComSucesso() {
         Long idBanda = 1L;

@@ -126,17 +126,6 @@ class EstudioControllerTest {
     }
 
     @Test
-    @DisplayName("Deve deletar todos os estúdios com sucesso")
-    void deveDeletarTodosEstudiosComSucesso() {
-        doNothing().when(estudioService).deletarTodos();
-
-        ResponseEntity resposta = estudioController.deletarTodos();
-
-        assertEquals(HttpStatus.OK, resposta.getStatusCode());
-        verify(estudioService, times(1)).deletarTodos();
-    }
-
-    @Test
     @DisplayName("Deve cadastrar estúdio com imagem com sucesso")
     void deveCadastrarEstudioComImagemComSucesso() {
         String estudioJson = "{\"nome\":\"Estudio Teste\"}";
