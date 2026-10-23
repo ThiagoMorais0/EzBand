@@ -139,14 +139,23 @@ public interface UsuarioDao extends JpaRepository<Usuario, Long> {
 """)
     List<EnsaioDTO> buscarEnsaiosEspeciais(Long idUsuario);
 
+    // translate() remove acentos dos dois lados, para "joao" encontrar "João"
     @Query(value = """
-            SELECT id, nome, 'USUARIO' as tipo, url_foto_perfil as urlFoto FROM usuario WHERE nome ILIKE %:termo%
+            SELECT id, nome, 'USUARIO' as tipo, url_foto_perfil as urlFoto FROM usuario
+              WHERE translate(lower(nome), 'áàâãäéèêëíìîïóòôõöúùûüçñ', 'aaaaaeeeeiiiiooooouuuucn')
+                    LIKE '%' || translate(lower(:termo), 'áàâãäéèêëíìîïóòôõöúùûüçñ', 'aaaaaeeeeiiiiooooouuuucn') || '%'
             UNION ALL
-            SELECT id, nome, 'BANDA' as tipo, url_logo as urlFoto FROM banda WHERE nome ILIKE %:termo%
+            SELECT id, nome, 'BANDA' as tipo, url_logo as urlFoto FROM banda
+              WHERE translate(lower(nome), 'áàâãäéèêëíìîïóòôõöúùûüçñ', 'aaaaaeeeeiiiiooooouuuucn')
+                    LIKE '%' || translate(lower(:termo), 'áàâãäéèêëíìîïóòôõöúùûüçñ', 'aaaaaeeeeiiiiooooouuuucn') || '%'
             UNION ALL
-            SELECT id, nome, 'ESTUDIO' as tipo, url_foto_perfil as urlFoto FROM estudio WHERE nome ILIKE %:termo%
+            SELECT id, nome, 'ESTUDIO' as tipo, url_foto_perfil as urlFoto FROM estudio
+              WHERE translate(lower(nome), 'áàâãäéèêëíìîïóòôõöúùûüçñ', 'aaaaaeeeeiiiiooooouuuucn')
+                    LIKE '%' || translate(lower(:termo), 'áàâãäéèêëíìîïóòôõöúùûüçñ', 'aaaaaeeeeiiiiooooouuuucn') || '%'
             UNION ALL
-            SELECT id, nome, 'LOCAL_EVENTO' as tipo, url_foto_perfil as urlFoto FROM local_evento WHERE nome ILIKE %:termo%
+            SELECT id, nome, 'LOCAL_EVENTO' as tipo, url_foto_perfil as urlFoto FROM local_evento
+              WHERE translate(lower(nome), 'áàâãäéèêëíìîïóòôõöúùûüçñ', 'aaaaaeeeeiiiiooooouuuucn')
+                    LIKE '%' || translate(lower(:termo), 'áàâãäéèêëíìîïóòôõöúùûüçñ', 'aaaaaeeeeiiiiooooouuuucn') || '%'
             LIMIT 50
             """, nativeQuery = true)
     List<BuscaGlobalProjection> buscarGlobal(String termo);

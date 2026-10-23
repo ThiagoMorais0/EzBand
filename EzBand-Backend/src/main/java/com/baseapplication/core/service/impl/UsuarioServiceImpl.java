@@ -332,11 +332,18 @@ public class UsuarioServiceImpl implements UsuarioService {
 				)).toList();
 
 		LevenshteinDistance levenshtein = new LevenshteinDistance();
+		String termoNormalizado = normalizarBusca(termo);
 
 		return resultados.stream()
-				.sorted(Comparator.comparingInt(dto -> levenshtein.apply(termo.toLowerCase(), dto.getNome().toLowerCase())))
+				.sorted(Comparator.comparingInt(dto -> levenshtein.apply(termoNormalizado, normalizarBusca(dto.getNome()))))
 				.limit(20)
 				.collect(Collectors.toList());
+	}
+
+	private static String normalizarBusca(String texto) {
+		return java.text.Normalizer.normalize(texto, java.text.Normalizer.Form.NFD)
+				.replaceAll("\\p{M}", "")
+				.toLowerCase();
 	}
 
 	@Override
