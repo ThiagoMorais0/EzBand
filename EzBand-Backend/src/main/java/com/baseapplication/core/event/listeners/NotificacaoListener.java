@@ -86,7 +86,8 @@ public class NotificacaoListener {
             return;
         }
 
-        if(notificacao instanceof NovoEventoMarcado){
+        // Avisos de baixa urgencia: ficam so no app e no push, sem mensagem no WhatsApp.
+        if(notificacao instanceof NovoEventoMarcado || notificacao instanceof NovoSeguidor){
             return;
         }
 
