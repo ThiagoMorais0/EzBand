@@ -36,7 +36,8 @@ public interface UsuarioService {
 
 	Boolean verificarEmailJaCadastrado(String email);
 
-	InfoPerfilUsuarioDTO editarUsuarioComImagem(String usuarioJson, MultipartFile imagem, Boolean removerImagemDePerfil);
+	InfoPerfilUsuarioDTO editarUsuarioComImagem(String usuarioJson, MultipartFile imagem, Boolean removerImagemDePerfil,
+			MultipartFile banner, Boolean removerBanner);
 
 
 	void enviarSolicitacaoParaIngressarBanda(Long idBanda, String instrumento);

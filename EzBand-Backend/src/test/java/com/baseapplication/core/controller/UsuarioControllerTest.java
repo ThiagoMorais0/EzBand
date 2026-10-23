@@ -89,12 +89,12 @@ class UsuarioControllerTest {
         Boolean removerImagemDePerfil = false;
         InfoPerfilUsuarioDTO dtoRetorno = new InfoPerfilUsuarioDTO();
 
-        when(usuarioService.editarUsuarioComImagem(anyString(), any(), anyBoolean())).thenReturn(dtoRetorno);
+        when(usuarioService.editarUsuarioComImagem(anyString(), any(), anyBoolean(), any(), any())).thenReturn(dtoRetorno);
 
-        ResponseEntity resposta = usuarioController.editarUsuarioComImagem(usuarioJson, imagem, removerImagemDePerfil);
+        ResponseEntity resposta = usuarioController.editarUsuarioComImagem(usuarioJson, imagem, removerImagemDePerfil, null, false);
 
         assertEquals(HttpStatus.OK, resposta.getStatusCode());
-        verify(usuarioService, times(1)).editarUsuarioComImagem(usuarioJson, imagem, removerImagemDePerfil);
+        verify(usuarioService, times(1)).editarUsuarioComImagem(usuarioJson, imagem, removerImagemDePerfil, null, false);
     }
 
     @Test
@@ -104,10 +104,10 @@ class UsuarioControllerTest {
         MultipartFile imagem = mock(MultipartFile.class);
         Boolean removerImagemDePerfil = false;
 
-        when(usuarioService.editarUsuarioComImagem(anyString(), any(), anyBoolean()))
+        when(usuarioService.editarUsuarioComImagem(anyString(), any(), anyBoolean(), any(), any()))
                 .thenThrow(new RuntimeException("Erro"));
 
-        ResponseEntity resposta = usuarioController.editarUsuarioComImagem(usuarioJson, imagem, removerImagemDePerfil);
+        ResponseEntity resposta = usuarioController.editarUsuarioComImagem(usuarioJson, imagem, removerImagemDePerfil, null, false);
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, resposta.getStatusCode());
     }

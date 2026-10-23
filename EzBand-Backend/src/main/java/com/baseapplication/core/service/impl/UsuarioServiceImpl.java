@@ -131,7 +131,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 			throw new ResourceNotFoundException("Usuário não encontrado");
 		if (usuario.getId() != infoPerfil.getId())
 			throw new InvalidParamException("ID e e-mail divergentes");
-		BeanUtils.copyProperties(infoPerfil, usuario);
+		BeanUtils.copyProperties(infoPerfil, usuario, "urlBanner");
 		usuarioDao.save(usuario);
 	}
 
@@ -168,7 +168,8 @@ public class UsuarioServiceImpl implements UsuarioService {
 
 	@Override
 	@jakarta.transaction.Transactional
-	public InfoPerfilUsuarioDTO editarUsuarioComImagem(String usuarioJson, MultipartFile imagem, Boolean removerImagemDePerfil) {
+	public InfoPerfilUsuarioDTO editarUsuarioComImagem(String usuarioJson, MultipartFile imagem, Boolean removerImagemDePerfil,
+			MultipartFile banner, Boolean removerBanner) {
 		InfoPerfilUsuarioDTO usuarioDTO = null;
 		try {
 			usuarioDTO = new ObjectMapper().readValue(usuarioJson, InfoPerfilUsuarioDTO.class);
@@ -187,13 +188,25 @@ public class UsuarioServiceImpl implements UsuarioService {
 			imagemService.deletarImagemPorUrl(urlImagem);
 			urlImagem = "default";
 		}
+		String urlBanner = usuario.getUrlBanner();
+		if (banner != null) {
+			String urlBannerAntigo = urlBanner;
+			urlBanner = imagemService.saveImageAndGetUrl(banner, "userbanners",
+					usuario.getId() + "_" + System.currentTimeMillis() + "." + FileUtils.getSufix(banner));
+			imagemService.deletarImagemPorUrl(urlBannerAntigo);
+		} else if (Boolean.TRUE.equals(removerBanner)) {
+			imagemService.deletarImagemPorUrl(urlBanner);
+			urlBanner = null;
+		}
 		List<String> tiposUsuarioAtual = usuario.getTiposUsuario();
 		BeanUtils.copyProperties(usuarioDTO, usuario);
 		usuario.setTiposUsuario(tiposUsuarioAtual);
 		usuario.setUrlFotoPerfil(urlImagem);
+		usuario.setUrlBanner(urlBanner);
 		usuario.setAtivo(true);
 		usuarioDao.save(usuario);
 		usuarioDTO.setUrlFotoPerfil(urlImagem);
+		usuarioDTO.setUrlBanner(urlBanner);
 		return usuarioDTO;
 	}
 

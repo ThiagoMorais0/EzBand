@@ -43,9 +43,11 @@ public class UsuarioController {
 	public ResponseEntity<?> editarUsuarioComImagem(
 			@RequestParam("usuario") String usuarioJson,
 			@RequestParam(required = false) MultipartFile imagem,
-			@RequestParam Boolean removerImagemDePerfil) {
+			@RequestParam Boolean removerImagemDePerfil,
+			@RequestParam(required = false) MultipartFile banner,
+			@RequestParam(required = false, defaultValue = "false") Boolean removerBanner) {
 		try {
-			Object dto = usuarioService.editarUsuarioComImagem(usuarioJson, imagem, removerImagemDePerfil);
+			Object dto = usuarioService.editarUsuarioComImagem(usuarioJson, imagem, removerImagemDePerfil, banner, removerBanner);
 			return ResponseEntity.ok()
 					.contentType(MediaType.APPLICATION_JSON)
 					.body(dto);

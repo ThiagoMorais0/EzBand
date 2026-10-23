@@ -32,6 +32,7 @@ public class InfoPerfilUsuarioDTO {
     private String cidade;
     private String descricao;
     private String urlFotoPerfil;
+    private String urlBanner;
     private String instrumentos;
     private TipoRelacionamento tipoRelacionamento;
     private Long quantidadeSeguidores;

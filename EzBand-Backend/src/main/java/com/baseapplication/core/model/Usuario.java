@@ -50,6 +50,7 @@ public class Usuario implements UserDetails {
     @Enumerated(EnumType.STRING)
     private PermissaoUsuario permissao;
     private String urlFotoPerfil;
+    private String urlBanner;
     private LocalDateTime dataUltimoLogin;
     private Boolean celularValidado = false;
     private Boolean cadastroCompleto = true;

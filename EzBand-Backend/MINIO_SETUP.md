@@ -7,6 +7,7 @@ O projeto utiliza **6 buckets** no MinIO:
 1. **`profilepictures`** - Fotos de perfil de usuários e membros fantasma
 2. **`bandlogos`** - Logos das bandas
 3. **`bandbanners`** - Banners das bandas (imagem de capa do perfil)
+   - **`userbanners`** - Banners dos usuários (imagem de capa do perfil público)
 4. **`userposts`** - Imagens de publicações (posts de usuários e bandas)
 5. **`venuelogo`** - Logos de locais de eventos (venues)
 6. **`studiologo`** - Logos de estúdios
@@ -38,6 +39,7 @@ Execute os comandos abaixo para criar todos os buckets:
 mc mb myminio/profilepictures
 mc mb myminio/bandlogos
 mc mb myminio/bandbanners
+mc mb myminio/userbanners
 mc mb myminio/userposts
 mc mb myminio/venuelogo
 mc mb myminio/studiologo
@@ -53,6 +55,7 @@ Para permitir que as imagens sejam acessíveis publicamente via URL direta, conf
 mc anonymous set download myminio/profilepictures
 mc anonymous set download myminio/bandlogos
 mc anonymous set download myminio/bandbanners
+mc anonymous set download myminio/userbanners
 mc anonymous set download myminio/userposts
 mc anonymous set download myminio/venuelogo
 mc anonymous set download myminio/studiologo
@@ -70,6 +73,7 @@ mc alias set myminio http://localhost:9000 minioadmin minioadmin
 mc mb myminio/profilepictures
 mc mb myminio/bandlogos
 mc mb myminio/bandbanners
+mc mb myminio/userbanners
 mc mb myminio/userposts
 mc mb myminio/venuelogo
 mc mb myminio/studiologo
@@ -78,6 +82,7 @@ mc mb myminio/studiologo
 mc anonymous set download myminio/profilepictures
 mc anonymous set download myminio/bandlogos
 mc anonymous set download myminio/bandbanners
+mc anonymous set download myminio/userbanners
 mc anonymous set download myminio/userposts
 mc anonymous set download myminio/venuelogo
 mc anonymous set download myminio/studiologo
