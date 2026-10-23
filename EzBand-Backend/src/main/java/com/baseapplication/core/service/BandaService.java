@@ -47,6 +47,8 @@ public interface BandaService {
 
     void sairDaBanda(Long idBanda, Long id);
 
+    void excluirBanda(Long idBanda, Long idUsuario);
+
     ShowsFuturosDTO buscarShowsFuturosBanda(Long idBanda, Long idUsuario) ;
 
     Banda buscarPorId(Long idBanda);

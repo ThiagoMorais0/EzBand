@@ -157,6 +157,9 @@ public class ConviteBandaServiceImpl implements ConviteBandaService {
 
     private ConviteExternoPreviewDTO previewDeConviteExterno(ConviteExternoBanda convite) {
         Banda banda = convite.getBanda();
+        if (banda.estaExcluida()) {
+            return ConviteExternoPreviewDTO.invalido("A banda deste convite não existe mais.");
+        }
         ConviteExternoPreviewDTO dto = montarPreview(banda, convite.getInstrumento(), convite.getEventos());
         dto.setNomeRemetente(nomeUsuario(convite.getIdUsuarioRemetente()));
 
@@ -176,7 +179,7 @@ public class ConviteBandaServiceImpl implements ConviteBandaService {
     }
 
     private ConviteExternoPreviewDTO previewDeNotificacao(ConviteParaUsuarioIngressarBanda convite) {
-        Banda banda = bandaDao.findById(convite.getRemetenteId()).orElse(null);
+        Banda banda = bandaDao.findById(convite.getRemetenteId()).filter(b -> !b.estaExcluida()).orElse(null);
         if (banda == null) {
             return ConviteExternoPreviewDTO.invalido("A banda deste convite não existe mais.");
         }
@@ -284,6 +287,9 @@ public class ConviteBandaServiceImpl implements ConviteBandaService {
 
     private ConviteAceitoDTO aceitarConviteExterno(ConviteExternoBanda convite, Usuario usuarioLogado) {
         Banda banda = convite.getBanda();
+        if (banda.estaExcluida()) {
+            throw new ResourceNotFoundException("Banda não encontrada. Ela pode ter sido deletada.");
+        }
         boolean jaEraMembro = ehMembro(usuarioLogado.getId(), banda.getId());
 
         // Reabrir o proprio link depois de aceito e comum (WhatsApp, historico do navegador):
@@ -447,6 +453,7 @@ public class ConviteBandaServiceImpl implements ConviteBandaService {
 
     private Banda buscarBanda(Long idBanda) {
         return bandaDao.findById(idBanda)
+                .filter(banda -> !banda.estaExcluida())
                 .orElseThrow(() -> new ResourceNotFoundException("Banda não encontrada. Ela pode ter sido deletada."));
     }
 

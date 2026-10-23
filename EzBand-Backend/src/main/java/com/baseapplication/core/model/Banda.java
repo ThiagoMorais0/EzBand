@@ -41,6 +41,10 @@ public class Banda implements Serializable {
     private String nacionalidade;
     // Ano em que a banda foi fundada. Opcional: nao confundir com dataInclusao (entrada no EzBand).
     private Integer anoFundacao;
+    // Exclusao logica: a banda tem FK em eventos, notificacoes, orcamentos etc., entao some
+    // para todo mundo sem apagar o historico. Nullable para o ddl-auto conseguir criar a coluna.
+    private Boolean excluida;
+    private LocalDate dataExclusao;
     // Opcional: quando nulo, o perfil simplesmente nao exibe o tipo de repertorio.
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
@@ -75,6 +79,10 @@ public class Banda implements Serializable {
 
     @OneToMany(mappedBy = "banda", fetch = FetchType.EAGER)
     private List<MembroFantasma> membrosFantasma;
+
+    public boolean estaExcluida() {
+        return Boolean.TRUE.equals(excluida);
+    }
 
     public List<Usuario> getUsuariosMusicos() {
         return musicos.stream().map(MusicoBanda::getUsuario).collect(Collectors.toList());

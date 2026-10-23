@@ -22,6 +22,7 @@ public interface BandaDao extends JpaRepository<Banda, Long> {
             "INNER JOIN Show s on s.banda.id = b.id " +
             "INNER JOIN MusicoEvento me on me.id.idEvento = s.id " +
             "WHERE me.id.idUsuario = :idUsuario " +
+            "AND (b.excluida IS NULL OR b.excluida = false) " +
             "AND s.banda.id NOT IN (SELECT m.banda.id FROM MusicoBanda m where m.usuario.id = :idUsuario)")
     Optional<List<Banda>> buscarParticipacoesEspeciais(Long idUsuario);
 
@@ -69,6 +70,7 @@ public interface BandaDao extends JpaRepository<Banda, Long> {
     Integer buscarQuantidadeDeMusicasNoRepertorio(Long idBanda);
 
     @Query("SELECT b FROM Banda b " +
-            "WHERE (:#{#dto.nome} IS NULL OR :#{#dto.nome} = '' OR LOWER(b.nome) LIKE LOWER(CONCAT('%', :#{#dto.nome}, '%')))")
+            "WHERE (b.excluida IS NULL OR b.excluida = false) " +
+            "AND (:#{#dto.nome} IS NULL OR :#{#dto.nome} = '' OR LOWER(b.nome) LIKE LOWER(CONCAT('%', :#{#dto.nome}, '%')))")
     List<Banda> buscarSugestoes(@Param("dto") BuscaBandaDTO dto);
 }

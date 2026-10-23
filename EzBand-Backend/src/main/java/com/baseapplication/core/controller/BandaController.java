@@ -162,6 +162,13 @@ public class BandaController {
         }
     }
 
+    @PostMapping("/excluirBanda")
+    public ResponseEntity<?> excluirBanda(@RequestParam Long idBanda) {
+        // Sem try/catch generico: a RestrictionException (nao e fundador) sai como 403 pelo handler global.
+        bandaService.excluirBanda(idBanda, Context.getUsuarioLogado().getId());
+        return ResponseEntity.ok("Banda excluída com sucesso");
+    }
+
     @GetMapping("/buscarShowsFuturosBanda")
     public ShowsFuturosDTO buscarShowsFuturosBanda(@RequestParam Long idBanda) {
         return bandaService.buscarShowsFuturosBanda(idBanda, Context.getUsuarioLogado().getId());

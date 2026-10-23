@@ -104,7 +104,8 @@ public class BandaServiceImpl implements BandaService {
 	@Override
 	public BandaDTO getInfo(Long idBanda) {
 		return new BandaDTO(
-				bandaDao.findById(idBanda).orElseThrow(() -> new ResourceNotFoundException("Banda não encontrada")),
+				bandaDao.findById(idBanda).filter(banda -> !banda.estaExcluida())
+						.orElseThrow(() -> new ResourceNotFoundException("Banda não encontrada")),
 				Context.getUsuarioLogado().getId());
 	}
 
@@ -509,7 +510,7 @@ public class BandaServiceImpl implements BandaService {
 	@Override
 	public ResponseEntity<?> buscarBandaParaIngressar(Long idBanda) {
 		Banda banda = buscarPorId(idBanda);
-		if (banda == null) {
+		if (banda == null || banda.estaExcluida()) {
 			return ResponseEntity.status(404).body("Banda não existe");
 		}
 		try {
@@ -559,6 +560,38 @@ public class BandaServiceImpl implements BandaService {
 		} else {
 			musicoBandaService.expulsar(idBanda, idUsuario);
 		}
+	}
+
+	/**
+	 * Exclusao logica, so para o fundador: cancela os eventos futuros, tira todos os membros
+	 * (a banda some do painel de todo mundo) e marca a banda como excluida, o que a esconde
+	 * da busca, do perfil e dos convites. Eventos passados ficam como historico.
+	 */
+	@Override
+	@Transactional
+	public void excluirBanda(Long idBanda, Long idUsuario) {
+		MusicoBanda solicitante = musicoBandaService.buscarPorIdUsuarioEIdBanda(idUsuario, idBanda);
+		if (solicitante == null || !solicitante.getPermissoes().contains(PermissaoMusico.FUNDADOR))
+			throw new RestrictionException("Somente o fundador pode excluir a banda.");
+
+		Banda banda = buscarPorId(idBanda);
+		cancelarEventosFuturos(idBanda);
+		for (MusicoBanda musico : List.copyOf(banda.getMusicos())) {
+			musicoBandaService.expulsar(idBanda, musico.getId().getIdUsuario());
+		}
+		banda.setExcluida(true);
+		banda.setDataExclusao(LocalDate.now());
+		bandaDao.save(banda);
+	}
+
+	private void cancelarEventosFuturos(Long idBanda) {
+		List<Show> shows = showDao.buscarFuturosNaoRealizadosPorBanda(idBanda);
+		shows.forEach(show -> show.setStatus(StatusEvento.CANCELADO));
+		showDao.saveAll(shows);
+
+		List<Ensaio> ensaios = ensaioDao.buscarFuturosNaoRealizadosPorBanda(idBanda);
+		ensaios.forEach(ensaio -> ensaio.setStatus(StatusEvento.CANCELADO));
+		ensaioDao.saveAll(ensaios);
 	}
 
 	@Override
